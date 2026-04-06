@@ -15,7 +15,12 @@ class User extends Authenticatable {
     public $timestamps = false;
 
     protected $fillable = [
-        "name",
+        "nombre_1",
+        "nombre_2",
+        "apellido_1",
+        "apellido_2",
+        "cargo",
+        "rut",
         "email",
         "password",
     ];
@@ -25,10 +30,23 @@ class User extends Authenticatable {
         "remember_token",
     ];
 
+    protected $appends = [
+        "name",
+    ];
+
     protected $casts = [
         "email_verified_at" => "datetime",
         "password" => "hashed",
     ];
+
+    public function getNameAttribute(): string {
+        return trim(implode(" ", [
+            $this->nombre_1,
+            $this->nombre_2,
+            $this->apellido_1,
+            $this->apellido_2,
+        ]));
+    }
 
     public function roles(): BelongsToMany {
         return $this->belongsToMany(Rol::class, "usuarios_tienen_roles", "id_usuario", "id_rol");

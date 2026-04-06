@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string("apellido_1");
             $table->string("apellido_2");
             $table->string("cargo");
-            $table->string("rut");
+            $table->string("rut")->unique();
 
             $table->string("email")->unique();
             $table->timestamp("email_verified_at")->nullable();
