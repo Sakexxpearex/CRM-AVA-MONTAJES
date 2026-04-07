@@ -6,22 +6,22 @@ Paleta AVA para usar en Tailwind.
 
 | Token | Hex | Preview |
 | --- | --- | --- |
-| `gris-1` | `#7A7F85` | <span style="display:inline-block;width:48px;height:16px;background:#7A7F85;border:1px solid #ccc;"></span> |
-| `gris-2` | `#2D3238` | <span style="display:inline-block;width:48px;height:16px;background:#2D3238;border:1px solid #ccc;"></span> |
-| `verde-1` | `#F3FAEC` | <span style="display:inline-block;width:48px;height:16px;background:#F3FAEC;border:1px solid #ccc;"></span> |
-| `verde-2` | `#ECF3E5` | <span style="display:inline-block;width:48px;height:16px;background:#ECF3E5;border:1px solid #ccc;"></span> |
-| `verde-3` | `#DBE0D5` | <span style="display:inline-block;width:48px;height:16px;background:#DBE0D5;border:1px solid #ccc;"></span> |
-| `verde-4` | `#C1F75E` | <span style="display:inline-block;width:48px;height:16px;background:#C1F75E;border:1px solid #ccc;"></span> |
-| `verde-5` | `#A0F700` | <span style="display:inline-block;width:48px;height:16px;background:#A0F700;border:1px solid #ccc;"></span> |
-| `verde-6` | `#86CF00` | <span style="display:inline-block;width:48px;height:16px;background:#86CF00;border:1px solid #ccc;"></span> |
-| `rojo-1` | `#F80000` | <span style="display:inline-block;width:48px;height:16px;background:#F80000;border:1px solid #ccc;"></span> |
-| `rojo-2` | `#B70000` | <span style="display:inline-block;width:48px;height:16px;background:#B70000;border:1px solid #ccc;"></span> |
-| `naranjo-1` | `#FF5900` | <span style="display:inline-block;width:48px;height:16px;background:#FF5900;border:1px solid #ccc;"></span> |
-| `amarillo-1` | `#FFCB00` | <span style="display:inline-block;width:48px;height:16px;background:#FFCB00;border:1px solid #ccc;"></span> |
-| `azul-1` | `#008DE7` | <span style="display:inline-block;width:48px;height:16px;background:#008DE7;border:1px solid #ccc;"></span> |
-| `azul-2` | `#04008b` | <span style="display:inline-block;width:48px;height:16px;background:#04008b;border:1px solid #ccc;"></span> |
-| `indigo-1` | `#6F00FF` | <span style="display:inline-block;width:48px;height:16px;background:#6F00FF;border:1px solid #ccc;"></span> |
-| `morado-1` | `#800080` | <span style="display:inline-block;width:48px;height:16px;background:#800080;border:1px solid #ccc;"></span> |
+| `gris-1` | `#7A7F85` | ![#7A7F85](https://placehold.co/48x16/7A7F85/7A7F85.png) |
+| `gris-2` | `#2D3238` | ![#2D3238](https://placehold.co/48x16/2D3238/2D3238.png) |
+| `verde-1` | `#F3FAEC` | ![#F3FAEC](https://placehold.co/48x16/F3FAEC/F3FAEC.png) |
+| `verde-2` | `#ECF3E5` | ![#ECF3E5](https://placehold.co/48x16/ECF3E5/ECF3E5.png) |
+| `verde-3` | `#DBE0D5` | ![#DBE0D5](https://placehold.co/48x16/DBE0D5/DBE0D5.png) |
+| `verde-4` | `#C1F75E` | ![#C1F75E](https://placehold.co/48x16/C1F75E/C1F75E.png) |
+| `verde-5` | `#A0F700` | ![#A0F700](https://placehold.co/48x16/A0F700/A0F700.png) |
+| `verde-6` | `#86CF00` | ![#86CF00](https://placehold.co/48x16/86CF00/86CF00.png) |
+| `rojo-1` | `#F80000` | ![#F80000](https://placehold.co/48x16/F80000/F80000.png) |
+| `rojo-2` | `#B70000` | ![#B70000](https://placehold.co/48x16/B70000/B70000.png) |
+| `naranjo-1` | `#FF5900` | ![#FF5900](https://placehold.co/48x16/FF5900/FF5900.png) |
+| `amarillo-1` | `#FFCB00` | ![#FFCB00](https://placehold.co/48x16/FFCB00/FFCB00.png) |
+| `azul-1` | `#008DE7` | ![#008DE7](https://placehold.co/48x16/008DE7/008DE7.png) |
+| `azul-2` | `#04008b` | ![#04008b](https://placehold.co/48x16/04008B/04008B.png) |
+| `indigo-1` | `#6F00FF` | ![#6F00FF](https://placehold.co/48x16/6F00FF/6F00FF.png) |
+| `morado-1` | `#800080` | ![#800080](https://placehold.co/48x16/800080/800080.png) |
 
 ## CDN de SVGs
 
