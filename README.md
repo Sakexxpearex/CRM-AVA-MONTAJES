@@ -18,7 +18,7 @@ chown -R www-data:www-data /var/www/app
 chmod -R 775 /var/www/app/storage
 chmod -R 775 /var/www/app/bootstrap/cache/
 ```
-|
+
 Ejecutar migracion inicial:
 
 ```bash
@@ -72,3 +72,10 @@ php artisan migrate
 - `nunomaduro/collision`: mejor salida de errores en consola.
 - `laravel/pail`: visor en tiempo real de logs.
 - `laravel/breeze` + `laravel/ui`: scaffolding de autenticacion y UI base.
+
+
+## Normas gráficas
+
+La documentación visual y el catálogo de assets viven en:
+
+- [Normas gráficas y assets](./docs/normas-graficas.md)
