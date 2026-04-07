@@ -55,4 +55,5 @@ Base URL: `https://cdn.intrava.cl/v2/logos/`
 
 ## Documentación
 
-Descargar normas gráficas AVA: [normas_graficas.zip](https://cdn.intrava.cl/v2/normas_graficas.zip)
+- PDF normas gráficas: [Ava_Manual_2024.pdf](https://cdn.intrava.cl/v2/Ava_Manual_2024.pdf)
+- ZIP completo normas gráficas: [normas_graficas.zip](https://cdn.intrava.cl/v2/normas_graficas.zip)
