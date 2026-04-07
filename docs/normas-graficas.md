@@ -31,7 +31,7 @@ Base URL: `https://cdn.intrava.cl/v2/logos/`
 | --- | --- | --- |
 | `blanco-original.svg` | [abrir](https://cdn.intrava.cl/v2/logos/blanco-original.svg) | <img src="https://cdn.intrava.cl/v2/logos/blanco-original.svg" alt="blanco-original" height="48" /> |
 | `blanco.svg` | [abrir](https://cdn.intrava.cl/v2/logos/blanco.svg) | <img src="https://cdn.intrava.cl/v2/logos/blanco.svg" alt="blanco" height="48" /> |
-| `fecha-verde.svg` | [abrir](https://cdn.intrava.cl/v2/logos/fecha-verde.svg) | <img src="https://cdn.intrava.cl/v2/logos/fecha-verde.svg" alt="fecha-verde" height="48" /> |
+| `flecha-verde.svg` | [abrir](https://cdn.intrava.cl/v2/logos/flecha-verde.svg) | <img src="https://cdn.intrava.cl/v2/logos/flecha-verde.svg" alt="flecha-verde" height="48" /> |
 | `isotipo-blanco-verde.svg` | [abrir](https://cdn.intrava.cl/v2/logos/isotipo-blanco-verde.svg) | <img src="https://cdn.intrava.cl/v2/logos/isotipo-blanco-verde.svg" alt="isotipo-blanco-verde" height="48" /> |
 | `isotipo-blanco.svg` | [abrir](https://cdn.intrava.cl/v2/logos/isotipo-blanco.svg) | <img src="https://cdn.intrava.cl/v2/logos/isotipo-blanco.svg" alt="isotipo-blanco" height="48" /> |
 | `isotipo-negro-verde-original.svg` | [abrir](https://cdn.intrava.cl/v2/logos/isotipo-negro-verde-original.svg) | <img src="https://cdn.intrava.cl/v2/logos/isotipo-negro-verde-original.svg" alt="isotipo-negro-verde-original" height="48" /> |
