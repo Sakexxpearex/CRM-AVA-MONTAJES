@@ -3,6 +3,7 @@
 use Illuminate\Support\Str;
 
 $postgres = [
+    "public",
     "usuarios",
     "laravel",
 ];
@@ -40,7 +41,7 @@ return [
     |
     */
 
-    "default" => env("DB_CONNECTION", "usuarios"),
+    "default" => env("DB_CONNECTION", "public"),
 
     /*
     |--------------------------------------------------------------------------
@@ -150,7 +151,7 @@ return [
     */
 
     "migrations" => [
-        "table" => "laravel.migrations",
+        "table" => "migrations",
         "update_date_on_publish" => true,
     ],
 
