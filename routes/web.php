@@ -1,7 +1,14 @@
 <?php
 
+use App\Http\Controllers\EmpresaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+Route::apiResource('empresas', EmpresaController::class);
+
+Route::get('/test', function () {
+    return 'ok';
+});
 
 Route::get('/', function () {
     return Inertia::render('welcome');
