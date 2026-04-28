@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('licitaciones', function (Blueprint $table) {
+        Schema::connection('crm')->create('licitaciones', function (Blueprint $table) {
             $table->id();
             
             

@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('interacciones', function (Blueprint $table) {
+        Schema::connection('crm')->create('interacciones', function (Blueprint $table) {
             $table->id();
             
             // 1. ¿En qué contexto? (Licitación)

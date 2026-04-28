@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('divisiones', function (Blueprint $table) {
+        Schema::connection('crm')->create('divisiones', function (Blueprint $table) {
             $table->id();
             
 

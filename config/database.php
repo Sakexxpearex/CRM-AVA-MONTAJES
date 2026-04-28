@@ -6,6 +6,7 @@ $postgres = [
     "public",
     "usuarios",
     "laravel",
+    "crm"
 ];
 
 $connections = [];

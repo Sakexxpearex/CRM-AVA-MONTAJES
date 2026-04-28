@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('valoracion_persona', function (Blueprint $table) {
+        Schema::connection('crm')->create('valoracion_persona', function (Blueprint $table) {
             $table->id();
             // ¿A quién evaluamos?
             $table->foreignId('persona_id')->constrained('personas')->onDelete('cascade');

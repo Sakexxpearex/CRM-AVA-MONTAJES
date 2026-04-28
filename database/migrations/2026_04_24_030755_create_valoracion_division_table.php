@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('valoracion_division', function (Blueprint $table) {
+        Schema::connection('crm')->create('valoracion_division', function (Blueprint $table){
             $table->id();
             // ¿A qué división evaluamos?
             $table->foreignId('division_id')->constrained('divisiones')->onDelete('cascade');
