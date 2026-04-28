@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('competencia_en_licitacion', function (Blueprint $table) {
+        Schema::connection('crm')->create('competencia_en_licitacion', function (Blueprint $table) {
             $table->id();
             $table->foreignId('licitacion_id')->constrained('licitaciones')->onDelete('cascade');
             $table->foreignId('empresa_id')->constrained('empresas')->onDelete('cascade');

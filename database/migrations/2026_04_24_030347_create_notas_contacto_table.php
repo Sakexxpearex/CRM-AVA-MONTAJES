@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('notas_contacto', function (Blueprint $table) {
+        Schema::connection('crm')->create('notas_contacto', function (Blueprint $table) {
             $table->id();
             
             // 1. ¿Sobre quién es la nota? (Persona)

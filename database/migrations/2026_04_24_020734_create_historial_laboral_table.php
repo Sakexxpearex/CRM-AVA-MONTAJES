@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('historial_laboral', function (Blueprint $table) {
+        Schema::connection('crm')->create('historial_laboral', function (Blueprint $table) {
             $table->id();
             
             // Las dos llaves foráneas que conectan los mundos

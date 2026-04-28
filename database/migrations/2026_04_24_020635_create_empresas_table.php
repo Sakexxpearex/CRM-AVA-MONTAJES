@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('empresas', function (Blueprint $table) {
+       Schema::connection('crm')->create('empresas', function (Blueprint $table) {
             $table->id();
             
             // Datos de la empresa
