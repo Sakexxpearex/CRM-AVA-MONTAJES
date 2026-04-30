@@ -30,17 +30,23 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        try{
         $request->validate([
             "nombre_1" => "required|string|max:255",
             "nombre_2" => "required|string|max:255",
             "apellido_1" => "required|string|max:255",
             "apellido_2" => "required|string|max:255",
             "cargo" => "required|string|max:255",
-            "rut" => "required|string|max:255|unique:".User::class,
-            "email" => "required|string|lowercase|email|max:255|unique:".User::class,
+            "rut" => "required|string|max:255|unique:usuarios.users,rut",
+            "email" => "required|string|lowercase|email|max:255|unique:usuarios.users,email",
             "password" => ["required", "confirmed", Rules\Password::defaults()],
         ]);
+        }catch (\Illuminate\Validation\ValidationException $e) {
+        // Queria ver porque no me dejaba registrar un usuario :,V
+        dd($e->errors());
+        }
 
+        
         $user = User::create([
             "nombre_1" => $request->nombre_1,
             "nombre_2" => $request->nombre_2,
@@ -51,6 +57,11 @@ class RegisteredUserController extends Controller
             "email" => $request->email,
             "password" => Hash::make($request->password),
         ]);
+
+        event(new Registered($user));
+        Auth::login($user);
+
+        return redirect(route('dashboard', absolute: false));
 
         event(new Registered($user));
 

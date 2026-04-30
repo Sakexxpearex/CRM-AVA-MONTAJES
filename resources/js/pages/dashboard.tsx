@@ -1,35 +1,59 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-];
+import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
+import { Head, usePage } from '@inertiajs/react';
 
 export default function Dashboard() {
+    const { auth } = usePage().props as any;
+    const user = auth.user;
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+            <AuthenticatedLayout>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+
+           {/* Usuario (esquina superior derecha) */}
+           <div className="flex justify-end mb-4">
+                <div className="flex items-center gap-3">
+                    <div className="text-right">
+                        <p className="text-sm font-bold dark:text-white leading-none">
+                            {user.nombre_1} {user.apellido_1}
+                        </p>
+                        <p className="text-[10px] text-gray-500 font-medium">
+                            {user.email}
+                        </p>
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    <div className="w-9 h-9 bg-[#B0FF08] rounded-full flex items-center justify-center text-black font-black text-xs shadow-sm">
+                        {user.nombre_1[0]}{user.apellido_1[0]}
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                </div>
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-xl border md:min-h-min">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                 </div>
             </div>
-        </AppLayout>
+            <div className="flex justify-between items-start mb-8">
+                <div>
+                    <h2 className="text-3xl font-bold dark:text-white">Dashboard</h2>
+                </div>
+                
+            </div>
+
+            {/* Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm relative overflow-hidden group">
+                    {/* Acento de color verde neón */}
+                    <div className="absolute top-0 left-0 w-1 h-full bg-[#B0FF08] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    
+                    <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Licitaciones Activas</h3>
+                    <div className="flex items-end gap-2 mt-2">
+                        <p className="text-5xl font-black dark:text-white">12</p>
+                        <span className="text-[#B0FF08] text-sm font-bold mb-2">+2 este mes</span>
+                    </div>
+                </div>
+
+                <div className="p-6 bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm">
+                    <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Empresas</h3>
+                    <p className="text-5xl font-black mt-2 dark:text-white">24</p>
+                </div>
+
+                <div className="p-6 bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm">
+                    <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Contactos</h3>
+                    <p className="text-5xl font-black mt-2 dark:text-white">156</p>
+                </div>
+            </div>
+        </AuthenticatedLayout>
     );
 }

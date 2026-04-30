@@ -1,20 +1,11 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
+// Importación de componentes de UI
 import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-
-interface LoginForm {
-    email: string;
-    password: string;
-    remember: boolean;
-}
 
 interface LoginProps {
     status?: string;
@@ -22,7 +13,7 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
+    const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
         remember: false,
@@ -36,69 +27,77 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
-            <Head title="Log in" />
+        <AuthLayout 
+            title="Iniciar Sesión" 
+            description="Bienvenido de vuelta al Sistema de Gestión"
+        >
+            <Head title="Iniciar Sesión" />
 
-            <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            required
-                            autoFocus
-                            tabIndex={1}
-                            autoComplete="email"
-                            value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
-                            placeholder="email@example.com"
-                        />
-                        <InputError message={errors.email} />
-                    </div>
+            {status && (
+                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                    {status}
+                </div>
+            )}
 
-                    <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
-                            {canResetPassword && (
-                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                    Forgot password?
-                                </TextLink>
-                            )}
-                        </div>
-                        <Input
-                            id="password"
-                            type="password"
-                            required
-                            tabIndex={2}
-                            autoComplete="current-password"
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Password"
-                        />
-                        <InputError message={errors.password} />
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" tabIndex={3} />
-                        <Label htmlFor="remember">Remember me</Label>
-                    </div>
-
-                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Log in
-                    </Button>
+            <form onSubmit={submit} className="w-full space-y-5">
+                {/* Email */}
+                <div className="flex flex-col w-full">
+                    <Label htmlFor="email" className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                        Email
+                    </Label>
+                    <input
+                        id="email"
+                        type="email"
+                        value={data.email}
+                        onChange={(e) => setData('email', e.target.value)}
+                        className="w-full h-12 px-4 bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-[#B0FF08] focus:border-[#B0FF08] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all outline-none"
+                        placeholder="usuario@ejemplo.com"
+                        required
+                        autoFocus
+                    />
+                    <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="text-muted-foreground text-center text-sm">
-                    Don't have an account?{' '}
-                    <TextLink href={route('register')} tabIndex={5}>
-                        Sign up
-                    </TextLink>
+                {/* Password */}
+                <div className="flex flex-col w-full">
+                    <div className="flex justify-between items-center mb-2 ml-1">
+                        <Label htmlFor="password" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                            Contraseña
+                        </Label>
+                        {canResetPassword && (
+                            <Link 
+                                href={route('password.request')} 
+                                className="text-xs text-gray-500 hover:text-[#B0FF08] transition-colors"
+                            >
+                                ¿Olvidaste tu contraseña?
+                            </Link>
+                        )}
+                    </div>
+                    <input
+                        id="password"
+                        type="password"
+                        value={data.password}
+                        onChange={(e) => setData('password', e.target.value)}
+                        className="w-full h-12 px-4 bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-[#B0FF08] focus:border-[#B0FF08] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all outline-none"
+                        placeholder="••••••••"
+                        required
+                    />
+                    <InputError message={errors.password} className="mt-2" />
                 </div>
+
+                {/* Boton de entrar */}
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="w-full h-14 bg-black dark:bg-[#B0FF08] text-white dark:text-black rounded-xl font-black text-lg hover:opacity-90 active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2 tracking-widest"
+                >
+                    {processing ? (
+                        <LoaderCircle className="h-5 w-5 animate-spin" />
+                    ) : (
+                        "ENTRAR"
+                    )}
+                </button>
             </form>
-
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
         </AuthLayout>
     );
 }

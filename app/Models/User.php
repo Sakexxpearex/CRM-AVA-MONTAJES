@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable {
     use HasFactory, Notifiable;
     protected $connection = "usuarios";
-    protected $table = "users";
+    protected $table = "usuarios.users";
     public $timestamps = false;
 
     protected $fillable = [

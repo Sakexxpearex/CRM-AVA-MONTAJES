@@ -22,8 +22,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
     };
 
     return (
-        <AuthLayout title="Forgot password" description="Enter your email to receive a password reset link">
-            <Head title="Forgot password" />
+        <AuthLayout title="Restablecer contraseña" description="Ingresa tu email para recibir un enlace para restablecer tu contraseña. ">
+            <Head title="Restablecer contraseña" />
 
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
 
@@ -48,14 +48,19 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     <div className="my-6 flex items-center justify-start">
                         <Button className="w-full" disabled={processing}>
                             {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Email password reset link
+                            Enviar link para restablecer contraseña
                         </Button>
                     </div>
                 </form>
 
-                <div className="text-muted-foreground space-x-1 text-center text-sm">
-                    <span>Or, return to</span>
-                    <TextLink href={route('login')}>log in</TextLink>
+                <div className="dark:text-gray-300 text-center text-sm">
+                    <span>O, regresar a </span>
+                    <TextLink 
+                        href={route('login')} 
+                        className="dark:text-[#B0FF08] font-bold hover:underline"
+                    >
+                        inicio de sesión
+                    </TextLink>
                 </div>
             </div>
         </AuthLayout>

@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Empresa;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class EmpresaController extends Controller
 {
     public function index()
     {
-       return response()->json(Empresa::all());
-        //return response()->json(
-        //    Empresa::with('divisiones')->get()
-        //);
+       return Inertia::render('empresas/Index', [
+            'empresas' => Empresa::all()
+        ]);
     }
 
     public function store(Request $request)
@@ -25,17 +25,15 @@ class EmpresaController extends Controller
 
         $empresa = Empresa::create($data);
 
-        return response()->json([
-            'message' => 'Empresa creada correctamente',
-            'empresa' => $empresa,
-        ], 201);
+        return redirect()->route('empresas.index')->with('message', 'Empresa creada correctamente');
     }
+    
 
     public function show(Empresa $empresa)
     {
-        return response()->json(
-            $empresa->load('divisiones')
-        );
+        return Inertia::render('Empresas/Show', [
+            'empresa' => $empresa->load('divisiones')
+        ]);
     }
 
     public function update(Request $request, Empresa $empresa)
@@ -48,18 +46,13 @@ class EmpresaController extends Controller
 
         $empresa->update($data);
 
-        return response()->json([
-            'message' => 'Empresa actualizada correctamente',
-            'empresa' => $empresa,
-        ]);
+        return redirect()->route('empresas.index');
     }
 
     public function destroy(Empresa $empresa)
     {
         $empresa->delete();
 
-        return response()->json([
-            'message' => 'Empresa eliminada correctamente',
-        ]);
+        return redirect()->route('empresas.index');
     }
 }
