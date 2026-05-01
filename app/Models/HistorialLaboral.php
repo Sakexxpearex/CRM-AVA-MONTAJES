@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class HistorialLaboral extends Model
 {
+    protected $connection = 'crm';
     protected $table = 'historial_laboral';
 
     protected $fillable = [
@@ -23,6 +24,7 @@ class HistorialLaboral extends Model
         'fecha_fin' => 'date',
     ];
 
+    
     public function persona()
     {
         return $this->belongsTo(Persona::class);
