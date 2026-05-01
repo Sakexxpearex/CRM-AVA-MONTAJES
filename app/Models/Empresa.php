@@ -15,6 +15,7 @@ class Empresa extends Model
         'rut',
         'nombre',
         'tipo',
+        'alias',
     ];
 
     // 3. RELACIONES

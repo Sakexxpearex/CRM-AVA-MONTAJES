@@ -19,7 +19,7 @@ return new class extends Migration
             
             // El nombre de la división ( "Minería", "Obras Civiles", "Norte")
             $table->string('nombre');
-            
+            $table->string('alias')->nullable(); // Ej: DCH [NUEVO]
             $table->timestamps();
         });
     }

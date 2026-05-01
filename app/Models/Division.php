@@ -11,6 +11,7 @@ class Division extends Model
     protected $fillable = [
         'empresa_id',
         'nombre',
+        'alias',
     ];
 
     public function empresa()
@@ -34,4 +35,11 @@ class Division extends Model
             ])
             ->withTimestamps();
     }
-}
+        public function getNombreCompletoAttribute()
+    {
+        // Esto devolverá algo como "CODELCO - DCH"
+        $empresaNombre = $this->empresa->alias ?: $this->empresa->nombre;
+        $divisionNombre = $this->alias ?: $this->nombre;
+        return "{$empresaNombre} - {$divisionNombre}";
+    }
+    }
