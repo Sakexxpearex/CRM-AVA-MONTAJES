@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Division extends Model
 {
+    protected $connection = 'crm';
     protected $table = 'divisiones';
 
     protected $fillable = [
@@ -37,7 +38,7 @@ class Division extends Model
     }
         public function getNombreCompletoAttribute()
     {
-        // Esto devolverá algo como "CODELCO - DCH"
+        
         $empresaNombre = $this->empresa->alias ?: $this->empresa->nombre;
         $divisionNombre = $this->alias ?: $this->nombre;
         return "{$empresaNombre} - {$divisionNombre}";
