@@ -12,12 +12,16 @@ class Licitacion extends Model
     protected $table = 'licitaciones';
 
     // 2. Definir los campos que pueden ser llenados a través de formularios
-    protected $fillable = [
+protected $fillable = [
         'empresa_id',
         'division_id',
         'nombre_proyecto',
         'estado_pipeline',
         'proyecto_id',
+        'descripcion',       
+        'monto_estimado',   
+        'fecha_cierre',      
+        'fecha_adjudicacion' 
     ];
 
     // 3. RELACIONES
@@ -43,7 +47,9 @@ class Licitacion extends Model
      */
     public function proyecto()
     {
-        // Asumiendo que crearás (o ya tienes) un modelo llamado Proyecto
-        return $this->belongsTo(Proyecto::class, 'proyecto_id');
+        return $this->belongsTo(Proyecto::class, 'proyecto_id')->withDefault([
+                'nombre' => 'Sin Proyecto Asignado (Aún en Licitación)'
+        ]);
     }
+    
 }

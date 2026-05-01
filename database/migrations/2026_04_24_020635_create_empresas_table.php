@@ -17,7 +17,7 @@ return new class extends Migration
             // Datos de la empresa
             $table->string('rut')->unique(); 
             $table->string('nombre')->nullable(); 
-            
+            $table->string('alias')->nullable(); // Ej: CODELCO [NUEVO]
             // Solo aceptará estos 3 valores exactos
             $table->enum('tipo', ['Cliente', 'Competencia', 'Subcontratista']);
             

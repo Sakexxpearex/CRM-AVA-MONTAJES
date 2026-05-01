@@ -19,4 +19,8 @@ class Proyecto extends Model {
     public function usuarios(): BelongsToMany {
         return $this->belongsToMany(User::class, "usuarios_tienen_proyectos", "id_proyecto", "id_usuario");
     }
+
+    public function licitacion() { 
+            return $this->hasOne(Licitacion::class, 'proyecto_id');
+        }
 }
