@@ -50,4 +50,8 @@ class Persona extends Model
     {
         return trim("{$this->nombre_1} {$this->nombre_2} {$this->apellido_1} {$this->apellido_2}");
     }
+    public function notas()
+    {
+        return $this->morphMany(Nota::class, 'notable');
+    }
 }
