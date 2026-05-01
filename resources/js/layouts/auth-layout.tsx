@@ -29,7 +29,7 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
             {/* Para cambiar modo calro/oscuro en el Login */}
             <button 
                 onClick={() => setDarkMode(!darkMode)}
-                className="fixed top-6 right-6 p-3 rounded-full bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-sm text-gray-500 dark:text-[#B0FF08] hover:scale-110 transition-all"
+                className="fixed top-6 right-6 p-3 rounded-full bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-sm text-gray-500 dark:text-[#86CF00] hover:scale-110 transition-all"
             >
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -38,7 +38,7 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
             <div className="w-full max-w-[480px] bg-white dark:bg-[#111111] p-8 md:p-12 rounded-[2.5rem] shadow-xl md:shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col items-center relative overflow-hidden">
                 
                 {/* Linea verde superior (no tiene utilidad) */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-[#B0FF08]"></div>
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-[#86CF00]"></div>
                 
                 {/* Logo (cambia segun el modo en el que este) */}
                 <div className="text-center mb-8 w-full">

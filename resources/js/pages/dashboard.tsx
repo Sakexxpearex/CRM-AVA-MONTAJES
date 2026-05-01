@@ -19,7 +19,7 @@ export default function Dashboard() {
                             {user.email}
                         </p>
                     </div>
-                    <div className="w-9 h-9 bg-[#B0FF08] rounded-full flex items-center justify-center text-black font-black text-xs shadow-sm">
+                    <div className="w-9 h-9 bg-[#86CF00] rounded-full flex items-center justify-center text-black font-black text-xs shadow-sm">
                         {user.nombre_1[0]}{user.apellido_1[0]}
                     </div>
                 </div>
@@ -35,12 +35,12 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="p-6 bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm relative overflow-hidden group">
                     {/* Acento de color verde neón */}
-                    <div className="absolute top-0 left-0 w-1 h-full bg-[#B0FF08] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute top-0 left-0 w-1 h-full bg-[#86CF00] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     
                     <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Licitaciones Activas</h3>
                     <div className="flex items-end gap-2 mt-2">
                         <p className="text-5xl font-black dark:text-white">12</p>
-                        <span className="text-[#B0FF08] text-sm font-bold mb-2">+2 este mes</span>
+                        <span className="text-[#86CF00] text-sm font-bold mb-2">+2 este mes</span>
                     </div>
                 </div>
 

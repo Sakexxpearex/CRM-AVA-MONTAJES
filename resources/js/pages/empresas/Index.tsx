@@ -1,6 +1,9 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, usePage, useForm } from '@inertiajs/react';
-import { Building2, Plus, Search, MoreHorizontal, CheckCircle2, X, Briefcase, FileText, Users } from 'lucide-react';
+import { 
+    Building2, Plus, Search, MoreHorizontal, 
+    X, Briefcase, FileText, Users, LoaderCircle 
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import InputError from '@/components/input-error';
 
@@ -11,227 +14,185 @@ interface Empresa {
     tipo: 'Cliente' | 'Competencia' | 'Subcontratista';
 }
 
-// Mapa de iconos y colores por tipo de empresa
 const tipoConfig = {
-    Cliente: { icon: FileText, color: 'text-[#B0FF08]', bgColor: 'bg-[#B0FF08]/10' },
-    Competencia: { icon: Briefcase, color: 'text-red-500', bgColor: 'bg-red-500/10' },
-    Subcontratista: { icon: Users, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+    Cliente: { icon: FileText, color: 'text-green-600', bgColor: 'bg-green-50' },
+    Competencia: { icon: Briefcase, color: 'text-red-600', bgColor: 'bg-red-50' },
+    Subcontratista: { icon: Users, color: 'text-blue-600', bgColor: 'bg-blue-50' },
 };
 
 export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
     const { flash } = usePage<any>().props;
-    const [showFlash, setShowFlash] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
-        nombre: '',
-        rut: '',
-        tipo: 'Cliente' as 'Cliente' | 'Competencia' | 'Subcontratista',
+    const { data, setData, post, processing, errors, reset } = useForm({
+        nombre: '', 
+        rut: '', 
+        tipo: 'Cliente' as any,
     });
-
-    useEffect(() => {
-        if (flash?.message) {
-            setShowFlash(true);
-            const timer = setTimeout(() => setShowFlash(false), 4000);
-            return () => clearTimeout(timer);
-        }
-    }, [flash]);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('empresas.store'), {
-            onSuccess: () => {
-                setIsModalOpen(false);
-                reset();
-            },
+        post(route('empresas.store'), { 
+            onSuccess: () => { 
+                setIsModalOpen(false); 
+                reset(); 
+            } 
         });
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        reset();
-        clearErrors();
     };
 
     return (
         <AuthenticatedLayout>
-            <Head title="Empresas - Directorio" />
+            <Head title="Empresas - AVA CRM" />
 
-            {/* Notificación */}
-            {showFlash && flash?.message && (
-                <div className="fixed top-24 right-10 z-[120] animate-in fade-in slide-in-from-right-5 duration-300">
-                    <div className="bg-[#B0FF08] text-black px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 font-bold border border-black/10">
-                        <CheckCircle2 size={18} />
-                        <span className="text-sm">{flash.message}</span>
-                    </div>
-                </div>
-            )}
-
-            <div className="space-y-10">
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-8">
+                
                 {/* Header */}
-                <div className="flex items-center justify-between gap-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 border-[#B0FF08] pl-4 mb-8">
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-950 dark:text-white tracking-tighter">Directorio</h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Gestión centralizada de entidades y aliados.</p>
-                    </div>
-                    
-                    {/* BOTÓN DESKTOP: Se oculta en móvil (hidden) y aparece en md (flex) */}
+                        <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                            Empresas
+                        </h1>
+                        <p className="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-widest">
+                            Directorio de clientes y aliados
+                        </p>
+                    </div>  
+    
                     <button 
                         onClick={() => setIsModalOpen(true)}
-                        className="hidden md:flex items-center justify-center gap-2 bg-[#B0FF08] text-black font-bold text-sm px-6 py-3 rounded-full hover:bg-[#B0FF08]/90 active:scale-95 transition-all shadow-lg shadow-[#B0FF08]/10"
+                        className="hidden sm:flex items-center justify-center gap-2 bg-[#B0FF08] text-black font-extrabold text-xs px-5 py-3 rounded hover:bg-[#a2eb07] transition-all shadow-sm uppercase w-full sm:w-auto"
                     >
-                        <Plus size={18} />
-                        <span>Añadir Empresa</span>
+                        <Plus size={16} strokeWidth={3} />
+                        Nueva Empresa
                     </button>
                 </div>
 
-                {/* Barra de busqueda */}
-                <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={18} />
+                {/* Buscador */}
+                <div className="relative w-full max-w-2xl">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                     <input 
                         type="text" 
-                        placeholder="Buscar por nombre de empresa o RUT..." 
-                        className="w-full bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 rounded-2xl py-3.5 pl-12 pr-4 text-gray-950 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:ring-1 focus:ring-[#B0FF08] focus:border-[#B0FF08] transition-all text-sm font-medium"
+                        className="w-full bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-lg py-3 pl-12 text-[11px] font-bold tracking-wider outline-none focus:ring-2 focus:ring-[#B0FF08] transition-all"
+                        placeholder="BUSCAR POR NOMBRE O RUT..."
                     />
                 </div>
 
-                {/* Tabla de empresas */}
-                <div className="bg-white dark:bg-[#111111] border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
-                    <table className="w-full text-left">
-                        <thead className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#141414]">
-                            <tr className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                <th className="px-6 py-4">Empresa</th>
-                                <th className="px-6 py-4 hidden md:table-cell">RUT</th>
-                                <th className="px-6 py-4">Categoría</th>
-                                <th className="px-6 py-4 text-right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
-                            {empresas.length > 0 ? (
-                                empresas.map((empresa) => {
-                                    const { icon: TipoIcon, color, bgColor } = tipoConfig[empresa.tipo] || tipoConfig.Cliente;
+                {/* Tabla */}
+                <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-xl shadow-xl overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr className="bg-gray-50 dark:bg-[#0A0A0A] text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                    <th className="px-6 py-4">Empresa</th>
+                                    <th className="px-6 py-4 text-center">RUT</th>
+                                    <th className="px-6 py-4 text-center">Categoría</th>
+                                    <th className="px-6 py-4 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                {empresas.map((empresa) => {
+                                    const config = tipoConfig[empresa.tipo] || tipoConfig.Cliente;
                                     return (
-                                        <tr key={empresa.id} className="group hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 bg-gray-100 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl flex items-center justify-center text-gray-400 dark:text-gray-600 group-hover:border-[#B0FF08]/40 group-hover:text-[#B0FF08] transition-colors">
-                                                        <Building2 size={20} />
+                                        <tr key={empresa.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 bg-gray-100 dark:bg-[#1A1A1A] rounded flex items-center justify-center text-gray-400 group-hover:text-black group-hover:bg-[#B0FF08] transition-all">
+                                                        <Building2 size={16} />
                                                     </div>
-                                                    <div>
-                                                        <span className="font-semibold text-base text-gray-950 dark:text-white tracking-tight">
-                                                            {empresa.nombre}
-                                                        </span>
-                                                        <span className="md:hidden block text-xs text-gray-500 mt-0.5">{empresa.rut}</span>
-                                                    </div>
+                                                    <span className="font-bold text-sm text-gray-800 dark:text-gray-200 uppercase">{empresa.nombre}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5 hidden md:table-cell text-gray-600 dark:text-gray-400 font-mono text-sm tracking-tight">
+                                            <td className="px-6 py-3 text-center font-mono text-xs text-gray-500 italic uppercase">
                                                 {empresa.rut}
                                             </td>
-                                            <td className="px-6 py-5">
-                                                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full ${bgColor}`}>
-                                                    <TipoIcon size={14} className={color} />
-                                                    <span className={`text-xs font-bold ${color}`}>
-                                                        {empresa.tipo}
-                                                    </span>
-                                                </div>
+                                            <td className="px-6 py-3 text-center">
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-black uppercase ${config.bgColor} ${config.color} dark:bg-opacity-10`}>
+                                                    <config.icon size={12} strokeWidth={3} />
+                                                    {empresa.tipo}
+                                                </span>
                                             </td>
-                                            <td className="px-6 py-5 text-right relative">
-                                                <button className="p-2 text-gray-400 dark:text-gray-600 hover:text-gray-950 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-all">
+                                            <td className="px-6 py-3 text-right">
+                                                <button className="p-1.5 text-gray-300 hover:text-black dark:hover:text-white transition-colors">
                                                     <MoreHorizontal size={18} />
                                                 </button>
                                             </td>
                                         </tr>
                                     );
-                                })
-                            ) : (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-20 text-center">
-                                        <Building2 size={40} className="mx-auto mb-5 text-gray-300 dark:text-gray-700" />
-                                        <p className="text-gray-500 dark:text-gray-400 font-medium text-sm">No hay empresas registradas.</p>
-                                        <p className="text-gray-400 dark:text-gray-600 text-xs mt-1">Haz clic en "Añadir Empresa" para comenzar.</p>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            {/* Boton para version mobile */}
-            <button 
-                onClick={() => setIsModalOpen(true)}
-                className="flex md:hidden fixed bottom-24 right-6 z-[90] items-center justify-center bg-[#B0FF08] text-black w-14 h-14 rounded-full shadow-2xl active:scale-95 transition-all ring-4 ring-black/10"
-            >
-                <Plus size={28} strokeWidth={3} />
-            </button>
-            {/*  Crear empresa  */}
+            {/* Modal de Creación */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={closeModal}></div>
-                    
-                    <div className="relative bg-white dark:bg-[#111111] border border-gray-100 dark:border-gray-800 w-full max-w-lg rounded-3xl p-10 shadow-2xl animate-in zoom-in-95 duration-200">
-                        <button onClick={closeModal} className="absolute top-6 right-6 text-gray-400 hover:text-gray-950 dark:hover:text-white">
-                            <X size={20} />
-                        </button>
-
-                        <div className="mb-9">
-                            <h2 className="text-2xl font-extrabold text-gray-950 dark:text-white tracking-tighter">Nueva Empresa</h2>
-                            <p className="text-gray-500 dark:text-gray-400 font-medium text-sm mt-1">Completa los datos para registrar la entidad.</p>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+                    <div className="relative bg-white dark:bg-[#111] w-full max-w-md rounded-2xl p-8 shadow-2xl border border-gray-100 dark:border-gray-800 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-black uppercase tracking-tighter dark:text-white">Nuevo Registro</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-black dark:hover:text-white">
+                                <X size={20} />
+                            </button>
                         </div>
 
-                        <form onSubmit={submit} className="space-y-6">
+                        <form onSubmit={submit} className="space-y-5">
                             <div>
-                                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">RUT </label>
+                                <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">RUT Empresa</label>
                                 <input 
-                                    type="text"
+                                    type="text" 
                                     value={data.rut}
                                     onChange={e => setData('rut', e.target.value)}
-                                    className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 px-5 text-gray-950 dark:text-white focus:ring-1 focus:ring-[#B0FF08] focus:border-[#B0FF08] outline-none transition-all font-medium text-sm"
-                                    placeholder="Ej: 77.888.999-K"
+                                    className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md py-3 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#B0FF08] transition-all"
+                                    placeholder="12.345.678-9"
+                                    required
                                 />
-                                <InputError message={errors.rut} className="mt-2" />
+                                <InputError message={errors.rut} />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Nombre Comercial</label>
+                                <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">Nombre Comercial</label>
                                 <input 
-                                    type="text"
+                                    type="text" 
                                     value={data.nombre}
                                     onChange={e => setData('nombre', e.target.value)}
-                                    className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 px-5 text-gray-950 dark:text-white focus:ring-1 focus:ring-[#B0FF08] focus:border-[#B0FF08] outline-none transition-all font-medium text-sm"
-                                    placeholder="Nombre de la compañía"
+                                    className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md py-3 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#B0FF08] transition-all"
+                                    required
                                 />
-                                <InputError message={errors.nombre} className="mt-2" />
+                                <InputError message={errors.nombre} />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">Tipo de Relación</label>
-                                <div className="relative">
-                                    <select 
-                                        value={data.tipo}
-                                        onChange={e => setData('tipo', e.target.value as any)}
-                                        className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 px-5 text-gray-950 dark:text-white focus:ring-1 focus:ring-[#B0FF08] focus:border-[#B0FF08] outline-none transition-all font-medium text-sm appearance-none"
-                                    >
-                                        <option value="Cliente">Cliente</option>
-                                        <option value="Competencia">Competencia</option>
-                                        <option value="Subcontratista">Subcontratista</option>
-                                    </select>
-                                    <MoreHorizontal className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 rotate-90" size={16} />
-                                </div>
+                                <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">Categoría</label>
+                                <select 
+                                    value={data.tipo}
+                                    onChange={e => setData('tipo', e.target.value as any)}
+                                    className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md py-3 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#B0FF08] transition-all"
+                                >
+                                    <option value="Cliente">Cliente</option>
+                                    <option value="Competencia">Competencia</option>
+                                    <option value="Subcontratista">Subcontratista</option>
+                                </select>
                             </div>
 
                             <button 
-                                type="submit"
+                                type="submit" 
                                 disabled={processing}
-                                className="w-full bg-[#B0FF08] text-black font-bold py-4 rounded-xl hover:bg-[#B0FF08]/90 active:scale-98 transition-all shadow-md mt-4 disabled:opacity-50 text-sm"
+                                className="w-full bg-[#B0FF08] text-black font-black py-4 rounded-lg uppercase text-xs tracking-widest hover:brightness-95 transition-all flex items-center justify-center gap-2"
                             >
-                                {processing ? 'Procesando...' : 'Guardar Empresa'}
+                                {processing ? <LoaderCircle className="animate-spin" size={16} /> : "Guardar en Sistema"}
                             </button>
                         </form>
                     </div>
                 </div>
             )}
+
+            <button 
+                onClick={() => setIsModalOpen(true)}
+                className="md:hidden fixed bottom-24 right-6 z-50 flex items-center justify-center bg-[#B0FF08] text-black w-14 h-14 rounded-full shadow-2xl active:scale-90 transition-transform"
+            >
+                <Plus size={30} strokeWidth={3} />
+            </button>
         </AuthenticatedLayout>
     );
 }

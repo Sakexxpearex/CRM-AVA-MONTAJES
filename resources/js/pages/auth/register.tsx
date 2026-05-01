@@ -41,7 +41,7 @@ export default function Register() {
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="grid gap-1.5">
                             <Label className="dark:text-gray-300 text-[11px] uppercase">Primer nombre</Label>
-                            <Input className={inputClasses} value={data.nombre_1} onChange={(e) => setData("nombre_1", e.target.value)} placeholder="Juan" />
+                            <Input className= {inputClasses} value={data.nombre_1} onChange={(e) => setData("nombre_1", e.target.value)} placeholder="Juan" />
                             <InputError message={errors.nombre_1} />
                         </div>
                         <div className="grid gap-1.5">

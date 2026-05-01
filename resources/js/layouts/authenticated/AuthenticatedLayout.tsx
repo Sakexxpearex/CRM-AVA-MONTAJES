@@ -30,7 +30,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                         onClick={() => setDarkMode(!darkMode)}
                         className="p-2 text-gray-400 hover:text-white transition-colors"
                     >
-                        {darkMode ? <Sun size={20} className="text-[#B0FF08]" /> : <Moon size={20} />}
+                        {darkMode ? <Sun size={20} className="text-[#86CF00]" /> : <Moon size={20} />}
                     </button>
 
                     {/* Logout directo*/}
@@ -45,11 +45,11 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
             </nav>
 
             {/* Menú lateral */}
-            <aside className="hidden md:flex md:w-72 md:flex-col h-screen bg-[#0A0A0A] border-r border-gray-800">
+            <aside className="hidden md:flex md:w-72 md:flex-col h-screen bg-white dark:bg-[#0A0A0A] border-r border-gray-200 dark:border-gray-800 transition-colors duration-300">
                 <div className="p-10 flex justify-center">
                     <Link href={route('dashboard')}>
-                        <img src="/assets/logos/isotipo-blanco-verde.svg" className="h-10 w-auto dark:hidden" alt="AVA CRM" />
-                        <img src="/assets/logos/isotipo-blanco-verde.svg" className="h-10 w-auto hidden dark:block" alt="AVA CRM" />
+                        <img src="/assets/logos/negro-verde.svg" className="h-10 w-auto dark:hidden" alt="AVA CRM" />
+                        <img src="/assets/logos/blanco.svg" className="h-10 w-auto hidden dark:block" alt="AVA CRM" />
                     </Link>
                 </div>
 
@@ -70,7 +70,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
 
                 <div className="p-6 border-t border-gray-800 space-y-2">
                     <button onClick={() => setDarkMode(!darkMode)} className="flex items-center gap-3 w-full p-3 rounded-xl text-gray-400 hover:bg-white/5 transition-all">
-                        {darkMode ? <Sun size={20} className="text-[#B0FF08]" /> : <Moon size={20} />}
+                        {darkMode ? <Sun size={20} className="text-[#86CF00]" /> : <Moon size={20} />}
                         <span className="text-sm font-medium">{darkMode ? 'Modo Claro' : 'Modo Oscuro'}</span>
                     </button>
                     <Link href={route('logout')} method="post" as="button" className="flex items-center gap-3 w-full p-3 rounded-xl text-red-500 hover:bg-red-500/10 transition-all text-left">
@@ -82,9 +82,8 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
 
             {/* Área de contendio */}
             <main className="flex-1 flex flex-col min-w-0 relative h-full">
-                {/* Contenedor con scroll, padding superior en móvil para no chocar con el nav */}
-                <section className="flex-1 overflow-y-auto p-6 md:p-12 mt-16 md:mt-0 mb-20 md:mb-0 custom-scrollbar">
-                    <div className="max-w-7xl mx-auto">
+                <section className="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0 mb-20 md:mb-0">
+                    <div className="max-w-[1400px] mx-auto">
                         {children}
                     </div>
                 </section>
@@ -114,10 +113,12 @@ function NavLink({ href, icon, label, active = false }: { href: string, icon: an
         <Link 
             href={href} 
             className={`flex items-center gap-3 p-4 rounded-2xl font-bold transition-all duration-200 ${
-                active ? 'bg-white text-black shadow-lg shadow-white/10' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                active 
+                ? 'bg-black text-white shadow-xl shadow-black/10 dark:bg-[#86CF00] dark:text-black' 
+                : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 dark:text-gray-400'
             }`}
         >
-            <span className={active ? 'text-black' : 'text-gray-500'}>{icon}</span>
+            <span className={active ? 'text-inherit' : 'text-gray-400'}>{icon}</span>
             <span className="text-sm tracking-tight">{label}</span>
         </Link>
     );
@@ -127,7 +128,7 @@ function NavLink({ href, icon, label, active = false }: { href: string, icon: an
 function MobileNavLink({ href, icon, label, active = false }: { href: string, icon: any, label: string, active?: boolean }) {
     return (
         <Link href={href} className="flex flex-col items-center justify-center flex-1 gap-1">
-            <span className={`${active ? 'text-[#B0FF08]' : 'text-gray-500'}`}>{icon}</span>
+            <span className={`${active ? 'text-[#86CF00]' : 'text-gray-500'}`}>{icon}</span>
             <span className={`text-[10px] font-medium ${active ? 'text-white' : 'text-gray-500'}`}>{label}</span>
         </Link>
     );
