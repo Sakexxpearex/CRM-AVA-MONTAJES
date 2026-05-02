@@ -4,62 +4,55 @@ namespace App\Http\Controllers;
 
 use App\Models\Empresa;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class EmpresaController extends Controller
 {
     public function index()
     {
-       return response()->json(Empresa::all());
-        //return response()->json(
-        //    Empresa::with('divisiones')->get()
-        //);
+       return Inertia::render('empresas/Index', [
+            'empresas' => Empresa::all()
+        ]);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'rut' => 'required|string|max:20|unique:empresas,rut',
+            'rut' => 'required|string|max:20|unique:crm.empresas,rut',
             'nombre' => 'nullable|string|max:255',
             'tipo' => 'required|in:Cliente,Competencia,Subcontratista',
         ]);
 
         $empresa = Empresa::create($data);
 
-        return response()->json([
-            'message' => 'Empresa creada correctamente',
-            'empresa' => $empresa,
-        ], 201);
+        return redirect()->route('empresas.index')->with('message', 'Empresa creada correctamente');
     }
+    
 
     public function show(Empresa $empresa)
     {
-        return response()->json(
-            $empresa->load('divisiones')
-        );
+        return Inertia::render('Empresas/Show', [
+            'empresa' => $empresa->load('divisiones')
+        ]);
     }
 
     public function update(Request $request, Empresa $empresa)
     {
         $data = $request->validate([
-            'rut' => 'sometimes|required|string|max:20|unique:empresas,rut,' . $empresa->id,
+            'rut' => 'sometimes|required|string|max:20|unique:crm.empresas,rut,' . $empresa->id,
             'nombre' => 'sometimes|nullable|string|max:255',
             'tipo' => 'sometimes|required|in:Cliente,Competencia,Subcontratista',
         ]);
 
         $empresa->update($data);
 
-        return response()->json([
-            'message' => 'Empresa actualizada correctamente',
-            'empresa' => $empresa,
-        ]);
+        return redirect()->route('empresas.index');
     }
 
     public function destroy(Empresa $empresa)
     {
         $empresa->delete();
 
-        return response()->json([
-            'message' => 'Empresa eliminada correctamente',
-        ]);
+        return redirect()->route('empresas.index');
     }
 }

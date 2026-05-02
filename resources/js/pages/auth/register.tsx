@@ -3,36 +3,21 @@ import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
+import { Link } from '@inertiajs/react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
 interface RegisterForm {
     [key: string]: string;
-    nombre_1: string;
-    nombre_2: string;
-    apellido_1: string;
-    apellido_2: string;
-    cargo: string;
-    rut: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
+    nombre_1: string; nombre_2: string; apellido_1: string; apellido_2: string;
+    cargo: string; rut: string; email: string; password: string; password_confirmation: string;
 }
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
-        nombre_1: '',
-        nombre_2: '',
-        apellido_1: '',
-        apellido_2: '',
-        cargo: '',
-        rut: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+        nombre_1: '', nombre_2: '', apellido_1: '', apellido_2: '',
+        cargo: '', rut: '', email: '', password: '', password_confirmation: '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -42,165 +27,94 @@ export default function Register() {
         });
     };
 
-    return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
-            <Head title="Register" />
-            <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="nombre_1">Primer nombre</Label>
-                            <Input
-                                id="nombre_1"
-                                type="text"
-                                required
-                                autoFocus
-                                tabIndex={1}
-                                value={data.nombre_1}
-                                onChange={(e) => setData("nombre_1", e.target.value)}
-                                disabled={processing}
-                                placeholder="Juan"
-                            />
-                            <InputError message={errors.nombre_1} className="mt-2" />
-                        </div>
+    // Estilo para inputs 
+    const inputClasses = "h-11 bg-white dark:bg-[#0A0A0A] border-gray-200 dark:border-gray-800 text-sm text-black dark:text-white placeholder:text-gray-300 focus:ring-1 focus:ring-[#C1F75E] focus:border-[#C1F75E] transition-all outline-none rounded-md";
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="nombre_2">Segundo nombre</Label>
-                            <Input
-                                id="nombre_2"
-                                type="text"
-                                required
-                                tabIndex={2}
-                                value={data.nombre_2}
-                                onChange={(e) => setData("nombre_2", e.target.value)}
-                                disabled={processing}
-                                placeholder="Carlos"
-                            />
-                            <InputError message={errors.nombre_2} />
+    // Estilo para labels
+    const labelClasses = "text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] mb-1.5 ml-1 block";
+
+    return (
+        <AuthLayout title="Crear Cuenta" description="Registra un nuevo operador en el sistema">
+            <Head title="Registro de Usuario" />
+
+            <form className="flex flex-col gap-4" onSubmit={submit}>
+                <div className="grid gap-3">
+                    
+                    {/* Nombres */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <Label className={labelClasses}>Primer nombre</Label>
+                            <Input className={inputClasses} value={data.nombre_1} onChange={(e) => setData("nombre_1", e.target.value)} placeholder="EJ. JUAN" />
+                            <InputError message={errors.nombre_1} />
+                        </div>
+                        <div>
+                            <Label className={labelClasses}>Segundo nombre</Label>
+                            <Input className={inputClasses} value={data.nombre_2} onChange={(e) => setData("nombre_2", e.target.value)} placeholder="EJ. CARLOS" />
                         </div>
                     </div>
 
+                    {/* Apellidos */}
                     <div className="grid gap-4 md:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="apellido_1">Primer apellido</Label>
-                            <Input
-                                id="apellido_1"
-                                type="text"
-                                required
-                                tabIndex={3}
-                                value={data.apellido_1}
-                                onChange={(e) => setData("apellido_1", e.target.value)}
-                                disabled={processing}
-                                placeholder="Perez"
-                            />
+                        <div>
+                            <Label className={labelClasses}>Primer apellido</Label>
+                            <Input className={inputClasses} value={data.apellido_1} onChange={(e) => setData("apellido_1", e.target.value)} placeholder="EJ. PEREZ" />
                             <InputError message={errors.apellido_1} />
                         </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="apellido_2">Segundo apellido</Label>
-                            <Input
-                                id="apellido_2"
-                                type="text"
-                                required
-                                tabIndex={4}
-                                value={data.apellido_2}
-                                onChange={(e) => setData("apellido_2", e.target.value)}
-                                disabled={processing}
-                                placeholder="Gonzalez"
-                            />
-                            <InputError message={errors.apellido_2} />
+                        <div>
+                            <Label className={labelClasses}>Segundo apellido</Label>
+                            <Input className={inputClasses} value={data.apellido_2} onChange={(e) => setData("apellido_2", e.target.value)} placeholder="EJ. GONZÁLEZ" />
                         </div>
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="cargo">Cargo</Label>
-                        <Input
-                            id="cargo"
-                            type="text"
-                            required
-                            tabIndex={5}
-                            value={data.cargo}
-                            onChange={(e) => setData("cargo", e.target.value)}
-                            disabled={processing}
-                            placeholder="Analista"
-                        />
-                        <InputError message={errors.cargo} />
+                    {/* Cargo y Rut */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <Label className={labelClasses}>Cargo / Función</Label>
+                            <Input className={inputClasses} value={data.cargo} onChange={(e) => setData("cargo", e.target.value)} placeholder="OPERADOR" />
+                        </div>
+                        <div>
+                            <Label className={labelClasses}>RUT</Label>
+                            <Input className={inputClasses} value={data.rut} onChange={(e) => setData("rut", e.target.value)} placeholder="12.345.678-9" />
+                        </div>
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="rut">RUT</Label>
-                        <Input
-                            id="rut"
-                            type="text"
-                            required
-                            tabIndex={6}
-                            value={data.rut}
-                            onChange={(e) => setData("rut", e.target.value)}
-                            disabled={processing}
-                            placeholder="12345678-9"
-                        />
-                        <InputError message={errors.rut} />
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            required
-                            tabIndex={7}
-                            autoComplete="email"
-                            value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
-                            disabled={processing}
-                            placeholder="email@example.com"
-                        />
+                    {/*  Email  */}
+                    <div>
+                        <Label className={labelClasses}>Correo Electrónico</Label>
+                        <Input type="email" className={inputClasses} value={data.email} onChange={(e) => setData('email', e.target.value)} placeholder="USUARIO@AVACRM.COM" />
                         <InputError message={errors.email} />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            required
-                            tabIndex={8}
-                            autoComplete="new-password"
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            disabled={processing}
-                            placeholder="Password"
-                        />
-                        <InputError message={errors.password} />
+                    {/* Contraseñas */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <Label className={labelClasses}>Contraseña</Label>
+                            <Input type="password" className={inputClasses} value={data.password} onChange={(e) => setData('password', e.target.value)} placeholder="••••••••" />
+                            <InputError message={errors.password} />
+                        </div>
+                        <div>
+                            <Label className={labelClasses}>Confirmar</Label>
+                            <Input type="password" className={inputClasses} value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} placeholder="••••••••" />
+                        </div>
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
-                        <Input
-                            id="password_confirmation"
-                            type="password"
-                            required
-                            tabIndex={9}
-                            autoComplete="new-password"
-                            value={data.password_confirmation}
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
-                            disabled={processing}
-                            placeholder="Confirm password"
-                        />
-                        <InputError message={errors.password_confirmation} />
-                    </div>
-
-                    <Button type="submit" className="mt-2 w-full" tabIndex={10} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Create account
-                    </Button>
+                    {/* Botón Registrar */}
+                    <button 
+                        type="submit" 
+                        className="mt-4 w-full bg-black dark:bg-[#A0F700] text-white dark:text-black h-12 rounded-md font-black text-xs uppercase tracking-[0.3em] hover:bg-gray-900 dark:hover:bg-[#86CF00] transition-all flex items-center justify-center gap-2" 
+                        disabled={processing}
+                    >
+                        {processing ? <LoaderCircle className="h-4 w-4 animate-spin" /> : "Registrar Usuario"}
+                    </button>
                 </div>
 
-                <div className="text-muted-foreground text-center text-sm">
-                    Already have an account?{' '}
-                    <TextLink href={route('login')} tabIndex={11}>
-                        Log in
-                    </TextLink>
+                <div className="text-center mt-2">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        ¿Ya tienes cuenta? 
+                        <Link href={route('login')} className="text-black dark:text-[#C1F75E] underline ml-1 hover:text-[#86CF00]">
+                            Inicia sesión
+                        </Link>
+                    </p>
                 </div>
             </form>
         </AuthLayout>

@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Empresa extends Model
 {
-    // 1. Conexión y tabla explícitas
-    protected $connection = 'crm';
+    protected $connection = 'crm';    
     protected $table = 'empresas';
 
     // 2. Campos asignables masivamente
