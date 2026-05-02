@@ -15,6 +15,7 @@ return new class extends Migration
         $esquemas = [
             "usuarios",
             "laravel",
+            "crm"
         ];
 
         foreach($esquemas as $esquema) {
@@ -30,6 +31,7 @@ return new class extends Migration
         $esquemas = [
             "laravel",
             "usuarios",
+            "crm"
         ];
 
         foreach($esquemas as $esquema) {

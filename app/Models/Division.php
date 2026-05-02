@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Division extends Model
 {
+    protected $connection = 'crm';
     protected $table = 'divisiones';
 
     protected $fillable = [
         'empresa_id',
         'nombre',
+        'alias',
     ];
 
     public function empresa()
@@ -34,4 +36,11 @@ class Division extends Model
             ])
             ->withTimestamps();
     }
-}
+        public function getNombreCompletoAttribute()
+    {
+        
+        $empresaNombre = $this->empresa->alias ?: $this->empresa->nombre;
+        $divisionNombre = $this->alias ?: $this->nombre;
+        return "{$empresaNombre} - {$divisionNombre}";
+    }
+    }

@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::connection('crm')->create('divisiones', function (Blueprint $table) {
+        Schema::connection('crm')->create('notas', function (Blueprint $table) {
             $table->id();
+            $table->text('detalle'); // El contenido de la nota
             
-
-            $table->foreignId('empresa_id')->constrained('empresas')->onDelete('cascade');
+            // Crea automáticamente 'notable_id' y 'notable_type'
+            $table->morphs('notable'); 
             
-            // El nombre de la división ( "Minería", "Obras Civiles", "Norte")
-            $table->string('nombre');
-            $table->string('alias')->nullable(); // Ej: DCH [NUEVO]
+            // Quien escribe la nota (Usuario de AVA)
+            $table->foreignId('user_id')->constrained('usuarios.users');
+            
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('divisiones');
+        Schema::dropIfExists('notas');
     }
 };
