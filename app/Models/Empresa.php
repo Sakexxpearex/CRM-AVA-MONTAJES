@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Empresa extends Model
 {
+    protected $connection = 'crm';    
     protected $table = 'empresas';
 
     protected $fillable = [

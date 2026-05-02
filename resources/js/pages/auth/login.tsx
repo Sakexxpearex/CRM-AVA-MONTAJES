@@ -29,29 +29,32 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     return (
         <AuthLayout 
             title="Iniciar Sesión" 
-            description="Bienvenido de vuelta al Sistema de Gestión"
+            description="Ingresa tus credenciales para acceder"
         >
             <Head title="Iniciar Sesión" />
 
             {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                <div className="mb-4 text-center text-xs font-bold uppercase tracking-widest text-[#86CF00]">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit} className="w-full space-y-5">
+            <form onSubmit={submit} className="w-full space-y-6">
                 {/* Email */}
                 <div className="flex flex-col w-full">
-                    <Label htmlFor="email" className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
-                        Email
+                    <Label 
+                        htmlFor="email" 
+                        className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1"
+                    >
+                        Email de Usuario
                     </Label>
                     <input
                         id="email"
                         type="email"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
-                        className="w-full h-12 px-4 bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-[#B0FF08] focus:border-[#B0FF08] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all outline-none"
-                        placeholder="usuario@ejemplo.com"
+                        className="w-full h-11 px-4 bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md focus:border-[#C1F75E] focus:ring-1 focus:ring-[#C1F75E] text-sm text-gray-900 dark:text-white placeholder:text-xs placeholder:text-gray-300 transition-all outline-none"
+                        placeholder="USUARIO@EJEMPLO.COM"
                         required
                         autoFocus
                     />
@@ -61,15 +64,18 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 {/* Password */}
                 <div className="flex flex-col w-full">
                     <div className="flex justify-between items-center mb-2 ml-1">
-                        <Label htmlFor="password" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <Label 
+                            htmlFor="password" 
+                            className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em]"
+                        >
                             Contraseña
                         </Label>
                         {canResetPassword && (
                             <Link 
                                 href={route('password.request')} 
-                                className="text-xs text-gray-500 hover:text-[#B0FF08] transition-colors"
+                                className="text-[9px] font-bold uppercase tracking-wider text-gray-400 hover:text-[#86CF00] transition-colors"
                             >
-                                ¿Olvidaste tu contraseña?
+                                ¿Olvidaste tu clave?
                             </Link>
                         )}
                     </div>
@@ -78,23 +84,23 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         type="password"
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
-                        className="w-full h-12 px-4 bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-[#B0FF08] focus:border-[#B0FF08] text-gray-900 dark:text-white placeholder:text-gray-400 transition-all outline-none"
+                        className="w-full h-11 px-4 bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md focus:border-[#C1F75E] focus:ring-1 focus:ring-[#C1F75E] text-sm text-gray-900 dark:text-white placeholder:text-gray-300 transition-all outline-none"
                         placeholder="••••••••"
                         required
                     />
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                {/* Boton de entrar */}
+                {/* Botón de entrada */}
                 <button
                     type="submit"
                     disabled={processing}
-                    className="w-full h-14 bg-black dark:bg-[#B0FF08] text-white dark:text-black rounded-xl font-black text-lg hover:opacity-90 active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2 tracking-widest"
+                    className="w-full h-12 bg-black dark:bg-[#A0F700] text-white dark:text-black rounded-md font-black text-xs uppercase tracking-[0.3em] hover:bg-gray-900 dark:hover:bg-[#86CF00] active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2 border border-transparent"
                 >
                     {processing ? (
-                        <LoaderCircle className="h-5 w-5 animate-spin" />
+                        <LoaderCircle className="h-4 w-4 animate-spin" />
                     ) : (
-                        "ENTRAR"
+                        "Ingresar"
                     )}
                 </button>
             </form>

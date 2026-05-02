@@ -26,6 +26,8 @@ Route::middleware(['auth'])->group(function () {
     
     // Aqui irian el resto de rutas, de licitacions, conntactos, etc 
 
+    
+
     // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

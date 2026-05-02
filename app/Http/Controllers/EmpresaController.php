@@ -18,7 +18,7 @@ class EmpresaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'rut' => 'required|string|max:20|unique:empresas,rut',
+            'rut' => 'required|string|max:20|unique:crm.empresas,rut',
             'nombre' => 'nullable|string|max:255',
             'tipo' => 'required|in:Cliente,Competencia,Subcontratista',
         ]);
@@ -39,7 +39,7 @@ class EmpresaController extends Controller
     public function update(Request $request, Empresa $empresa)
     {
         $data = $request->validate([
-            'rut' => 'sometimes|required|string|max:20|unique:empresas,rut,' . $empresa->id,
+            'rut' => 'sometimes|required|string|max:20|unique:crm.empresas,rut,' . $empresa->id,
             'nombre' => 'sometimes|nullable|string|max:255',
             'tipo' => 'sometimes|required|in:Cliente,Competencia,Subcontratista',
         ]);
