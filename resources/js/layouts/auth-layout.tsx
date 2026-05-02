@@ -9,7 +9,7 @@ interface AuthLayoutProps {
 }
 
 export default function AuthLayout({ children, title, description }: PropsWithChildren<AuthLayoutProps>) {
-    // Modo claro por defecto (false)
+    // Modo claro por defecto
     const [darkMode, setDarkMode] = useState<boolean>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('theme');
@@ -40,7 +40,7 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                 {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            {/* Contenedor Principal */}
+            {/* Contenedor principal */}
             <div className="w-full max-w-[460px] bg-white dark:bg-[#111111] p-8 md:p-12 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col items-center relative overflow-hidden">
                 
                 {/* Linea verde simple arriba  */}
@@ -70,18 +70,12 @@ export default function AuthLayout({ children, title, description }: PropsWithCh
                     </p>
                 </div>
 
-                {/* Contenedor del Formulario */}
+                {/* Contenedor del formulario */}
                 <div className="w-full">
                     {children}
                 </div>
             </div>
 
-            {/* Footer de cortesía minimalista */}
-            <div className="mt-8 text-center">
-                <p className="text-gray-400 dark:text-gray-600 text-[9px] font-bold uppercase tracking-[0.3em]">
-                    © 2026 Advanced Value Analytics
-                </p>
-            </div>
         </div>
     );
 }

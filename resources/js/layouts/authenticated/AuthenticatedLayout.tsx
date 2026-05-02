@@ -21,11 +21,11 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
     return (
         <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300 overflow-hidden">
             
-            {/* Naveción Mobile*/}
+            {/* Naveción mobile*/}
             <nav className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#0A0A0A] border-b border-gray-800 px-6 flex justify-between items-center z-50">
                 <img src="/assets/logos/isotipo-blanco-verde.svg" className="h-8 w-auto" alt="Logo" />
                 <div className="flex items-center gap-4">
-                    {/* Modo Oscuro/Claro */}
+                    {/* Modo oscuro/claro */}
                     <button 
                         onClick={() => setDarkMode(!darkMode)}
                         className="p-2 text-gray-400 hover:text-white transition-colors"
@@ -107,7 +107,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
     );
 }
 
-// NavLink Desktop
+// NavLink pc
 function NavLink({ href, icon, label, active = false }: { href: string, icon: any, label: string, active?: boolean }) {
     return (
         <Link 
@@ -124,7 +124,7 @@ function NavLink({ href, icon, label, active = false }: { href: string, icon: an
     );
 }
 
-// NavLink Mobile
+// NavLink mobile
 function MobileNavLink({ href, icon, label, active = false }: { href: string, icon: any, label: string, active?: boolean }) {
     return (
         <Link href={href} className="flex flex-col items-center justify-center flex-1 gap-1">
