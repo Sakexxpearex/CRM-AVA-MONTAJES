@@ -3,63 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Interaccion;
+use App\Models\Licitacion;
+use App\Models\Persona;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class InteraccionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+       
+        $interacciones = Interaccion::with(['persona', 'licitacion'])->orderBy('fecha', 'desc')->get();
+        
+       
+        $personas = Persona::all();
+        $licitaciones = Licitacion::all();
+
+        return Inertia::render('Interacciones/Index', [
+            'interacciones' => $interacciones,
+            'personas' => $personas,
+            'licitaciones' => $licitaciones
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'licitacion_id' => 'nullable|exists:crm.licitaciones,id',
+            'persona_id' => 'required|exists:crm.personas,id', // O contactos, según tu tabla
+            'tipo' => 'required|string|in:Llamada,Correo,Reunión,WhatsApp', // Ajusta tus opciones
+            'fecha' => 'required|date',
+            'notas' => 'required|string',
+        ]);
+
+        Interaccion::create($validated);
+
+        return back();
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Interaccion $interaccion)
+    public function update(Request $request, $id)
     {
-        //
+        $interaccion = Interaccion::findOrFail($id);
+
+        $validated = $request->validate([
+            'licitacion_id' => 'nullable|exists:crm.licitaciones,id',
+            'persona_id' => 'required|exists:crm.personas,id',
+            'tipo' => 'required|string|in:Llamada,Correo,Reunión,WhatsApp',
+            'fecha' => 'required|date',
+            'notas' => 'required|string',
+        ]);
+
+        $interaccion->update($validated);
+
+        return back();
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Interaccion $interaccion)
+    public function destroy($id)
     {
-        //
-    }
+        $interaccion = Interaccion::findOrFail($id);
+        $interaccion->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Interaccion $interaccion)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Interaccion $interaccion)
-    {
-        //
+        return back();
     }
 }
