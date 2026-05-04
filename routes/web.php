@@ -23,9 +23,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Modulo de empresas
     Route::resource('empresas', EmpresaController::class);
-    
-    // Aqui irian el resto de rutas, de licitacions, conntactos, etc 
 
+    // Rutas Licitaciones, Personas e interacciones
+    Route::resource('licitaciones', LicitacionController::class);
+    Route::resource('personas', PersonaController::class);
+    Route::resource('interacciones', InteraccionController::class);
     
 
     // Perfil de usuario
