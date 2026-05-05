@@ -4,14 +4,12 @@ use App\Http\Controllers\EmpresaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::apiResource('empresas', EmpresaController::class);
-
 Route::get('/test', function () {
     return 'ok';
 });
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return redirect()->route('login');
 })->name('home');
 
 // Solo Usuarios logueados
@@ -26,6 +24,8 @@ Route::middleware(['auth'])->group(function () {
     
     // Aqui irian el resto de rutas, de licitacions, conntactos, etc 
 
+    //Falta el PersonaController
+    //Route::resource('personas', PersonaController::class);
     
 
     // Perfil de usuario
