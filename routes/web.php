@@ -11,7 +11,7 @@ Route::get('/test', function () {
 });
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::render('auth/login');
 })->name('home');
 
 // Solo Usuarios logueados
