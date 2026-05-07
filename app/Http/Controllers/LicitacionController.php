@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Licitacion;
 use App\Models\Empresa;
 use App\Models\Division;
+use App\Models\Proyecto;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -19,7 +20,7 @@ class LicitacionController extends Controller
 
         // Necesitamos empresas y divisiones para el modal de creación
         $empresas = Empresa::all();
-        $divisiones = Division::all();
+        $divisiones = Division::with('empresa')->get();
 
         return Inertia::render('licitaciones/Index', [
             'licitaciones' => $licitaciones,
@@ -50,7 +51,13 @@ class LicitacionController extends Controller
     public function show(Licitacion $licitacion)
     {
         return Inertia::render('Licitaciones/Show', [
-            'licitacion' => $licitacion->load(['empresa', 'division', 'interacciones.user', 'interacciones.persona'])
+            'licitacion' => $licitacion->load([
+                'empresa', 
+                'division', 
+                'proyecto', 
+                'interacciones.user', 
+                'interacciones.persona'
+            ])
         ]);
     }
 }

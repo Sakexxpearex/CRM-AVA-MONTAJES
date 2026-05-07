@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Persona; 
 use App\Models\Empresa;
 use App\Models\Division;
+use App\Models\Licitacion;
 use App\Models\HistorialLaboral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -56,7 +57,7 @@ class PersonaController extends Controller
             'division_id'  => $validated['division_id'],
             'cargo'        => $validated['cargo_actual'],
             'fecha_inicio' => now(),
-            'actual'       => true
+            'estado_actual'       => true
         ]);
 
         return redirect()->route('personas.index')->with('message', 'Persona creada con éxito');
@@ -69,12 +70,17 @@ class PersonaController extends Controller
         $persona->load([
             'historialLaboral.division.empresa',
             'trabajoActual.division.empresa',
-            'notas.user'
+            'notas.user',
+            'interacciones' => function($query) {
+                $query->with(['user', 'licitacion'])->latest();
+            },
+           
         ]);
 
         return Inertia::render('personas/Show', [
             'persona' => $persona,
-            'divisiones' => Division::with('empresa')->get()
+            'divisiones' => Division::with('empresa')->get(),
+            'licitaciones' => Licitacion::select('id', 'nombre_proyecto as nombre')->get()
         ]);
     }
 

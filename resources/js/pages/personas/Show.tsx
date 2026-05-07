@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { 
     ChevronLeft, Mail, Phone, Linkedin, 
     Building2, Calendar, Briefcase, MessageSquare, 
-    MapPin, Clock, ShieldCheck, Plus, X, User, FileText, ClipboardList
+    MapPin, Clock, ShieldCheck, Plus, X, User, FileText, ClipboardList, ArrowRight
 } from 'lucide-react';
 
 import { Persona } from '@/types/persona';
@@ -16,9 +16,9 @@ interface Division {
 }
 
 interface Props {
-    persona: Persona & { interacciones: any[] }; // Extendemos para incluir interacciones
+    persona: Persona & { interacciones: any[] };
     divisiones: Division[]; 
-    licitaciones: any[]; // Recibimos licitaciones para el select
+    licitaciones: any[]; // Recibimos licitaciones del controlador
 }
 
 export default function PersonaShow({ persona, divisiones, licitaciones }: Props) {
@@ -41,7 +41,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
         tipo_contacto: '',
         fecha: new Date().toISOString().split('T')[0],
         comentario: '',
-        licitacion_id: '',
+        licitacion_id: '', // Este es el campo que conectaremos
     });
 
     const getInitials = (name: string | null | undefined) => {
@@ -62,6 +62,14 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
         e.preventDefault();
         formInt.post(route('interacciones.store'), {
             onSuccess: () => { setIsInteraccionModalOpen(false); formInt.reset(); },
+        });
+    };
+
+         const formatDate = (dateStr: string) => {
+        return new Date(dateStr).toLocaleDateString('es-CL', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
         });
     };
 
@@ -101,7 +109,6 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                 </p>
                             </div>
 
-                            {/* BOTONES DE ACCIÓN PRINCIPALES */}
                             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto pb-2">
                                 <button 
                                     onClick={() => setIsInteraccionModalOpen(true)}
@@ -129,7 +136,6 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
                     {/* Trayectoria Laboral */}
                     <div className="lg:col-span-2 space-y-6">
                         <section className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 relative">
@@ -188,7 +194,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                             <div className="flex flex-wrap gap-2 pt-1">
                                                 {int.licitacion && (
                                                     <span className="text-[8px] bg-white/5 text-gray-400 px-2 py-0.5 rounded border border-gray-800 flex items-center gap-1 uppercase font-bold">
-                                                        <FileText size={8} /> {int.licitacion.numero_licitacion}
+                                                        <FileText size={8} /> {int.licitacion.nombre_proyecto}
                                                     </span>
                                                 )}
                                                 <span className="text-[8px] bg-white/5 text-gray-500 px-2 py-0.5 rounded flex items-center gap-1 uppercase font-bold">
@@ -222,12 +228,19 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                 </div>
             </div>
 
-            {/* REGISTRAR INTERACCIÓN */}
+            {/* Registrar Interaccion  */}
             {isInteraccionModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-                    <div className="bg-[#111] border border-gray-800 w-full max-w-lg rounded-3xl p-8 relative shadow-2xl">
-                        <button onClick={() => setIsInteraccionModalOpen(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white"><X size={20}/></button>
-                        <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-[#111] border border-gray-100 dark:border-gray-800 w-full max-w-lg rounded-3xl p-8 relative shadow-2xl transition-colors">
+                        
+                        <button 
+                            onClick={() => setIsInteraccionModalOpen(false)} 
+                            className="absolute right-6 top-6 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors"
+                        >
+                            <X size={20}/>
+                        </button>
+
+                        <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
                             <MessageSquare className="text-[#c1f75e]" /> Nueva Gestión Comercial
                         </h2>
 
@@ -236,23 +249,24 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                 <div>
                                     <label className="text-[10px] font-black uppercase text-gray-500 ml-1 tracking-widest">Tipo de Contacto</label>
                                     <select 
-                                        className="w-full bg-[#0A0A0A] border-gray-800 rounded-xl text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1"
+                                        className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1 transition-colors"
                                         value={formInt.data.tipo_contacto}
                                         onChange={e => formInt.setData('tipo_contacto', e.target.value)}
                                         required
                                     >
                                         <option value="">Seleccionar...</option>
+                                        <option value="Reunión Presencial">Reunión Presencial</option>
                                         <option value="Llamada">Llamada Telefónica</option>
                                         <option value="Correo">Correo Electrónico</option>
-                                        <option value="Reunión">Reunión Presencial</option>
                                         <option value="WhatsApp">Mensaje WhatsApp</option>
+                                        <option value="Otro">Otro</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase text-gray-500 ml-1 tracking-widest">Fecha</label>
                                     <input 
                                         type="date"
-                                        className="w-full bg-[#0A0A0A] border-gray-800 rounded-xl text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1"
+                                        className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1 transition-colors"
                                         value={formInt.data.fecha}
                                         onChange={e => formInt.setData('fecha', e.target.value)}
                                         required
@@ -263,21 +277,28 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                             <div>
                                 <label className="text-[10px] font-black uppercase text-gray-500 ml-1 tracking-widest">Asociar a Licitación</label>
                                 <select 
-                                    className="w-full bg-[#0A0A0A] border-gray-800 rounded-xl text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1"
+                                    className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1 transition-colors"
                                     value={formInt.data.licitacion_id}
                                     onChange={e => formInt.setData('licitacion_id', e.target.value)}
                                 >
                                     <option value="">Ninguna licitación</option>
-                                    {licitaciones?.map(lic => (
-                                        <option key={lic.id} value={lic.id}>{lic.numero_licitacion} - {lic.nombre}</option>
-                                    ))}
-                                </select>
-                            </div>
+                                    {/* Usamos las licitaciones que vienen del controlador */}
+                                    {licitaciones && licitaciones.length > 0 ? (
+                                            licitaciones.map((lic) => (
+                                                <option key={lic.id} value={lic.id} className="dark:bg-[#111]">
+                                                    {lic.nombre} {/* <--- Asegúrate que diga .nombre */}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option disabled>No hay licitaciones disponibles</option>
+                                        )}
+                                    </select>
+                            </div>  
 
                             <div>
                                 <label className="text-[10px] font-black uppercase text-gray-500 ml-1 tracking-widest">Detalle / Nota</label>
                                 <textarea 
-                                    className="w-full bg-[#0A0A0A] border-gray-800 rounded-xl text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1 min-h-[120px]"
+                                    className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1 min-h-[120px] resize-none transition-colors"
                                     placeholder="¿Qué se habló con el contacto?"
                                     value={formInt.data.comentario}
                                     onChange={e => formInt.setData('comentario', e.target.value)}
@@ -285,7 +306,11 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                 />
                             </div>
 
-                            <button type="submit" disabled={formInt.processing} className="w-full bg-[#c1f75e] text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#aee64b] transition-all shadow-xl shadow-[#c1f75e]/10">
+                            <button 
+                                type="submit" 
+                                disabled={formInt.processing} 
+                                className="w-full bg-[#c1f75e] text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-[#c1f75e]/10 active:scale-[0.98]"
+                            >
                                 {formInt.processing ? 'Guardando...' : 'Confirmar y Guardar Bitácora'}
                             </button>
                         </form>
@@ -293,19 +318,24 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                 </div>
             )}
 
-            {/* EXPERIENCIA LABORAL */}
+            {/* Experiencia Laboral */}
             {isExpModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#111] border border-gray-800 w-full max-w-md rounded-2xl p-8 relative shadow-2xl">
-                        <button onClick={() => setIsExpModalOpen(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white"><X size={20}/></button>
-                        <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-6 flex items-center gap-2">
+                    <div className="bg-white dark:bg-[#111] border border-gray-100 dark:border-gray-800 w-full max-w-md rounded-2xl p-8 relative shadow-2xl">
+                        <button 
+                            onClick={() => setIsExpModalOpen(false)} 
+                            className="absolute right-6 top-6 text-gray-400 hover:text-gray-600 dark:hover:text-white"
+                        >
+                            <X size={20}/>
+                        </button>
+                        <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-6 flex items-center gap-2">
                             <Plus className="text-[#c1f75e]" /> Nuevo Registro Laboral
                         </h2>
                         <form onSubmit={submitExperiencia} className="space-y-4">
                             <div>
                                 <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Empresa / División</label>
                                 <select 
-                                    className="w-full bg-[#0A0A0A] border-gray-800 rounded-xl text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1"
+                                    className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1"
                                     value={formExp.data.division_id}
                                     onChange={e => formExp.setData('division_id', e.target.value)}
                                     required
@@ -320,7 +350,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                 <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Cargo</label>
                                 <input 
                                     type="text"
-                                    className="w-full bg-[#0A0A0A] border-gray-800 rounded-xl text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1"
+                                    className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1"
                                     value={formExp.data.cargo}
                                     onChange={e => formExp.setData('cargo', e.target.value)}
                                     required
@@ -329,15 +359,15 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Inicio</label>
-                                    <input type="date" className="w-full bg-[#0A0A0A] border-gray-800 rounded-xl text-white text-[10px] focus:border-[#c1f75e] focus:ring-0 mt-1" value={formExp.data.fecha_inicio} onChange={e => formExp.setData('fecha_inicio', e.target.value)} required />
+                                    <input type="date" className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-[10px] focus:border-[#c1f75e] focus:ring-0 mt-1" value={formExp.data.fecha_inicio} onChange={e => formExp.setData('fecha_inicio', e.target.value)} required />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Fin</label>
-                                    <input type="date" disabled={formExp.data.estado_actual} className="w-full bg-[#0A0A0A] border-gray-800 rounded-xl text-white text-[10px] focus:border-[#c1f75e] focus:ring-0 mt-1 disabled:opacity-20" value={formExp.data.fecha_fin || ''} onChange={e => formExp.setData('fecha_fin', e.target.value)} />
+                                    <input type="date" disabled={formExp.data.estado_actual} className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-[10px] focus:border-[#c1f75e] focus:ring-0 mt-1 disabled:opacity-20" value={formExp.data.fecha_fin || ''} onChange={e => formExp.setData('fecha_fin', e.target.value)} />
                                 </div>
                             </div>
                             <label className="flex items-center gap-3 cursor-pointer group pt-2">
-                                <input type="checkbox" className="w-5 h-5 rounded border-gray-800 bg-black text-[#c1f75e] focus:ring-0" checked={formExp.data.estado_actual} onChange={e => formExp.setData('estado_actual', e.target.checked)} />
+                                <input type="checkbox" className="w-5 h-5 rounded border-gray-800 dark:bg-black text-[#c1f75e] focus:ring-0" checked={formExp.data.estado_actual} onChange={e => formExp.setData('estado_actual', e.target.checked)} />
                                 <span className="text-xs font-bold text-gray-400 uppercase italic">Es mi cargo actual</span>
                             </label>
                             <button type="submit" disabled={formExp.processing} className="w-full bg-[#c1f75e] text-black py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:brightness-90 transition-all shadow-lg">
