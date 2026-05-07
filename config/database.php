@@ -42,7 +42,7 @@ return [
     |
     */
 
-    "default" => env("DB_CONNECTION", "laravel"),
+    "default" => env("DB_CONNECTION", "crm"),
 
     /*
     |--------------------------------------------------------------------------

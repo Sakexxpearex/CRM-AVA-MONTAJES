@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\InteraccionController;
+use App\Http\Controllers\LicitacionController;
+use App\Http\Controllers\HistorialController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,12 +25,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Modulo de empresas
     Route::resource('empresas', EmpresaController::class);
-    
-    // Aqui irian el resto de rutas, de licitacions, conntactos, etc 
 
-    //Falta el PersonaController
-    //Route::resource('personas', PersonaController::class);
-    
+    // Rutas Licitaciones, Personas e interacciones
+    Route::resource('licitaciones', LicitacionController::class);
+    Route::resource('personas', PersonaController::class);
+    Route::resource('interacciones', InteraccionController::class);
+    Route::post('/historial-laboral', [HistorialController::class, 'store'])->name('historial.store');
+
 
     // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

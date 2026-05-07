@@ -3,63 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Interaccion;
+use App\Models\Licitacion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class InteraccionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
-    }
+        // Validamos usando los nombres de tu $fillable
+        $validated = $request->validate([
+            'persona_id'    => 'required|exists:crm.personas,id',
+            'licitacion_id' => 'nullable|exists:crm.licitaciones,id',
+            'tipo_contacto' => 'required|string',
+            'fecha'         => 'required|date',
+            'comentario'    => 'required|string',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Interaccion $interaccion)
-    {
-        //
-    }
+        // Creamos la interacción
+        Interaccion::create([
+            'persona_id'    => $validated['persona_id'],
+            'licitacion_id' => $validated['licitacion_id'],
+            'tipo_contacto' => $validated['tipo_contacto'],
+            'fecha'         => $validated['fecha'],
+            'comentario'    => $validated['comentario'],
+            'user_id'       => Auth::id(), // Tomamos el ID del usuario logueado
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Interaccion $interaccion)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Interaccion $interaccion)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Interaccion $interaccion)
-    {
-        //
+        // Volvemos atrás para que Inertia refresque la bitácora automáticamente
+        return back()->with('success', 'Gestión guardada.');
     }
 }
