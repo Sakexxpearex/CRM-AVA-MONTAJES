@@ -104,6 +104,19 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     )}
                 </button>
             </form>
+
+            {/* sección de registro  */}
+            <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 text-center">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-3">
+                    ¿No tienes acceso al sistema?
+                </p>
+                <Link
+                    href={route('register')}
+                    className="inline-block w-full py-3 border border-gray-200 dark:border-gray-800 rounded-md text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:border-[#C1F75E] hover:text-[#C1F75E] transition-all"
+                >
+                    Registrar nueva cuenta
+                </Link>
+            </div>
         </AuthLayout>
     );
 }

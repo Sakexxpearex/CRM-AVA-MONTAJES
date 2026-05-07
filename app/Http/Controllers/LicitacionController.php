@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Licitacion;
 use App\Models\Empresa;
 use App\Models\Division;
-// use App\Models\Proyecto; // Descomenta si necesitas listar los proyectos disponibles en el form
+use App\Models\Proyecto;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,14 +13,16 @@ class LicitacionController extends Controller
 {
     public function index()
     {
-        // busca las licitaciones y trae a sus tablas "familiares"
-        $licitaciones = Licitacion::with(['empresa', 'division', 'proyecto'])->get();
-        
-        // También mandamos las empresas y divisiones para llenar los <select> del formulario en React
-        $empresas = Empresa::all();
-        $divisiones = Division::all();
+        // Cargamos las licitaciones con sus relaciones para la tabla
+        $licitaciones = Licitacion::with(['empresa', 'division'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        return Inertia::render('Licitaciones/Index', [
+        // Necesitamos empresas y divisiones para el modal de creación
+        $empresas = Empresa::all();
+        $divisiones = Division::with('empresa')->get();
+
+        return Inertia::render('licitaciones/Index', [
             'licitaciones' => $licitaciones,
             'empresas' => $empresas,
             'divisiones' => $divisiones
@@ -29,52 +31,33 @@ class LicitacionController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validamos que la información que llega de React sea correcta
         $validated = $request->validate([
             'empresa_id' => 'required|exists:crm.empresas,id',
             'division_id' => 'required|exists:crm.divisiones,id',
             'nombre_proyecto' => 'required|string|max:255',
-            'estado_pipeline' => 'required|string',
-            'descripcion' => 'nullable|string',
+            'estado_pipeline' => 'required|string', // Ej: Prospecto, Cotización, Negociación
             'monto_estimado' => 'nullable|numeric',
+            'descripcion' => 'nullable|string',
             'fecha_cierre' => 'nullable|date',
-            'fecha_adjudicacion' => 'nullable|date',
-            
         ]);
 
-        // 2. Guardamos en la base de datos
         Licitacion::create($validated);
 
-        // 3. Le decimos a Inertia que vuelva a la página anterior
-        return back();
+        //return redirect()->route('licitaciones.index')->with('message', 'Licitación creada con éxito');
+        return redirect()->back();
     }
 
-    public function update(Request $request, $id)
+    // El show para ver el detalle (donde irán las interacciones después)
+    public function show(Licitacion $licitacion)
     {
-        $licitacion = Licitacion::findOrFail($id);
-
-        $validated = $request->validate([
-            'empresa_id' => 'required|exists:crm.empresas,id',
-            'division_id' => 'required|exists:crm.divisiones,id',
-            'nombre_proyecto' => 'required|string|max:255',
-            'estado_pipeline' => 'required|string',
-            'descripcion' => 'nullable|string',
-            'monto_estimado' => 'nullable|numeric',
-            'fecha_cierre' => 'nullable|date',
-            'fecha_adjudicacion' => 'nullable|date',
-            'proyecto_id' => 'nullable|integer' 
+        return Inertia::render('Licitaciones/Show', [
+            'licitacion' => $licitacion->load([
+                'empresa', 
+                'division', 
+                'proyecto', 
+                'interacciones.user', 
+                'interacciones.persona'
+            ])
         ]);
-
-        $licitacion->update($validated);
-
-        return back();
-    }
-
-    public function destroy($id)
-    {
-        $licitacion = Licitacion::findOrFail($id);
-        $licitacion->delete();
-
-        return back();
     }
 }

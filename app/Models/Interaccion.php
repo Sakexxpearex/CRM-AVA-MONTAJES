@@ -48,7 +48,7 @@ class Interaccion extends Model
      * Nota: Laravel resolverá automáticamente que el modelo User está en otra conexión
      * si tu modelo App\Models\User tiene configurado protected $connection = 'usuarios';
      */
-    public function usuario()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }

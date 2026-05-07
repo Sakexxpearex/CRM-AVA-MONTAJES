@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\InteraccionController;
+use App\Http\Controllers\LicitacionController;
+use App\Http\Controllers\HistorialController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-Route::apiResource('empresas', EmpresaController::class);
 
 Route::get('/test', function () {
     return 'ok';
@@ -28,7 +30,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('licitaciones', LicitacionController::class);
     Route::resource('personas', PersonaController::class);
     Route::resource('interacciones', InteraccionController::class);
-    
+    Route::post('/historial-laboral', [HistorialController::class, 'store'])->name('historial.store');
+
 
     // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

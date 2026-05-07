@@ -4,65 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\Interaccion;
 use App\Models\Licitacion;
-use App\Models\Persona;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class InteraccionController extends Controller
 {
-    public function index()
-    {
-       
-        $interacciones = Interaccion::with(['persona', 'licitacion'])->orderBy('fecha', 'desc')->get();
-        
-       
-        $personas = Persona::all();
-        $licitaciones = Licitacion::all();
-
-        return Inertia::render('Interacciones/Index', [
-            'interacciones' => $interacciones,
-            'personas' => $personas,
-            'licitaciones' => $licitaciones
-        ]);
-    }
-
     public function store(Request $request)
     {
+        // Validamos usando los nombres de tu $fillable
         $validated = $request->validate([
+            'persona_id'    => 'required|exists:crm.personas,id',
             'licitacion_id' => 'nullable|exists:crm.licitaciones,id',
-            'persona_id' => 'required|exists:crm.personas,id', // O contactos, según tu tabla
-            'tipo' => 'required|string|in:Llamada,Correo,Reunión,WhatsApp', // Ajusta tus opciones
-            'fecha' => 'required|date',
-            'notas' => 'required|string',
+            'tipo_contacto' => 'required|string',
+            'fecha'         => 'required|date',
+            'comentario'    => 'required|string',
         ]);
 
-        Interaccion::create($validated);
-
-        return back();
-    }
-
-    public function update(Request $request, $id)
-    {
-        $interaccion = Interaccion::findOrFail($id);
-
-        $validated = $request->validate([
-            'licitacion_id' => 'nullable|exists:crm.licitaciones,id',
-            'persona_id' => 'required|exists:crm.personas,id',
-            'tipo' => 'required|string|in:Llamada,Correo,Reunión,WhatsApp',
-            'fecha' => 'required|date',
-            'notas' => 'required|string',
+        // Creamos la interacción
+        Interaccion::create([
+            'persona_id'    => $validated['persona_id'],
+            'licitacion_id' => $validated['licitacion_id'],
+            'tipo_contacto' => $validated['tipo_contacto'],
+            'fecha'         => $validated['fecha'],
+            'comentario'    => $validated['comentario'],
+            'user_id'       => Auth::id(), // Tomamos el ID del usuario logueado
         ]);
 
-        $interaccion->update($validated);
-
-        return back();
-    }
-
-    public function destroy($id)
-    {
-        $interaccion = Interaccion::findOrFail($id);
-        $interaccion->delete();
-
-        return back();
+        // Volvemos atrás para que Inertia refresque la bitácora automáticamente
+        return back()->with('success', 'Gestión guardada.');
     }
 }

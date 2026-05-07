@@ -23,9 +23,9 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
             
             {/* Naveción mobile*/}
             <nav className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#0A0A0A] border-b border-gray-800 px-6 flex justify-between items-center z-50">
-                <img src="/assets/logos/isotipo-blanco-verde.svg" className="h-8 w-auto" alt="Logo" />
+                <img src="/assets/logos/blanco.svg" className="h-8 w-auto" alt="Logo" />
                 <div className="flex items-center gap-4">
-                    {/* Modo oscuro/claro */}
+                    {/* Modo oscuro/claro */}   
                     <button 
                         onClick={() => setDarkMode(!darkMode)}
                         className="p-2 text-gray-400 hover:text-white transition-colors"
@@ -63,9 +63,23 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                         label="Empresas" 
                         active={route().current('empresas.*')} 
                     />
-                    <NavLink href="#" icon={<FileSpreadsheet size={20}/>} label="Licitaciones" />
-                    <NavLink href="#" icon={<Users size={20}/>} label="Contactos" />
-                    <NavLink href="#" icon={<Calendar size={20}/>} label="Calendario" />
+
+                    {/* Navegacion a Licitaciones*/ }
+                    <NavLink 
+                        href={route('licitaciones.index')}  
+                        icon={<FileSpreadsheet size={20}/>} 
+                        label="Licitaciones" 
+                        active={route().current('licitaciones.*')}
+                    />
+
+                    {/* Navegacion a Contactos*/ }
+                    <NavLink 
+                        href={route('personas.index')} 
+                        icon={<Users size={20}/>} 
+                        label="Contactos" 
+                        active={route().current('personas.*')} 
+                    />
+                    <NavLink href="#" icon={<Calendar size={20}/>} label="Bitacora" />
                 </nav>
 
                 <div className="p-6 border-t border-gray-800 space-y-2">
@@ -98,8 +112,23 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                     label="Empresas" 
                     active={route().current('empresas.*')}
                 />
-                <MobileNavLink href="#" icon={<Users size={22}/>} label="Contactos" />
-                <MobileNavLink href="#" icon={<FileSpreadsheet size={22}/>} label="Licitaciones" />
+
+                {/* Navegacion a personas */ }
+                <MobileNavLink 
+                    href={route('personas.index')} 
+                    icon={<Users size={22}/>} 
+                    label="Contactos" 
+                    active={route().current('personas.*')}
+                />
+
+                {/* Navegacion a licitaciones */ }
+                <MobileNavLink 
+                    href={route('licitaciones.index')} 
+                    icon={<Users size={22}/>} 
+                    label="Licitaciones" 
+                    active={route().current('licitaciones.*')} 
+                />
+                
                 <MobileNavLink href="#" icon={<LayoutDashboard size={22}/>} label="Bitácora" />
                 <MobileNavLink href="#" icon={<Calendar size={22}/>} label="Análisis" />
             </div>
