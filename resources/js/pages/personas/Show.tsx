@@ -86,42 +86,42 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
                     </div>
                     
-                    <div className="px-8 pb-8">
-                        <div className="relative flex flex-col md:flex-row gap-8 items-end -mt-12">
+                    <div className="px-4 pb-8 md:px-8">
+                        <div className="relative flex flex-col items-center text-center md:flex-row md:items-end md:text-left gap-6 -mt-16 md:-mt-12">
                             <div className="w-32 h-32 bg-gray-900 text-[#c1f75e] rounded-2xl flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#111] shadow-2xl shrink-0 z-10">
                                 {getInitials(persona.nombre_completo)}
                             </div>
 
-                            <div className="flex-1 pb-2">
-                                <h1 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                            <div className="flex-1 pb-2 space-y-1">
+                                <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-none">
                                     {persona.nombre_completo}
                                 </h1>
-                                <p className="text-gray-500 font-mono text-sm flex items-center gap-2 mt-1">
+                                <p className="text-gray-500 font-mono text-sm flex items-center justify-center md:justify-start gap-2">
                                     <ShieldCheck size={14} className="text-gray-400" /> {persona.rut}
                                 </p>
                             </div>
 
                             {/* BOTONES DE ACCIÓN PRINCIPALES */}
-                            <div className="flex gap-3 pb-2 w-full md:w-auto">
+                            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto pb-2">
                                 <button 
                                     onClick={() => setIsInteraccionModalOpen(true)}
-                                    className="flex-1 md:flex-none bg-[#c1f75e] text-black px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:brightness-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#c1f75e]/20"
+                                    className="w-full sm:w-auto bg-[#c1f75e] text-black px-6 py-3 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:brightness-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#c1f75e]/20"
                                 >
                                     <Plus size={16} strokeWidth={3} />
                                     Registrar Interacción
                                 </button>
-                                <button className="flex-1 md:flex-none bg-black dark:bg-white dark:text-black text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:opacity-80 transition-all shadow-lg">
+                                <button className="w-full sm:w-auto bg-white dark:bg-white/10 text-black dark:text-white border border-gray-200 dark:border-gray-800 px-6 py-3 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:opacity-80 transition-all shadow-lg">
                                     Editar Perfil
                                 </button>
                             </div>
                         </div>
 
                         {/* Contact Chips */}
-                        <div className="flex flex-wrap gap-3 mt-8 pt-8 border-t border-gray-100 dark:border-gray-800">
-                            <a href={`mailto:${persona.email}`} className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-4 py-2.5 rounded-lg text-xs font-bold hover:bg-[#c1f75e] hover:text-black transition-all border border-transparent hover:border-[#c1f75e]">
+                        <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-8 pt-8 border-t border-gray-100 dark:border-gray-800">
+                            <a href={`mailto:${persona.email}`} className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-4 py-2.5 rounded-lg text-xs font-bold hover:bg-[#c1f75e] hover:text-black transition-all border border-transparent">
                                 <Mail size={14} /> {persona.email}
                             </a>
-                            <a href={`tel:${persona.telefono}`} className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-4 py-2.5 rounded-lg text-xs font-bold hover:bg-[#c1f75e] hover:text-black transition-all border border-transparent hover:border-[#c1f75e]">
+                            <a href={`tel:${persona.telefono}`} className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-4 py-2.5 rounded-lg text-xs font-bold hover:bg-[#c1f75e] hover:text-black transition-all border border-transparent">
                                 <Phone size={14} /> {persona.telefono}
                             </a>
                         </div>
