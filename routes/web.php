@@ -5,6 +5,7 @@ use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\InteraccionController;
 use App\Http\Controllers\LicitacionController;
 use App\Http\Controllers\HistorialController;
+use App\Http\Controllers\DashboardController; 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,9 +20,7 @@ Route::get('/', function () {
 // Solo Usuarios logueados
 Route::middleware(['auth'])->group(function () {
     // Dashboard principal
-    Route::get('/dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Modulo de empresas
     Route::resource('empresas', EmpresaController::class);
