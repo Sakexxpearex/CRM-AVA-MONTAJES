@@ -79,7 +79,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                         label="Contactos" 
                         active={route().current('personas.*')} 
                     />
-                    <NavLink href="#" icon={<Calendar size={20}/>} label="Bitacora" />
+                    <NavLink href="#" icon={<Calendar size={20}/>} label="Analisis" />
                 </nav>
 
                 <div className="p-6 border-t border-gray-800 space-y-2">
@@ -128,8 +128,6 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                     label="Licitaciones" 
                     active={route().current('licitaciones.*')} 
                 />
-                
-                <MobileNavLink href="#" icon={<LayoutDashboard size={22}/>} label="Bitácora" />
                 <MobileNavLink href="#" icon={<Calendar size={22}/>} label="Análisis" />
             </div>
         </div>

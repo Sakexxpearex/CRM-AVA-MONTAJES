@@ -32,7 +32,7 @@ export default function PersonaModal({
     editingId
 }: Props) {
 
-    // EFECTO: Cuando cambie la división, actualizamos automáticamente el empresa_id
+    // Cuando cambie la división, se actualiza automáticamente el empresa_id
     // para que el controlador lo reciba correctamente.
     useEffect(() => {
         if (data.division_id) {
@@ -47,8 +47,6 @@ export default function PersonaModal({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            
-            {/* Overlay */}
             <div 
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={onClose}
@@ -75,7 +73,7 @@ export default function PersonaModal({
                 {/* Form */}
                 <form onSubmit={submit} className="space-y-4 md:space-y-6">
 
-                    {/* RUT */}
+                    {/* Rut */}
                     <div>
                         <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">
                             RUT (ID único)
@@ -93,55 +91,55 @@ export default function PersonaModal({
 
                     {/* Nombres */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Primer Nombre</label>
-        <input
-            type="text"
-            value={data.nombre_1}
-            onChange={e => setData('nombre_1', e.target.value)}
-            className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
-            placeholder="Obligatorio"
-            required
-        />
-    </div>
-    <div>
-        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block italic text-gray-600">Segundo Nombre</label>
-        <input
-            type="text"
-            value={data.nombre_2}
-            onChange={e => setData('nombre_2', e.target.value)}
-            className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
-            placeholder="Obligatorio"
-            required 
-        />
-    </div>
-</div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Primer Nombre</label>
+                            <input
+                                type="text"
+                                value={data.nombre_1}
+                                onChange={e => setData('nombre_1', e.target.value)}
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                placeholder="Obligatorio"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block italic text-gray-600">Segundo Nombre</label>
+                            <input
+                                type="text"
+                                value={data.nombre_2}
+                                onChange={e => setData('nombre_2', e.target.value)}
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                placeholder="Obligatorio"
+                                required 
+                            />
+                        </div>
+                    </div>
 
-{/* Apellidos */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Apellido Paterno</label>
-        <input
-            type="text"
-            value={data.apellido_1}
-            onChange={e => setData('apellido_1', e.target.value)}
-            className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
-            placeholder="Obligatorio"
-            required
-        />
-    </div>
-    <div>
-        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Apellido Materno</label>
-        <input
-            type="text"
-            value={data.apellido_2}
-            onChange={e => setData('apellido_2', e.target.value)}
-            className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
-            placeholder="Obligatorio"
-            required
-        />
-    </div>
-</div>
+                    {/* Apellidos */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Apellido Paterno</label>
+                            <input
+                                type="text"
+                                value={data.apellido_1}
+                                onChange={e => setData('apellido_1', e.target.value)}
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                placeholder="Obligatorio"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Apellido Materno</label>
+                            <input
+                                type="text"
+                                value={data.apellido_2}
+                                onChange={e => setData('apellido_2', e.target.value)}
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                placeholder="Obligatorio"
+                                required
+                            />
+                        </div>
+                    </div>
 
                     {/* Contacto */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,7 +212,7 @@ export default function PersonaModal({
                         </div>
                     </div>
 
-                    {/* Submit */}
+                    {/* Enviar */}
                     <button
                         type="submit"
                         disabled={processing}

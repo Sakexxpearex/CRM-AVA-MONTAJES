@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Licitacion extends Model
 {
@@ -50,6 +51,11 @@ protected $fillable = [
         return $this->belongsTo(Proyecto::class, 'proyecto_id')->withDefault([
                 'nombre' => 'Sin Proyecto Asignado (Aún en Licitación)'
         ]);
+    }
+
+    public function interacciones(): HasMany
+    {
+        return $this->hasMany(Interaccion::class, 'licitacion_id');
     }
     
 }

@@ -1,59 +1,66 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
+import { LayoutDashboard, BarChart3, Building2, Users } from 'lucide-react';
+
+// Componentes de pagina (para mantener todo igual)
+import PageContainer from '@/components/pages/PageContainer';
+import PageHeader from '@/components/pages/PageHeader';
+import ContentPanel from '@/components/pages/ContentPanel';
+
+// Componentes especificos del dashboard
+import StatCard from '@/components/dashboard/StatCard';
 
 export default function Dashboard() {
     const { auth } = usePage().props as any;
     const user = auth.user;
+
     return (
-            <AuthenticatedLayout>
+        <AuthenticatedLayout>
             <Head title="Dashboard" />
 
-           {/* Usuario (esquina superior derecha) */}
-           <div className="flex justify-end mb-4">
-                <div className="flex items-center gap-3">
+            <PageContainer>
+                {/* Usuario esquina superior derecha */}
+                <div className="flex justify-end items-center gap-3 mb-6">
                     <div className="text-right">
                         <p className="text-sm font-bold dark:text-white leading-none">
                             {user.nombre_1} {user.apellido_1}
                         </p>
-                        <p className="text-[10px] text-gray-500 font-medium">
+                        <p className="text-[10px] text-gray-500 font-medium tracking-tighter uppercase">
                             {user.email}
                         </p>
                     </div>
-                    <div className="w-9 h-9 bg-[#86CF00] rounded-full flex items-center justify-center text-black font-black text-xs shadow-sm">
+                    <div className="w-9 h-9 bg-[#c1f75e] rounded flex items-center justify-center text-black font-black text-xs shadow-sm">
                         {user.nombre_1[0]}{user.apellido_1[0]}
                     </div>
                 </div>
-            </div>
-            <div className="flex justify-between items-start mb-8">
-                <div>
-                    <h2 className="text-3xl font-bold dark:text-white">Dashboard</h2>
-                </div>
-                
-            </div>
 
-            {/* Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm relative overflow-hidden group">
-                    {/* Acento de color verde neón */}
-                    <div className="absolute top-0 left-0 w-1 h-full bg-[#86CF00] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    
-                    <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Licitaciones Activas</h3>
-                    <div className="flex items-end gap-2 mt-2">
-                        <p className="text-5xl font-black dark:text-white">12</p>
-                        <span className="text-[#86CF00] text-sm font-bold mb-2">+2 este mes</span>
-                    </div>
-                </div>
+                {/* Header */}
+                <PageHeader 
+                    title="Dashboard"
+                    subtitle="Resumen de actividad, métricas y gestión comercial"
+                    icon={LayoutDashboard}
+                />
 
-                <div className="p-6 bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm">
-                    <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Empresas</h3>
-                    <p className="text-5xl font-black mt-2 dark:text-white">24</p>
+                {/* Metricas*/}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <StatCard 
+                        label="Licitaciones Activas"
+                        value="12"
+                        trend="+2 este mes"
+                        icon={BarChart3}
+                    />
+                    <StatCard 
+                        label="Empresas"
+                        value="24"
+                        icon={Building2}
+                    />
+                    <StatCard 
+                        label="Contactos"
+                        value="156"
+                        icon={Users}
+                    />
                 </div>
-
-                <div className="p-6 bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm">
-                    <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Contactos</h3>
-                    <p className="text-5xl font-black mt-2 dark:text-white">156</p>
-                </div>
-            </div>
+            </PageContainer>
         </AuthenticatedLayout>
     );
 }

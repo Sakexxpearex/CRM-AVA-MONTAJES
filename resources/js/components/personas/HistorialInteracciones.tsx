@@ -5,13 +5,13 @@ interface Interaccion {
     fecha: string;
     comentario: string;
     tipo_contacto: string;
-    user?: { name: string }; // El usuario que registró
+    user?: { name: string }; // Usuario q registro
     licitacion?: { numero_licitacion: string }; // Por si viene de una licitación
 }
 
 export default function HistorialInteracciones({ interacciones }: { interacciones: Interaccion[] }) {
     
-    // Mapeo de iconos según tu columna 'tipo_contacto'
+    // Iconos segun tipo de interaccion
     const getIcon = (tipo: string) => {
         const t = tipo.toLowerCase();
         if (t.includes('llamada')) return <Phone size={14} className="text-blue-400" />;
@@ -35,14 +35,14 @@ export default function HistorialInteracciones({ interacciones }: { interaccione
                 </button>
             </div>
 
-            {/* Lista de Interacciones */}
+            {/* Lista de interacciones */}
             <div className="p-6">
                 {interacciones && interacciones.length > 0 ? (
                     <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gray-100 dark:before:bg-gray-800">
                         {interacciones.map((i) => (
                             <div key={i.id} className="relative flex items-start gap-6 group">
                                 
-                                {/* Icono del Tipo de Contacto */}
+                                {/* Icono del tipo de interaccion */}
                                 <div className="absolute left-0 w-10 h-10 bg-gray-900 border border-gray-700 rounded-xl flex items-center justify-center z-10 shadow-xl group-hover:border-[#c1f75e] transition-colors">
                                     {getIcon(i.tipo_contacto)}
                                 </div>
@@ -63,7 +63,7 @@ export default function HistorialInteracciones({ interacciones }: { interaccione
                                             "{i.comentario}"
                                         </p>
                                         
-                                        {/* Meta información de la tabla */}
+                                        {/* Información de la tabla */}
                                         <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-200/50 dark:border-gray-800/50">
                                             <div className="flex items-center gap-1.5 text-[9px] font-bold text-gray-500 uppercase">
                                                 <User size={10} />

@@ -2,7 +2,7 @@
 
 export default function EstadoBadge({ estado }: { estado: string }) {
     const configs: any = {
-        // Estados del Seeder / Pipeline
+        // Estados del seeder / pipeline
         'Ganada': 'bg-[#c1f75e]/10 text-[#c1f75e] border-[#c1f75e]/20',
         'Evaluación': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
         'Preparación': 'bg-orange-500/10 text-orange-400 border-orange-500/20',

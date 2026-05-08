@@ -84,6 +84,13 @@ class PersonaController extends Controller
         ]);
     }
 
+    public function interacciones(Persona $persona)
+    {
+        return Inertia::render('personas/Interacciones', [
+            'persona' => $persona->load(['interacciones.user', 'interacciones.licitacion']),
+        ]);
+    }
+
     public function update(Request $request, Persona $persona)
     {
         $validated = $request->validate([

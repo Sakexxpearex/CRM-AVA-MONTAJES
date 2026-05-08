@@ -11,7 +11,8 @@ class EmpresaController extends Controller
     public function index()
     {
        return Inertia::render('empresas/Index', [
-            'empresas' => Empresa::all()
+            'empresas' => Empresa::all(),
+            'empresas' => Empresa::with('divisiones')->get()
         ]);
     }
 

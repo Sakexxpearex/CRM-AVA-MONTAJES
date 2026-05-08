@@ -104,7 +104,7 @@ export default function EmpresaModal({
             </select>
           </div>
 
-          {/* Submit */}
+          {/* Enviar */}
           <button
             type="submit"
             disabled={processing}

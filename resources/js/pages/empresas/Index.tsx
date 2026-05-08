@@ -1,18 +1,23 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { Factory, Plus, LayoutGrid } from 'lucide-react';
 import { useState } from 'react';
 
-//Componentes 
+// Componentes de pagina (para mantener todo igual)
+import PageContainer from '@/components/pages/PageContainer';
+import PageHeader from '@/components/pages/PageHeader';
+import ContentPanel from '@/components/pages/ContentPanel';
+
+// Componentes especificos de empresa
 import EmpresaModal from '@/components/empresas/EmpresaModal';
 import EmpresasTable from '@/components/empresas/EmpresaTable';
 import SearchEmpresa from '@/components/empresas/SearchEmpresa';
-import EmpresasHeader from '@/components/empresas/EmpresaHeader';
-import { Empresa } from '@/types/empresa'
-
+import DivisionModal from '@/components/empresas/DivisionModal';
+import { Empresa } from '@/types/empresa';
 
 export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDivisionModalOpen, setIsDivisionModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -22,7 +27,12 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
         tipo: 'Cliente' as any,
     });
 
-    // Formateador de rut
+    // Formulario de division
+    const divisionForm = useForm({
+        nombre: '',
+        empresa_id: '',
+    })
+
     const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value.replace(/[^0-9kK]/g, "");
         if (value.length > 1) {
@@ -52,14 +62,20 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         if (editingId) {
-            put(route('empresas.update', editingId), {
-                onSuccess: () => closeModal(),
-            });
+            put(route('empresas.update', editingId), { onSuccess: () => closeModal() });
         } else {
-            post(route('empresas.store'), { 
-                onSuccess: () => closeModal(),
-            });
+            post(route('empresas.store'), { onSuccess: () => closeModal() });
         }
+    };
+
+    const submitDivision = (e: React.FormEvent) => {
+        e.preventDefault();
+        divisionForm.post(route('divisiones.store'), {
+            onSuccess: () => {
+                setIsDivisionModalOpen(false);
+                divisionForm.reset();
+            }
+        });
     };
 
     const handleDelete = (id: number) => {
@@ -69,34 +85,47 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
     };
 
     const empresasFiltradas = empresas.filter(e => 
-        e.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        e.rut.includes(searchTerm)
+        e.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || e.rut.includes(searchTerm)
     );
 
     return (
         <AuthenticatedLayout>
             <Head title="Empresas - AVA CRM" />
 
-            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-8">
-                
-                <EmpresasHeader onCreate={() => setIsModalOpen(true)} />
+            <PageContainer>
+                {/* Header */}
+                <PageHeader 
+                    title="Empresas"
+                    subtitle="Directorio de clientes y aliados estratégicos"
+                    icon={Factory}
+                    actionLabel="Nueva Empresa"
+                    onActionClick={() => setIsModalOpen(true)}
+                />
+                <div className="flex gap-4 mb-6">
+                    <button 
+                        onClick={() => setIsDivisionModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-gray-800 rounded-xl text-[10px] font-black uppercase text-gray-500 hover:text-[#c1f75e] hover:border-[#c1f75e]/30 transition-all"
+                    >
+                        <LayoutGrid size={14} /> Nueva División
+                    </button>
+                </div>
 
                 {/* Buscador */}
-                <SearchEmpresa
-                value={searchTerm}
-                onChange={setSearchTerm}
-                />
+                <div className="flex justify-start">
+                    <SearchEmpresa value={searchTerm} onChange={setSearchTerm} />
+                </div>
 
-            
-            {/* Tabla */}
-            <EmpresasTable 
-                empresas={empresasFiltradas}
-                onEdit={openEditModal}
-                onDelete={handleDelete}
-            />
-                        </div>
+                {/* Tabla */}
+                <ContentPanel padding={false}>
+                    <EmpresasTable 
+                        empresas={empresasFiltradas}
+                        onEdit={openEditModal}
+                        onDelete={handleDelete}
+                    />
+                </ContentPanel>
+            </PageContainer>
 
-            {/* Modal de creación/actualización) */}
+            {/* Modales */}
             <EmpresaModal
                 isOpen={isModalOpen}
                 onClose={closeModal}
@@ -107,13 +136,24 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
                 processing={processing}
                 editingId={editingId}
                 handleRutChange={handleRutChange}
-                />
-            {/* Boton mobile */}
-            <button 
+            />
+
+            <DivisionModal 
+                isOpen={isDivisionModalOpen}
+                onClose={() => setIsDivisionModalOpen(false)}
+                data={divisionForm.data}
+                setData={divisionForm.setData}
+                submit={submitDivision}
+                errors={divisionForm.errors}
+                processing={divisionForm.processing}
+                empresas={empresas} // Lista de mepresas para el select
+            />
+
+           <button 
                 onClick={() => setIsModalOpen(true)}
-                className="md:hidden fixed bottom-24 right-6 z-50 flex items-center justify-center bg-[#C1F75E] text-black w-14 h-14 rounded-full shadow-2xl active:scale-90 transition-transform"
+                className="md:hidden fixed bottom-24 right-6 z-50 flex items-center justify-center bg-[#c1f75e] text-black w-10 h-10 rounded-full shadow-2xl active:scale-90 transition-transform"
             >
-                <Plus size={30} strokeWidth={3} />
+                <Plus size={16} strokeWidth={3} />
             </button>
         </AuthenticatedLayout>
     );
