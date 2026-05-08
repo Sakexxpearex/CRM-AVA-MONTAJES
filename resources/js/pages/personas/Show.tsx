@@ -1,13 +1,14 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { 
-    ChevronLeft, Mail, Phone, Linkedin, 
-    Building2, Calendar, Briefcase, MessageSquare, 
+import {
+    ChevronLeft, Mail, Phone, Linkedin,
+    Building2, Calendar, Briefcase, MessageSquare,
     MapPin, Clock, ShieldCheck, Plus, X, User, FileText, ClipboardList, ArrowRight
 } from 'lucide-react';
 
 import { Persona } from '@/types/persona';
+import { formatDate } from '@/utils/formatters';
 
 interface Division {
     id: number;
@@ -17,7 +18,7 @@ interface Division {
 
 interface Props {
     persona: Persona & { interacciones: any[] };
-    divisiones: Division[]; 
+    divisiones: Division[];
     licitaciones: any[]; // Recibimos licitaciones del controlador
 }
 
@@ -65,26 +66,18 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
         });
     };
 
-         const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString('es-CL', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-        });
-    };
-
     return (
         <AuthenticatedLayout>
             <Head title={`${persona.nombre_completo} - Perfil CRM`} />
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-6">
-                
+
                 {/* Navegación Superior */}
-                <Link 
-                    href={route('personas.index')} 
+                <Link
+                    href={route('personas.index')}
                     className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-[#c1f75e] transition-colors text-xs font-black uppercase tracking-widest group w-fit"
                 >
-                    <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform"/> 
+                    <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                     Volver al Directorio
                 </Link>
 
@@ -93,7 +86,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                     <div className="h-32 bg-gray-900 relative">
                         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
                     </div>
-                    
+
                     <div className="px-4 pb-8 md:px-8">
                         <div className="relative flex flex-col items-center text-center md:flex-row md:items-end md:text-left gap-6 -mt-16 md:-mt-12">
                             <div className="w-32 h-32 bg-gray-900 text-[#c1f75e] rounded-2xl flex items-center justify-center text-4xl font-black border-4 border-white dark:border-[#111] shadow-2xl shrink-0 z-10">
@@ -110,7 +103,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto pb-2">
-                                <button 
+                                <button
                                     onClick={() => setIsInteraccionModalOpen(true)}
                                     className="w-full sm:w-auto bg-[#c1f75e] text-black px-6 py-3 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:brightness-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#c1f75e]/20"
                                 >
@@ -143,7 +136,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
                                     <Briefcase size={14} className="text-[#c1f75e]" /> Historial de Cargos
                                 </h3>
-                                <button 
+                                <button
                                     onClick={() => setIsExpModalOpen(true)}
                                     className="p-2 bg-[#c1f75e]/10 text-[#c1f75e] rounded-lg hover:bg-[#c1f75e] hover:text-black transition-all group"
                                 >
@@ -163,7 +156,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                                 <p className="text-sm text-gray-800 dark:text-gray-200 font-extrabold uppercase">{empleo.division.empresa.nombre}</p>
                                             </div>
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter bg-gray-100 dark:bg-white/5 text-gray-500">
-                                                <Clock size={12} /> {empleo.fecha_inicio} — {empleo.estado_actual ? 'Presente' : empleo.fecha_fin}
+                                                <Clock size={12} /> {formatDate(empleo.fecha_inicio)} — {empleo.estado_actual ? 'Presente' : formatDate(empleo.fecha_fin)}
                                             </span>
                                         </div>
                                     </div>
@@ -178,7 +171,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2 mb-6">
                                 <ClipboardList size={14} className="text-[#c1f75e]" /> Bitácora CRM
                             </h3>
-                            
+
                             <div className="space-y-6">
                                 {persona.interacciones?.length > 0 ? (
                                     persona.interacciones.map((int, idx) => (
@@ -186,7 +179,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                             <div className="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-[#c1f75e] shadow-[0_0_8px_#c1f75e]"></div>
                                             <div className="flex justify-between items-start">
                                                 <span className="text-[9px] font-black uppercase text-[#c1f75e] tracking-widest">{int.tipo_contacto}</span>
-                                                <span className="text-[9px] font-mono text-gray-500 italic">{int.fecha}</span>
+                                                <span className="text-[9px] font-mono text-gray-500 italic">{formatDate(int.fecha)}</span>
                                             </div>
                                             <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed italic">
                                                 "{int.comentario}"
@@ -232,12 +225,12 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
             {isInteraccionModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                     <div className="bg-white dark:bg-[#111] border border-gray-100 dark:border-gray-800 w-full max-w-lg rounded-3xl p-8 relative shadow-2xl transition-colors">
-                        
-                        <button 
-                            onClick={() => setIsInteraccionModalOpen(false)} 
+
+                        <button
+                            onClick={() => setIsInteraccionModalOpen(false)}
                             className="absolute right-6 top-6 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors"
                         >
-                            <X size={20}/>
+                            <X size={20} />
                         </button>
 
                         <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
@@ -248,7 +241,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black uppercase text-gray-500 ml-1 tracking-widest">Tipo de Contacto</label>
-                                    <select 
+                                    <select
                                         className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1 transition-colors"
                                         value={formInt.data.tipo_contacto}
                                         onChange={e => formInt.setData('tipo_contacto', e.target.value)}
@@ -264,7 +257,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase text-gray-500 ml-1 tracking-widest">Fecha</label>
-                                    <input 
+                                    <input
                                         type="date"
                                         className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1 transition-colors"
                                         value={formInt.data.fecha}
@@ -276,7 +269,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
 
                             <div>
                                 <label className="text-[10px] font-black uppercase text-gray-500 ml-1 tracking-widest">Asociar a Licitación</label>
-                                <select 
+                                <select
                                     className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1 transition-colors"
                                     value={formInt.data.licitacion_id}
                                     onChange={e => formInt.setData('licitacion_id', e.target.value)}
@@ -284,20 +277,20 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                     <option value="">Ninguna licitación</option>
                                     {/* Usamos las licitaciones que vienen del controlador */}
                                     {licitaciones && licitaciones.length > 0 ? (
-                                            licitaciones.map((lic) => (
-                                                <option key={lic.id} value={lic.id} className="dark:bg-[#111]">
-                                                    {lic.nombre} {/* <--- Asegúrate que diga .nombre */}
-                                                </option>
-                                            ))
-                                        ) : (
-                                            <option disabled>No hay licitaciones disponibles</option>
-                                        )}
-                                    </select>
-                            </div>  
+                                        licitaciones.map((lic) => (
+                                            <option key={lic.id} value={lic.id} className="dark:bg-[#111]">
+                                                {lic.nombre} {/* <--- Asegúrate que diga .nombre */}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option disabled>No hay licitaciones disponibles</option>
+                                    )}
+                                </select>
+                            </div>
 
                             <div>
                                 <label className="text-[10px] font-black uppercase text-gray-500 ml-1 tracking-widest">Detalle / Nota</label>
-                                <textarea 
+                                <textarea
                                     className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1 min-h-[120px] resize-none transition-colors"
                                     placeholder="¿Qué se habló con el contacto?"
                                     value={formInt.data.comentario}
@@ -306,9 +299,9 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                 />
                             </div>
 
-                            <button 
-                                type="submit" 
-                                disabled={formInt.processing} 
+                            <button
+                                type="submit"
+                                disabled={formInt.processing}
                                 className="w-full bg-[#c1f75e] text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-[#c1f75e]/10 active:scale-[0.98]"
                             >
                                 {formInt.processing ? 'Guardando...' : 'Confirmar y Guardar Bitácora'}
@@ -322,11 +315,11 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
             {isExpModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
                     <div className="bg-white dark:bg-[#111] border border-gray-100 dark:border-gray-800 w-full max-w-md rounded-2xl p-8 relative shadow-2xl">
-                        <button 
-                            onClick={() => setIsExpModalOpen(false)} 
+                        <button
+                            onClick={() => setIsExpModalOpen(false)}
                             className="absolute right-6 top-6 text-gray-400 hover:text-gray-600 dark:hover:text-white"
                         >
-                            <X size={20}/>
+                            <X size={20} />
                         </button>
                         <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-6 flex items-center gap-2">
                             <Plus className="text-[#c1f75e]" /> Nuevo Registro Laboral
@@ -334,7 +327,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                         <form onSubmit={submitExperiencia} className="space-y-4">
                             <div>
                                 <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Empresa / División</label>
-                                <select 
+                                <select
                                     className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1"
                                     value={formExp.data.division_id}
                                     onChange={e => formExp.setData('division_id', e.target.value)}
@@ -348,7 +341,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                             </div>
                             <div>
                                 <label className="text-[10px] font-black uppercase text-gray-500 ml-1">Cargo</label>
-                                <input 
+                                <input
                                     type="text"
                                     className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white text-sm focus:border-[#c1f75e] focus:ring-0 mt-1"
                                     value={formExp.data.cargo}

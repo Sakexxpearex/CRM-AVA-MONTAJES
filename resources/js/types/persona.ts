@@ -32,5 +32,5 @@ export interface Persona {
         };
         cargo: string;
     };
-     historial_laboral?: HistorialLaboral[];
+    historial_laboral?: HistorialLaboral[];
 }
