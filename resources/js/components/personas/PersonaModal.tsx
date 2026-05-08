@@ -1,6 +1,7 @@
 import { X, LoaderCircle, Briefcase, Users } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { useEffect } from 'react';
+import { formatRut } from '@/utils/formatters';
 
 interface Division {
     id: number;
@@ -81,7 +82,7 @@ export default function PersonaModal({
                         <input
                             type="text"
                             value={data.rut}
-                            onChange={e => setData('rut', e.target.value)}
+                            onChange={e => setData('rut', formatRut(e.target.value))}
                             className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#c1f75e]"
                             placeholder="12345678-K"
                             required

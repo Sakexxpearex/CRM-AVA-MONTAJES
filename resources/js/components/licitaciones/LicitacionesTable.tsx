@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { Eye, Building2, Calendar, DollarSign } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
+import { formatDate } from '@/utils/formatters';
 
 export default function LicitacionesTable({ licitaciones }: { licitaciones: any[] }) {
     const formatMoney = (val: any) => {
@@ -43,7 +44,7 @@ export default function LicitacionesTable({ licitaciones }: { licitaciones: any[
                                 <div className="flex flex-col text-right">
                                     <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Cierre</span>
                                     <span className="text-[10px] font-bold dark:text-gray-300 uppercase">
-                                        {lic.fecha_cierre || 'Pendiente'}
+                                        {formatDate(lic.fecha_cierre) || ' --- '}
                                     </span>
                                 </div>
                             </div>
@@ -88,7 +89,7 @@ export default function LicitacionesTable({ licitaciones }: { licitaciones: any[
                                     {formatMoney(lic.monto_estimado)}
                                 </td>
                                 <td className="px-6 py-4 text-center font-mono text-[10px] text-gray-500 uppercase">
-                                    {lic.fecha_cierre || '---'}
+                                    {formatDate(lic.fecha_cierre) || ' --- '}
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <Link 

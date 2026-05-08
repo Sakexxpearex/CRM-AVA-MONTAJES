@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
-import { LayoutDashboard, BarChart3, Building2, Users } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Building2, Users,Zap } from 'lucide-react';
 
 // Componentes de pagina (para mantener todo igual)
 import PageContainer from '@/components/pages/PageContainer';
@@ -10,9 +10,13 @@ import ContentPanel from '@/components/pages/ContentPanel';
 // Componentes especificos del dashboard
 import StatCard from '@/components/dashboard/StatCard';
 
-export default function Dashboard() {
+export default function Dashboard({ stats }: any) {
     const { auth } = usePage().props as any;
     const user = auth.user;
+    if (!stats) {
+        return <div className="p-10 text-white font-mono text-xs">Error: No se recibieron estadísticas del servidor.</div>;
+    }
+
 
     return (
         <AuthenticatedLayout>
@@ -45,19 +49,26 @@ export default function Dashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <StatCard 
                         label="Licitaciones Activas"
-                        value="12"
-                        trend="+2 este mes"
+                        value={stats.totalLicitaciones}
+                        trend={`${stats.nuevasLicitaciones} nuevas`}
                         icon={BarChart3}
                     />
                     <StatCard 
                         label="Empresas"
-                        value="24"
+                        value={stats.totalEmpresas}
                         icon={Building2}
                     />
                     <StatCard 
                         label="Contactos"
-                        value="156"
+                        value={stats.totalPersonas}
                         icon={Users}
+                    />
+                    <StatCard 
+                        label="Ritmo Mensual"
+                        value={stats.nuevasLicitaciones}
+                        trend="Este mes"
+                        icon={Zap}
+                        color="neon"
                     />
                 </div>
             </PageContainer>

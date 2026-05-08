@@ -7,6 +7,8 @@ import {
     ClipboardList, ChevronRight 
 } from 'lucide-react';
 
+import { formatDate, formatRut } from '@/utils/formatters';
+
 // Componentes de pagina (para mantener todo igual)
 import PageContainer from '@/components/pages/PageContainer';
 import PageHeader from '@/components/pages/PageHeader';
@@ -35,13 +37,6 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
 
     const getInitials = (nombre: string, apellido: string) => {
         return `${nombre?.[0] || ''}${apellido?.[0] || ''}`.toUpperCase();
-    };
-
-    const formatDate = (dateStr: string) => {
-        if (!dateStr) return '---';
-        return new Date(dateStr).toLocaleDateString('es-CL', {
-            day: '2-digit', month: 'short', year: 'numeric'
-        });
     };
 
     const submitExperiencia = (e: React.FormEvent) => {
@@ -74,7 +69,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                 {/* Header */}
                 <PageHeader 
                     title={`${persona.nombre_1} ${persona.apellido_1}`}
-                    subtitle={`RUT: ${persona.rut || 'No registrado'}`}
+                    subtitle={`RUT: ${formatRut(persona.rut)}`}
                     icon={User}
                     actionLabel="Registrar Interacción"
                     onActionClick={() => setIsInteraccionModalOpen(true)}

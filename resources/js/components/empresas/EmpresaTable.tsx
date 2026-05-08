@@ -1,5 +1,6 @@
 import { Building2, Briefcase, FileText, Users, Trash2, Edit3,LayoutGrid } from 'lucide-react';
 import { Empresa } from '@/types/empresa';
+import { formatRut } from '@/utils/formatters';
 
 const tipoConfig = {
     Cliente: { icon: FileText, color: 'text-green-600', bgColor: 'bg-green-50' },
@@ -36,7 +37,7 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                                                 <LayoutGrid size={10} className="text-[#c1f75e]" /> 
                                                 {empresa.divisiones?.length || 0} Divisiones registradas
                                             </span>
-                                            <p className="text-[10px] font-mono text-gray-500 mt-0.5 italic">{empresa.rut}</p>
+                                            <p className="text-[10px] font-mono text-gray-500 mt-0.5 italic">{formatRut(empresa.rut)}</p>
                                         </div>
                                     </div>
                                     <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${config.bgColor} ${config.color} dark:bg-opacity-10`}>
@@ -91,7 +92,7 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                                             <span className="font-bold text-sm text-gray-800 dark:text-gray-200 uppercase">{empresa.nombre}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-center font-mono text-xs text-gray-500 italic uppercase">{empresa.rut}</td>
+                                    <td className="px-6 py-4 text-center font-mono text-xs text-gray-500 italic uppercase">{formatRut(empresa.rut)}</td>
                                     <td className="px-6 py-4 text-center">
                                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-black uppercase ${config.bgColor} ${config.color} dark:bg-opacity-10`}>
                                             <config.icon size={12} strokeWidth={3} /> {empresa.tipo}

@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { ChevronLeft, Calendar, History } from 'lucide-react';
+import { formatDate } from '@/utils/formatters';
 
 // Componentes de pagina (para mantener todo igual)
 import PageContainer from '@/components/pages/PageContainer';

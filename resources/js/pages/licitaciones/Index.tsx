@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { BarChart3, Plus } from 'lucide-react';
 
+
 // Componentes de pagina (para mantener todo igual)
 import PageContainer from '@/components/pages/PageContainer';
 import PageHeader from '@/components/pages/PageHeader';

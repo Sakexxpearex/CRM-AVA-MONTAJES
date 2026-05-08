@@ -6,6 +6,7 @@ import {
     CheckCircle, Zap
 } from 'lucide-react';
 import { useState } from 'react';
+import { formatDate } from '@/utils/formatters';
 
 // Componentes de pagina (para mantener todo igual)
 import PageContainer from '@/components/pages/PageContainer';
@@ -38,13 +39,6 @@ export default function Show({ licitacion }: any) {
         }
         return acc;
     }, []) || [];
-
-    const formatDate = (dateStr: string) => {
-        if (!dateStr) return '---';
-        return new Date(dateStr).toLocaleDateString('es-CL', { 
-            day: '2-digit', month: 'short', year: 'numeric' 
-        });
-    };
 
     const onSubmitAdjudicar = (e: React.FormEvent) => {
         e.preventDefault();

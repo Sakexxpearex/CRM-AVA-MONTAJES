@@ -1,4 +1,5 @@
 import { MessageSquare, Phone, Mail, MessageCircle, MoreHorizontal, User, FileText } from 'lucide-react';
+import { formatDate } from '@/utils/formatters';
 
 export default function TimeLineItem({ interaccion }: any) {
     // Selector de icono según tipo
@@ -24,7 +25,7 @@ export default function TimeLineItem({ interaccion }: any) {
                         <span className="text-[10px] font-black uppercase text-[#c1f75e] tracking-widest bg-[#c1f75e]/5 px-2 py-1 rounded">
                             {interaccion.tipo_contacto}
                         </span>
-                        <p className="text-[11px] text-gray-500 font-mono mt-2">{interaccion.fecha}</p>
+                        <p className="text-[11px] text-gray-500 font-mono mt-2">{formatDate(interaccion.fecha)}</p>
                     </div>
                     <button className="text-gray-600 hover:text-white"><MoreHorizontal size={18} /></button>
                 </div>

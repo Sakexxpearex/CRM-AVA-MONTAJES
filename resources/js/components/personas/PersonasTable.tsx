@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { User, Mail, Phone, Building2, Edit3, Trash2, Eye } from 'lucide-react';
 import { Persona } from '@/types/persona';
+import { formatRut } from '@/utils/formatters';
 
 interface Props {
     personas: Persona[];
@@ -55,6 +56,9 @@ export default function PersonasTable({ personas, onEdit, onDelete }: Props) {
                                         </div>
                                         <div>
                                             <p className="font-bold text-sm text-gray-800 dark:text-gray-200 uppercase leading-none">{p.nombre_1} {p.apellido_1}</p>
+                                            <p className="text-[10px] text-gray-500 font-mono mt-1">
+                                                {formatRut(p.rut)}
+                                            </p>
                                             <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">{p.trabajo_actual?.cargo || '---'}</p>
                                         </div>
                                     </div>

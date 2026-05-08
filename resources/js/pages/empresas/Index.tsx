@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { Factory, Plus, LayoutGrid } from 'lucide-react';
 import { useState } from 'react';
+import { formatRut } from '@/utils/formatters';
 
 // Componentes de pagina (para mantener todo igual)
 import PageContainer from '@/components/pages/PageContainer';
@@ -15,11 +16,15 @@ import SearchEmpresa from '@/components/empresas/SearchEmpresa';
 import DivisionModal from '@/components/empresas/DivisionModal';
 import { Empresa } from '@/types/empresa';
 
+
 export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDivisionModalOpen, setIsDivisionModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingId, setEditingId] = useState<number | null>(null);
+    const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData('rut', formatRut(e.target.value));
+    };
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         nombre: '', 
@@ -32,16 +37,6 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
         nombre: '',
         empresa_id: '',
     })
-
-    const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value.replace(/[^0-9kK]/g, "");
-        if (value.length > 1) {
-            const dv = value.slice(-1).toUpperCase();
-            const digits = value.slice(0, -1);
-            value = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "-" + dv;
-        }
-        setData('rut', value);
-    };
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -84,9 +79,17 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
         }
     };
 
-    const empresasFiltradas = empresas.filter(e => 
-        e.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || e.rut.includes(searchTerm)
+    const empresasFiltradas = empresas.filter(e => {
+    const term = searchTerm.toLowerCase();
+    const rutLimpio = e.rut.replace(/[^0-9kK]/g, "");
+    const searchLimpio = searchTerm.replace(/[^0-9kK]/g, "");
+
+    return (
+        e.nombre.toLowerCase().includes(term) || 
+        rutLimpio.includes(searchLimpio) ||
+        formatRut(e.rut).includes(searchTerm) 
     );
+});
 
     return (
         <AuthenticatedLayout>

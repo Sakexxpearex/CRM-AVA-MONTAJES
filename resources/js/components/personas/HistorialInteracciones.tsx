@@ -1,4 +1,5 @@
 import { MessageSquare, Phone, Mail, Calendar, Plus, FileText, User } from 'lucide-react';
+import { formatDate } from '@/utils/formatters';
 
 interface Interaccion {
     id: number;
@@ -54,7 +55,7 @@ export default function HistorialInteracciones({ interacciones }: { interaccione
                                             {i.tipo_contacto}
                                         </span>
                                         <time className="text-[10px] font-mono text-gray-500 bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded">
-                                            {i.fecha}
+                                            {formatDate(i.fecha)} {/* Fecha Formateada (ej: 08 May. 2026) */}
                                         </time>
                                     </div>
 
