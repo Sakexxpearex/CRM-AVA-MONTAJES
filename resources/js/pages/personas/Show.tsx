@@ -9,11 +9,12 @@ import {
 
 import { Persona } from '@/types/persona';
 import { formatDate } from '@/utils/formatters';
+import PersonaModal from '@/components/personas/PersonaModal';
 
 interface Division {
     id: number;
     nombre: string;
-    empresa: { nombre: string };
+    empresa: { id: number; nombre: string };
 }
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
 export default function PersonaShow({ persona, divisiones, licitaciones }: Props) {
     const [isExpModalOpen, setIsExpModalOpen] = useState(false);
     const [isInteraccionModalOpen, setIsInteraccionModalOpen] = useState(false);
+
 
     // Formulario 1: Experiencia Laboral
     const formExp = useForm({
@@ -44,7 +46,28 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
         comentario: '',
         licitacion_id: '', // Este es el campo que conectaremos
     });
+    const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
+    // Este es el formulario que usará el modal reutilizado
+    const formEdit = useForm({
+        rut: persona.rut || '',
+        nombre_1: persona.nombre_1 || '',
+        nombre_2: persona.nombre_2 || '',
+        apellido_1: persona.apellido_1 || '',
+        apellido_2: persona.apellido_2 || '',
+        email: persona.email || '',
+        telefono: persona.telefono || '',
+        perfil_linkedin: persona.perfil_linkedin || '',
+        // Datos técnicos necesarios para que el componente no falle
+        division_id: persona.historial_laboral?.find(h => h.estado_actual)?.division || '',
+        cargo_actual: persona.historial_laboral?.find(h => h.estado_actual)?.cargo || '',
+    });
+    const submitEdit = (e: React.FormEvent) => {
+        e.preventDefault();
+        formEdit.patch(route('personas.update', persona.id), {
+            onSuccess: () => setIsEditProfileModalOpen(false),
+        });
+    };
     const getInitials = (name: string | null | undefined) => {
         if (!name) return '?';
         const parts = name.trim().split(' ');
@@ -110,7 +133,9 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                     <Plus size={16} strokeWidth={3} />
                                     Registrar Interacción
                                 </button>
-                                <button className="w-full sm:w-auto bg-white dark:bg-white/10 text-black dark:text-white border border-gray-200 dark:border-gray-800 px-6 py-3 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:opacity-80 transition-all shadow-lg">
+                                <button
+                                    onClick={() => setIsEditProfileModalOpen(true)}
+                                    className="w-full sm:w-auto bg-white dark:bg-white/10 text-black dark:text-white border border-gray-200 dark:border-gray-800 px-6 py-3 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:opacity-80 transition-all shadow-lg">
                                     Editar Perfil
                                 </button>
                             </div>
@@ -370,6 +395,19 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                     </div>
                 </div>
             )}
+            {/* Reutilizamos el modal que ya hicimos antes */}
+            <PersonaModal
+                isOpen={isEditProfileModalOpen}
+                onClose={() => setIsEditProfileModalOpen(false)}
+                data={formEdit.data}
+                setData={formEdit.setData}
+                submit={submitEdit}
+                processing={formEdit.processing}
+                errors={formEdit.errors}
+                divisiones={divisiones}
+                editingId={persona.id}
+                isLimited={true}
+            />
         </AuthenticatedLayout>
     );
 }

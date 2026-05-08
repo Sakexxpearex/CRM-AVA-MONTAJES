@@ -1,4 +1,4 @@
-import { X, LoaderCircle, Briefcase, Users } from 'lucide-react';
+import { X, LoaderCircle, Briefcase, Users, Linkedin } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { useEffect } from 'react';
 
@@ -18,6 +18,7 @@ interface Props {
     errors: any;
     divisiones: Division[];
     editingId: number | null;
+    isLimited?: boolean; // Para controlar si se pueden editar ciertos campos o no
 }
 
 export default function PersonaModal({
@@ -29,7 +30,8 @@ export default function PersonaModal({
     processing,
     errors,
     divisiones,
-    editingId
+    editingId,
+    isLimited = false,
 }: Props) {
 
     // EFECTO: Cuando cambie la división, actualizamos automáticamente el empresa_id
@@ -47,9 +49,9 @@ export default function PersonaModal({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            
+
             {/* Overlay */}
-            <div 
+            <div
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={onClose}
             />
@@ -61,11 +63,11 @@ export default function PersonaModal({
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-black uppercase tracking-tighter dark:text-white flex items-center gap-2">
                         <Users size={20} className="text-[#c1f75e]" />
-                        {editingId ? 'Editar Contacto' : 'Nuevo Contacto'}
+                        {isLimited ? 'Editar Perfil Detallado' : (editingId ? 'Editar Contacto' : 'Nuevo Contacto')}
                     </h2>
 
-                    <button 
-                        onClick={onClose} 
+                    <button
+                        onClick={onClose}
                         className="text-gray-400 hover:text-white transition-colors"
                     >
                         <X size={20} />
@@ -93,55 +95,55 @@ export default function PersonaModal({
 
                     {/* Nombres */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Primer Nombre</label>
-        <input
-            type="text"
-            value={data.nombre_1}
-            onChange={e => setData('nombre_1', e.target.value)}
-            className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
-            placeholder="Obligatorio"
-            required
-        />
-    </div>
-    <div>
-        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block italic text-gray-600">Segundo Nombre</label>
-        <input
-            type="text"
-            value={data.nombre_2}
-            onChange={e => setData('nombre_2', e.target.value)}
-            className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
-            placeholder="Obligatorio"
-            required 
-        />
-    </div>
-</div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Primer Nombre</label>
+                            <input
+                                type="text"
+                                value={data.nombre_1}
+                                onChange={e => setData('nombre_1', e.target.value)}
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                placeholder="Obligatorio"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block italic text-gray-600">Segundo Nombre</label>
+                            <input
+                                type="text"
+                                value={data.nombre_2}
+                                onChange={e => setData('nombre_2', e.target.value)}
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                placeholder="Obligatorio"
+                                required
+                            />
+                        </div>
+                    </div>
 
-{/* Apellidos */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Apellido Paterno</label>
-        <input
-            type="text"
-            value={data.apellido_1}
-            onChange={e => setData('apellido_1', e.target.value)}
-            className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
-            placeholder="Obligatorio"
-            required
-        />
-    </div>
-    <div>
-        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Apellido Materno</label>
-        <input
-            type="text"
-            value={data.apellido_2}
-            onChange={e => setData('apellido_2', e.target.value)}
-            className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
-            placeholder="Obligatorio"
-            required
-        />
-    </div>
-</div>
+                    {/* Apellidos */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Apellido Paterno</label>
+                            <input
+                                type="text"
+                                value={data.apellido_1}
+                                onChange={e => setData('apellido_1', e.target.value)}
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                placeholder="Obligatorio"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Apellido Materno</label>
+                            <input
+                                type="text"
+                                value={data.apellido_2}
+                                onChange={e => setData('apellido_2', e.target.value)}
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                placeholder="Obligatorio"
+                                required
+                            />
+                        </div>
+                    </div>
 
                     {/* Contacto */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -170,49 +172,67 @@ export default function PersonaModal({
                         </div>
                     </div>
 
-                    {/* Info laboral */}
-                    <div className="bg-gray-50 dark:bg-[#0A0A0A] p-5 rounded-xl border border-gray-200 dark:border-gray-800 space-y-4">
-                        
-                        <h3 className="text-[10px] font-black text-[#c1f75e] uppercase tracking-widest flex items-center gap-2">
-                            <Briefcase size={12} />
-                            Vinculación Laboral Inmediata
-                        </h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                            <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block italic">Empresa - División</label>
-                                <select
-                                    value={data.division_id}
-                                    onChange={e => setData('division_id', e.target.value)}
-                                    className="w-full bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white"
-                                    required
-                                >
-                                    <option value="">Seleccione División...</option>
-                                        {(divisiones || []).map(div => (
-                                        <option key={div.id} value={div.id}>
-                                        {div.empresa?.nombre} - {div.nombre}
-                                    </option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.empresa_id} />
-                            </div>
-
-                            <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block italic">Cargo Actual</label>
-                                <input
-                                    type="text"
-                                    value={data.cargo_actual} // Sincronizado con el controlador
-                                    onChange={e => setData('cargo_actual', e.target.value)}
-                                    className="w-full bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white"
-                                    placeholder="Ej: Gerente de Operaciones"
-                                    required
-                                />
-                                <InputError message={errors.cargo_actual} />
-                            </div>
-
+                    {/* CAMPO LINKEDIN: Solo se muestra si es modo limitado (Edición desde Perfil) */}
+                    {isLimited && (
+                        <div className="animate-in fade-in slide-in-from-top-2">
+                            <label className="text-[10px] font-black text-[#0077b5] uppercase mb-1 block flex items-center gap-1">
+                                <Linkedin size={12} /> Perfil de LinkedIn
+                            </label>
+                            <input
+                                type="url"
+                                value={data.perfil_linkedin || ''}
+                                onChange={e => setData('perfil_linkedin', e.target.value)}
+                                className="w-full bg-blue-50/5 dark:bg-[#0077b5]/5 border border-blue-200 dark:border-[#0077b5]/30 rounded-md p-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#0077b5]"
+                                placeholder="https://www.linkedin.com/in/usuario"
+                            />
                         </div>
-                    </div>
+                    )}
+
+                    {/* Info laboral */}
+                    {!isLimited && (
+                        <div className="bg-gray-50 dark:bg-[#0A0A0A] p-5 rounded-xl border border-gray-200 dark:border-gray-800 space-y-4">
+
+                            <h3 className="text-[10px] font-black text-[#c1f75e] uppercase tracking-widest flex items-center gap-2">
+                                <Briefcase size={12} />
+                                Vinculación Laboral Inmediata
+                            </h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                <div>
+                                    <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block italic">Empresa - División</label>
+                                    <select
+                                        value={data.division_id}
+                                        onChange={e => setData('division_id', e.target.value)}
+                                        className="w-full bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                        required
+                                    >
+                                        <option value="">Seleccione División...</option>
+                                        {(divisiones || []).map(div => (
+                                            <option key={div.id} value={div.id}>
+                                                {div.empresa?.nombre} - {div.nombre}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors.empresa_id} />
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block italic">Cargo Actual</label>
+                                    <input
+                                        type="text"
+                                        value={data.cargo_actual} // Sincronizado con el controlador
+                                        onChange={e => setData('cargo_actual', e.target.value)}
+                                        className="w-full bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white"
+                                        placeholder="Ej: Gerente de Operaciones"
+                                        required
+                                    />
+                                    <InputError message={errors.cargo_actual} />
+                                </div>
+
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit */}
                     <button
