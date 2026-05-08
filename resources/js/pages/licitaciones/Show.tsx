@@ -1,10 +1,11 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { 
     ChevronLeft, Building2, MessageSquare, 
     Clock, FileText, User, ArrowRight,
     CheckCircle, Zap
 } from 'lucide-react';
+import { useState } from 'react';
 
 // Componentes de pagina (para mantener todo igual)
 import PageContainer from '@/components/pages/PageContainer';
@@ -18,6 +19,11 @@ export default function Show({ licitacion }: any) {
     if (!licitacion) {
         return <div className="p-10 text-white font-black uppercase tracking-widest text-center">Cargando datos...</div>;
     }
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { data, setData, post, processing, errors } = useForm({
+        centro_costo: '',
+    });
 
     const formatMoney = (val: any) => {
         const num = parseFloat(val);
@@ -40,10 +46,11 @@ export default function Show({ licitacion }: any) {
         });
     };
 
-    const handleAdjudicar = () => {
-        if (confirm('¿Confirmas que esta licitación ha sido ganada? Esto creará automáticamente un proyecto operativo.')) {
-            router.post(route('licitaciones.adjudicar', licitacion.id));
-        }
+    const onSubmitAdjudicar = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route('licitaciones.adjudicar', licitacion.id), {
+            onSuccess: () => setIsModalOpen(false),
+        });
     };
 
     return (
@@ -64,9 +71,8 @@ export default function Show({ licitacion }: any) {
                     title={licitacion.nombre_proyecto || "Sin Nombre"}
                     subtitle="Detalle técnico y comercial de la licitación"
                     icon={FileText}
-                    // Si ya está ganada, no mostrar el boton de adjudicar 
                     actionLabel={!licitacion.proyecto_id && licitacion.estado_pipeline !== 'Ganada' ? "Adjudicar Proyecto" : undefined}
-                    onActionClick={handleAdjudicar}
+                    onActionClick={() => setIsModalOpen(true)} // <--- Cambiado para abrir modal
                 />
 
                 {/* Info */}
@@ -190,6 +196,55 @@ export default function Show({ licitacion }: any) {
                     </div>
                 </div>
             </PageContainer>
+
+            {/* Modal de adjudicacion*/}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 w-full max-w-md rounded-2xl p-8 shadow-2xl">
+                        <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-2 flex items-center gap-3">
+                            <CheckCircle className="text-[#c1f75e]" size={24} /> Adjudicar Proyecto
+                        </h2>
+                        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-8">
+                            Esta acción moverá la licitación a la etapa de ejecución operativa.
+                        </p>
+
+                        <form onSubmit={onSubmitAdjudicar} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black uppercase text-gray-400 ml-1 tracking-widest">
+                                    Centro de Costo Requerido
+                                </label>
+                                <input 
+                                    type="text"
+                                    placeholder="Ej: CC-2026-001"
+                                    className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e] focus:border-[#c1f75e] font-mono"
+                                    value={data.centro_costo}
+                                    onChange={e => setData('centro_costo', e.target.value.toUpperCase())}
+                                    required
+                                    autoFocus
+                                />
+                                {errors.centro_costo && <p className="text-red-500 text-[10px] font-bold uppercase">{errors.centro_costo}</p>}
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button 
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="flex-1 py-3 text-[10px] font-black uppercase text-gray-500 hover:text-white transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    disabled={processing}
+                                    className="flex-[2] bg-[#c1f75e] text-black py-3 rounded-lg font-black text-xs uppercase tracking-widest shadow-xl shadow-[#c1f75e]/10 hover:brightness-95 active:scale-[0.98] transition-all disabled:opacity-50"
+                                >
+                                    {processing ? 'Procesando...' : 'Confirmar y Crear Proyecto'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }

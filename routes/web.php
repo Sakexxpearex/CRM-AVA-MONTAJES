@@ -6,6 +6,7 @@ use App\Http\Controllers\InteraccionController;
 use App\Http\Controllers\LicitacionController;
 use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\ProyectoController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -34,6 +35,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('interacciones', InteraccionController::class);
     Route::post('/historial-laboral', [HistorialController::class, 'store'])->name('historial.store');
 
+    // Ruta para redirigir una licitacion a proyectos
+    Route::post('/licitaciones/{id}/adjudicar', [LicitacionController::class, 'adjudicar'])
+    ->name('licitaciones.adjudicar');
+
     // Ruta para el historial de interacciones del contacto (TimeLine)
     Route::get('/personas/{persona}/interacciones', [PersonaController::class, 'interacciones'])
         ->name('personas.interacciones');
@@ -44,6 +49,10 @@ Route::middleware(['auth'])->group(function () {
 
     //Ruta para las divisiones
     Route::post('/divisiones', [DivisionController::class, 'store'])->name('divisiones.store');
+
+    // Rutas de Proyectos
+    Route::get('/proyectos', [ProyectoController::class, 'index'])->name('proyectos.index');
+    Route::get('/proyectos/{id}', [ProyectoController::class, 'show'])->name('proyectos.show');
 
     // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -47,11 +47,10 @@ protected $fillable = [
      * Una licitación puede estar asociada a un proyecto (es nullable, así que puede devolver null).
      */
     public function proyecto()
-    {
-        return $this->belongsTo(Proyecto::class, 'proyecto_id')->withDefault([
-                'nombre' => 'Sin Proyecto Asignado (Aún en Licitación)'
-        ]);
-    }
+{
+    // Aunque estén en bases de datos distintas, Eloquent lo resuelve
+    return $this->belongsTo(Proyecto::class, 'proyecto_id');
+}
 
     public function interacciones(): HasMany
     {
