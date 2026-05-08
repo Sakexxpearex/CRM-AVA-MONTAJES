@@ -49,7 +49,9 @@ export default function Dashboard({ stats }: Props) {
                     <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Licitaciones Activas</h3>
                     <div className="flex items-end gap-2 mt-2">
                         <p className="text-5xl font-black dark:text-white">{stats.totalLicitaciones}</p>
-                        <span className="text-[#86CF00] text-sm font-bold mb-2">+ {stats.nuevasLicitaciones}</span>
+                        {stats.nuevasLicitaciones > 0 && (
+                            <span className="text-[#86CF00] text-sm font-bold mb-2">+ {stats.nuevasLicitaciones}</span>
+                        )}
                     </div>
                 </div>
 
