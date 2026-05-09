@@ -17,7 +17,8 @@ class DashboardController extends Controller
                 'totalLicitaciones' => Licitacion::whereNotIn('estado_pipeline', ['ganada','perdida','Ganada','Perdida'])->count(),
                 'totalEmpresas' => Empresa::count(),
                 'totalPersonas' => Persona::count(),
-                'nuevasLicitaciones' => Licitacion::whereMonth('created_at', now()->month)->whereNotIn('estado_pipeline', ['ganada','perdida','Ganada','Perdida'])->count(),
+                'nuevasLicitaciones' => Licitacion::whereMonth('created_at', now()->month)
+                                    ->whereYear('created_at', now()->year)->whereNotIn('estado_pipeline', ['ganada','perdida','Ganada','Perdida'])->count(),
             
             ]
         ]);
