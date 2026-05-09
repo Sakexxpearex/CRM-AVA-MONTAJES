@@ -82,14 +82,19 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                             </label>
                             <select 
                                 required
-                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white focus:ring-2 focus:ring-[#c1f75e] outline-none"
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white focus:ring-2 focus:ring-[#c1f75e] outline-none disabled:opacity-30"
                                 value={data.empresa_id}
                                 onChange={e => setData('empresa_id', e.target.value)}
                             >
                                 <option value="" className="dark:bg-[#111]">Seleccionar Empresa...</option>
-                                {empresas.map((emp: any) => (
-                                    <option key={emp.id} value={emp.id} className="dark:bg-[#111]">{emp.nombre}</option>
-                                ))}
+                                {empresas
+                                    .filter((emp: any) => emp.tipo === 'Cliente')
+                                    .map((emp: any) => (
+                                        <option key={emp.id} value={emp.id} className="dark:bg-[#111]">
+                                            {emp.nombre}
+                                        </option>
+                                    ))
+                                }
                             </select>
                         </div>
 
