@@ -36,13 +36,13 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             
-            {/* Overlay para cerrar */}
+            {/* Cerrar */}
             <div className="absolute inset-0" onClick={onClose} />
 
-            {/* Contenedor del Modal con Estética Dark */}
+            {/* Contenedor modal */}
             <div className="relative bg-white dark:bg-[#111] w-full max-w-2xl rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100 dark:border-gray-800 overflow-y-auto max-h-[95vh]">
                 
-                {/* Header Estilo Neón */}
+                {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <h2 className="text-xl font-black uppercase tracking-tighter dark:text-white flex items-center gap-2">
                         <Briefcase size={20} className="text-[#c1f75e]" />
@@ -58,7 +58,7 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
 
                 <form onSubmit={submit} className="space-y-6">
                     
-                    {/* Nombre del Proyecto */}
+                    {/* Nombre del proyecto */}
                     <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block tracking-widest">
                             Nombre del Proyecto
@@ -75,25 +75,30 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Empresa Mandante */}
+                        {/* Empresa */}
                         <div className="space-y-1">
                             <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block tracking-widest italic">
                                 Empresa Mandante
                             </label>
                             <select 
                                 required
-                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white focus:ring-2 focus:ring-[#c1f75e] outline-none"
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white focus:ring-2 focus:ring-[#c1f75e] outline-none disabled:opacity-30"
                                 value={data.empresa_id}
                                 onChange={e => setData('empresa_id', e.target.value)}
                             >
                                 <option value="" className="dark:bg-[#111]">Seleccionar Empresa...</option>
-                                {empresas.map((emp: any) => (
-                                    <option key={emp.id} value={emp.id} className="dark:bg-[#111]">{emp.nombre}</option>
-                                ))}
+                                {empresas
+                                    .filter((emp: any) => emp.tipo === 'Cliente')
+                                    .map((emp: any) => (
+                                        <option key={emp.id} value={emp.id} className="dark:bg-[#111]">
+                                            {emp.nombre}
+                                        </option>
+                                    ))
+                                }
                             </select>
                         </div>
 
-                        {/* División / Faena */}
+                        {/* División */}
                         <div className="space-y-1">
                             <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block tracking-widest italic">
                                 División / Faena
@@ -112,7 +117,7 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                             </select>
                         </div>
 
-                        {/* Monto Estimado */}
+                        {/* Monto */}
                         <div className="space-y-1">
                             <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block tracking-widest">
                                 <DollarSign size={10} className="inline mr-1" /> Monto Estimado (CLP)
@@ -141,7 +146,7 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                                 <option value="Llenar Cupo">Llenar Cupo</option>
                             </select>
                         </div>
-                        {/* Fecha de Cierre */}
+                        {/* Fecha de cierre */}
                         <div className="space-y-1">
                             <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block tracking-widest">
                                 <Calendar size={10} className="inline mr-1" /> Fecha Estimada Cierre
@@ -155,7 +160,7 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                         </div>
                     </div>
 
-                    {/* Descripción Alcance */}
+                    {/* Descripción*/}
                     <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block tracking-widest flex items-center gap-2">
                             <FileText size={12} /> Breve Descripción del Alcance
@@ -168,7 +173,7 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                         />
                     </div>
 
-                    {/* Botón de Acción Neón */}
+                    {/* Enviar*/}
                     <button 
                         type="submit" 
                         disabled={processing}

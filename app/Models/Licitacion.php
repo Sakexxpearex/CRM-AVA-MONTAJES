@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Licitacion extends Model
 {
@@ -46,10 +47,14 @@ protected $fillable = [
      * Una licitación puede estar asociada a un proyecto (es nullable, así que puede devolver null).
      */
     public function proyecto()
+{
+    // Aunque estén en bases de datos distintas, Eloquent lo resuelve
+    return $this->belongsTo(Proyecto::class, 'proyecto_id');
+}
+
+    public function interacciones(): HasMany
     {
-        return $this->belongsTo(Proyecto::class, 'proyecto_id')->withDefault([
-                'nombre' => 'Sin Proyecto Asignado (Aún en Licitación)'
-        ]);
+        return $this->hasMany(Interaccion::class, 'licitacion_id');
     }
     
 }

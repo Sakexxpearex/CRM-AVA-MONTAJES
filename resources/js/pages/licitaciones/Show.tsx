@@ -1,195 +1,244 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { 
-    ChevronLeft, Building2, Calendar, DollarSign, 
-    MessageSquare, Clock, FileText, User, ArrowRight,
-    ShieldCheck, Plus, ExternalLink
+    ChevronLeft, Building2, MessageSquare, 
+    Clock, FileText, User, ArrowRight,
+    CheckCircle, Zap
 } from 'lucide-react';
+import { useState } from 'react';
+import { formatDate } from '@/utils/formatters';
+
+// Componentes de pagina (para mantener todo igual)
+import PageContainer from '@/components/pages/PageContainer';
+import PageHeader from '@/components/pages/PageHeader';
+import ContentPanel from '@/components/pages/ContentPanel';
+
+// Componentes especificos para el detalle de licitaciones
 import EstadoBadge from '@/components/licitaciones/EstadoBadge';
 
 export default function Show({ licitacion }: any) {
-    // Formateador de moneda
-    const formatMoney = (val: number) => 
-        new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(val || 0);
+    if (!licitacion) {
+        return <div className="p-10 text-white font-black uppercase tracking-widest text-center">Cargando datos...</div>;
+    }
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { data, setData, post, processing, errors } = useForm({
+        centro_costo: '',
+    });
+
+    const formatMoney = (val: any) => {
+        const num = parseFloat(val);
+        return isNaN(num) ? '$ 0' : new Intl.NumberFormat('es-CL', { 
+            style: 'currency', currency: 'CLP', maximumFractionDigits: 0 
+        }).format(num);
+    };
+
+    const contactosUnicos = licitacion.interacciones?.reduce((acc: any[], curr: any) => {
+        if (curr.persona && !acc.find((p: any) => p.id === curr.persona.id)) {
+            acc.push(curr.persona);
+        }
+        return acc;
+    }, []) || [];
+
+    const onSubmitAdjudicar = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route('licitaciones.adjudicar', licitacion.id), {
+            onSuccess: () => setIsModalOpen(false),
+        });
+    };
 
     return (
         <AuthenticatedLayout>
-            <Head title={`Licitación: ${licitacion.nombre_proyecto}`} />
+            <Head title={`Licitación: ${licitacion.nombre_proyecto || 'Detalle'}`} />
 
-            <div className="max-w-[1400px] mx-auto px-4 py-8 space-y-6">
-                
-                {/* 1. NAVEGACIÓN Y ACCIONES */}
-                <div className="flex items-center justify-between">
-                    <Link 
-                        href={route('licitaciones.index')}
-                        className="flex items-center gap-2 text-[10px] font-black uppercase text-gray-500 hover:text-[#c1f75e] transition-colors"
-                    >
-                        <ChevronLeft size={14} strokeWidth={3} /> Volver al Pipeline
-                    </Link>
-                    <div className="flex gap-2">
-                        <button className="px-4 py-2 bg-white/5 border border-gray-800 text-white text-[10px] font-black uppercase rounded-lg hover:bg-[#c1f75e] hover:text-black transition-all">
-                            Editar Licitación
-                        </button>
-                    </div>
-                </div>
+            <PageContainer>
+                {/* Navegacion */}
+                <Link 
+                    href={route('licitaciones.index')}
+                    className="flex items-center gap-2 text-[10px] font-black uppercase text-gray-500 hover:text-[#c1f75e] transition-colors w-fit tracking-widest mb-2"
+                >
+                    <ChevronLeft size={14} strokeWidth={3} /> Volver al Pipeline
+                </Link>
 
-                {/* 2. HEADER PRINCIPAL */}
+                {/* Header */}
+                <PageHeader 
+                    title={licitacion.nombre_proyecto || "Sin Nombre"}
+                    subtitle="Detalle técnico y comercial de la licitación"
+                    icon={FileText}
+                    actionLabel={!licitacion.proyecto_id && licitacion.estado_pipeline !== 'Ganada' ? "Adjudicar Proyecto" : undefined}
+                    onActionClick={() => setIsModalOpen(true)} // <--- Cambiado para abrir modal
+                />
+
+                {/* Info */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 bg-white dark:bg-[#111] p-8 rounded-3xl border border-gray-200 dark:border-gray-800 relative overflow-hidden">
-                        {/* Marca de agua si es contrato activo */}
-                        {licitacion.proyecto_id && (
-                            <ShieldCheck size={120} className="absolute -right-4 -bottom-4 text-[#c1f75e]/5 -rotate-12" />
-                        )}
-                        
-                        <div className="space-y-4 relative z-10">
+                    <ContentPanel className="lg:col-span-2">
+                        <div className="space-y-4">
                             <EstadoBadge estado={licitacion.estado_pipeline} />
-                            <h1 className="text-4xl font-black uppercase tracking-tighter dark:text-white leading-none">
-                                {licitacion.nombre_proyecto}
-                            </h1>
-                            <div className="flex flex-wrap gap-6 pt-2">
-                                <div className="flex items-center gap-2 text-gray-400">
-                                    <Building2 size={16} className="text-[#c1f75e]" />
-                                    <span className="text-xs font-bold uppercase tracking-widest">{licitacion.empresa?.nombre}</span>
+                            
+                            <div className="flex flex-wrap gap-6 pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-4">
+                                <div className="flex items-center gap-2">
+                                    <Building2 className="text-[#c1f75e]" size={16} />
+                                    <div className="flex flex-col">
+                                        <span className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Empresa Cliente</span>
+                                        <span className="text-[11px] font-bold uppercase dark:text-gray-200">{licitacion.empresa?.nombre || 'No asignada'}</span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2 text-gray-400">
-                                    <User size={16} className="text-[#c1f75e]" />
-                                    <span className="text-xs font-bold uppercase tracking-widest">{licitacion.division?.nombre}</span>
+                                <div className="hidden md:block w-[1px] h-6 bg-gray-800/50"></div>
+                                <div className="flex items-center gap-2">
+                                    <User className="text-[#c1f75e]" size={16} />
+                                    <div className="flex flex-col">
+                                        <span className="text-[7px] font-black text-gray-500 uppercase tracking-widest">División / Área</span>
+                                        <span className="text-[11px] font-bold uppercase dark:text-gray-200">{licitacion.division?.nombre || 'General'}</span>
+                                    </div>
                                 </div>
+                                {licitacion.proyecto_id && (
+                                     <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-black uppercase rounded">
+                                        <Zap size={12} /> Contrato en Ejecución
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    </div>
+                    </ContentPanel>
 
-                    {/* CARD DE MONTO RÁPIDO */}
-                    <div className="bg-[#c1f75e] p-8 rounded-3xl flex flex-col justify-center shadow-xl shadow-[#c1f75e]/10">
-                        <p className="text-[10px] font-black uppercase text-black/50 tracking-widest mb-1">Presupuesto Estimado</p>
-                        <h2 className="text-3xl font-black text-black font-mono tracking-tighter">
+                    {/* Monto */}
+                    <div className="bg-[#c1f75e] p-7 rounded-2xl flex flex-col justify-center shadow-lg shadow-[#c1f75e]/10 text-black">
+                        <p className="text-[8px] font-black uppercase opacity-60 tracking-[0.2em] mb-1">Presupuesto Referencial</p>
+                        <h2 className="text-2xl font-black font-mono tracking-tight leading-none">
                             {formatMoney(licitacion.monto_estimado)}
                         </h2>
-                        <div className="mt-4 pt-4 border-t border-black/10 flex items-center gap-2 text-black/60 font-black text-[10px] uppercase">
-                            <Clock size={14} /> Cierre: {licitacion.fecha_cierre || 'Pendiente'}
+                        <div className="mt-4 pt-3 border-t border-black/10 flex items-center gap-2 font-black text-[8px] uppercase opacity-70 tracking-widest">
+                            <Clock size={12} /> Cierre: {licitacion.fecha_cierre || 'Pendiente'}
                         </div>
                     </div>
                 </div>
 
-                {/* 3. CONTENIDO DETALLADO */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* Si ya es un PROYECTO (del Seeder) */}
-                        {licitacion.proyecto && (
-                            <div className="bg-black border border-[#c1f75e]/30 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-[#c1f75e]/10 rounded-2xl text-[#c1f75e]">
-                                        <ShieldCheck size={24} />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-white font-black uppercase text-xs">Licitación Adjudicada</h4>
-                                        <p className="text-gray-500 text-[10px] font-bold">Vínculo: {licitacion.proyecto.nombre} ({licitacion.proyecto.centro_costo})</p>
-                                    </div>
-                                </div>
-                                <Link 
-                                    href="#" // Aquí iría route('proyectos.show', licitacion.proyecto_id)
-                                    className="w-full md:w-auto px-6 py-3 bg-[#c1f75e] text-black text-[10px] font-black uppercase rounded-xl flex items-center justify-center gap-2 hover:scale-105 transition-all"
-                                >
-                                    Ver Ejecución del Contrato <ExternalLink size={14} />
-                                </Link>
-                            </div>
-                        )}
-
-                        {/* Descripción */}
-                        <div className="bg-white dark:bg-[#111] p-8 rounded-3xl border border-gray-200 dark:border-gray-800 space-y-4">
-                            <h3 className="text-[10px] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
-                                <FileText size={16} className="text-[#c1f75e]" /> Alcance y Detalles
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div className="lg:col-span-8 space-y-6">
+                        {/* Descripcion */}
+                        <ContentPanel>
+                            <h3 className="text-[9px] font-black uppercase text-gray-400 tracking-[0.3em] mb-4 flex items-center gap-2">
+                                <FileText size={14} className="text-[#c1f75e]" /> Alcance Técnico
                             </h3>
                             <p className="text-gray-400 text-sm leading-relaxed italic">
-                                {licitacion.descripcion || 'No hay descripción registrada.'}
+                                {licitacion.descripcion || 'Sin descripción técnica registrada.'}
                             </p>
-                        </div>
+                        </ContentPanel>
 
-                        {/* BITÁCORA */}
-                        <div className="bg-white dark:bg-[#111] p-8 rounded-3xl border border-gray-200 dark:border-gray-800">
-                            <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-[10px] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
-                                    <MessageSquare size={16} className="text-[#c1f75e]" /> Bitácora de Gestiones
-                                </h3>
-                                <button className="p-2 bg-[#c1f75e]/10 text-[#c1f75e] rounded-lg hover:bg-[#c1f75e] hover:text-black transition-all">
-                                    <Plus size={16} strokeWidth={3} />
-                                </button>
-                            </div>
-
-                            <div className="space-y-6 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gray-800">
+                        {/* Bitacora */}
+                        <ContentPanel>
+                            <h3 className="text-[9px] font-black uppercase text-gray-400 tracking-[0.3em] mb-8 flex items-center gap-2">
+                                <MessageSquare size={14} className="text-[#c1f75e]" /> Bitácora Comercial
+                            </h3>
+                            <div className="space-y-6 relative before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-[1.5px] before:bg-gray-800">
                                 {licitacion.interacciones?.length > 0 ? (
                                     licitacion.interacciones.map((int: any) => (
-                                        <div key={int.id} className="relative pl-12">
-                                            <div className="absolute left-0 top-1 w-9 h-9 bg-black border border-gray-800 rounded-full flex items-center justify-center z-10 text-[#c1f75e]">
-                                                <Clock size={14} />
+                                        <div key={int.id} className="relative pl-10">
+                                            <div className="absolute left-0 top-1 w-8 h-8 bg-black border-2 border-[#c1f75e] rounded flex items-center justify-center z-10 text-[#c1f75e]">
+                                                <Clock size={12} />
                                             </div>
-                                            <div className="bg-white/5 p-5 rounded-2xl border border-gray-800/50">
+                                            <div className="bg-white/5 p-4 rounded-xl border border-gray-800/50 hover:border-gray-700 transition-colors">
                                                 <div className="flex justify-between items-start mb-2">
-                                                    <span className="text-[10px] font-black text-[#c1f75e] uppercase tracking-widest">{int.tipo_contacto}</span>
-                                                    <span className="text-[10px] text-gray-500 font-mono">{int.fecha}</span>
+                                                    <span className="text-[9px] font-black text-[#c1f75e] uppercase tracking-tighter">{int.tipo_contacto}</span>
+                                                    <span className="text-[9px] text-gray-500 font-mono">{formatDate(int.fecha)}</span>
                                                 </div>
-                                                <p className="text-xs text-gray-300 mb-3 leading-relaxed italic">"{int.comentario}"</p>
-                                                <div className="flex items-center gap-2 text-[9px] font-black text-gray-500 uppercase">
-                                                    <User size={10} /> {int.user?.name} <ArrowRight size={10} /> {int.persona?.nombre_1} {int.persona?.apellido_1}
+                                                <p className="text-[12px] text-gray-300 italic mb-3 leading-snug">"{int.comentario}"</p>
+                                                <div className="flex items-center gap-2 text-[8px] font-black text-gray-500 uppercase pt-3 border-t border-gray-800/50">
+                                                    <User size={10} /> {int.user?.name} 
+                                                    <ArrowRight size={10} className="text-[#c1f75e]" /> 
+                                                    <span className="text-gray-400">{int.persona?.nombre_1} {int.persona?.apellido_1}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-10 border-2 border-dashed border-gray-800 rounded-2xl">
-                                        <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Sin gestiones registradas</p>
+                                    <div className="text-center py-10 opacity-30 italic text-[10px] uppercase font-black tracking-widest border border-dashed border-gray-800 rounded-xl">
+                                        Sin gestiones comerciales registradas
                                     </div>
                                 )}
                             </div>
-                        </div>
+                        </ContentPanel>
                     </div>
 
-                    {/* COLUMNA DERECHA: SIDEBAR */}
-                    <div className="space-y-6">
-                        <div className="bg-white dark:bg-[#111] p-6 rounded-3xl border border-gray-200 dark:border-gray-800">
-                            <h3 className="text-[10px] font-black uppercase text-gray-500 mb-6 tracking-widest">Estado del Pipeline</h3>
-                            <div className="space-y-5">
-                                {/* Sincronizado con los estados de tu Seeder */}
-                                {['Prospecto', 'Evaluación', 'Negociación', 'Ganada'].map((step, idx) => {
-                                    const isCurrent = licitacion.estado_pipeline === step;
-                                    return (
-                                        <div key={idx} className={`flex items-center gap-4 ${isCurrent ? 'opacity-100' : 'opacity-20'}`}>
-                                            <div className={`w-3 h-3 rounded-full ${isCurrent ? 'bg-[#c1f75e] shadow-[0_0_12px_#c1f75e]' : 'bg-gray-700'}`} />
-                                            <span className={`text-[10px] font-black uppercase tracking-wider ${isCurrent ? 'text-white' : 'text-gray-500'}`}>
-                                                {step}
-                                            </span>
-                                        </div>
-                                    );
-                                })}
+                    {/* Contactos */}
+                    <div className="lg:col-span-4">
+                        <ContentPanel>
+                            <h3 className="text-[9px] font-black uppercase text-[#c1f75e] mb-6 tracking-[0.2em]">Contactos Asociados</h3>
+                            <div className="space-y-3">
+                                {contactosUnicos.length > 0 ? (
+                                    contactosUnicos.map((p: any) => (
+                                        <Link 
+                                            key={p.id} 
+                                            href={route('personas.show', p.id)} 
+                                            className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-gray-800 hover:border-[#c1f75e]/50 transition-all group"
+                                        >
+                                            <div className="w-8 h-8 bg-gray-900 rounded flex items-center justify-center text-[#c1f75e] font-black text-[10px] border border-gray-800">
+                                                {p.nombre_1?.[0]}{p.apellido_1?.[0]}
+                                            </div>
+                                            <div className="flex-1 overflow-hidden">
+                                                <p className="text-[11px] font-black text-white uppercase truncate group-hover:text-[#c1f75e] transition-colors">
+                                                    {p.nombre_1} {p.apellido_1}
+                                                </p>
+                                                <p className="text-[8px] text-gray-500 font-bold uppercase tracking-tighter">Ver Perfil</p>
+                                            </div>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <p className="text-center text-[9px] text-gray-600 uppercase font-black py-4 italic border border-dashed border-gray-800 rounded-xl">Sin contactos vinculados</p>
+                                )}
                             </div>
-                        </div>
-
-                        {/* Card de Contacto Clave */}
-                        <div className="bg-white dark:bg-[#111] p-6 rounded-3xl border border-gray-200 dark:border-gray-800">
-                            <h3 className="text-[10px] font-black uppercase text-gray-500 mb-4 tracking-widest">Contacto Mandante</h3>
-                            {licitacion.interacciones?.[0]?.persona ? (
-                                <Link 
-                                    href={route('personas.show', licitacion.interacciones[0].persona.id)}
-                                    className="flex items-center gap-4 p-3 bg-white/5 rounded-2xl hover:bg-[#c1f75e]/10 transition-all group"
-                                >
-                                    <div className="w-10 h-10 bg-black border border-gray-800 rounded-xl flex items-center justify-center text-[#c1f75e] font-black group-hover:border-[#c1f75e]/50 transition-all text-xs">
-                                        {licitacion.interacciones[0].persona.nombre_1[0]}
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-black text-white uppercase group-hover:text-[#c1f75e] transition-colors">
-                                            {licitacion.interacciones[0].persona.nombre_1} {licitacion.interacciones[0].persona.apellido_1}
-                                        </p>
-                                        <p className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">Ver Perfil</p>
-                                    </div>
-                                </Link>
-                            ) : (
-                                <p className="text-[10px] text-gray-600 italic">No hay contactos vinculados.</p>
-                            )}
-                        </div>
+                        </ContentPanel>
                     </div>
                 </div>
-            </div>
+            </PageContainer>
+
+            {/* Modal de adjudicacion*/}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 w-full max-w-md rounded-2xl p-8 shadow-2xl">
+                        <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-2 flex items-center gap-3">
+                            <CheckCircle className="text-[#c1f75e]" size={24} /> Adjudicar Proyecto
+                        </h2>
+                        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-8">
+                            Esta acción moverá la licitación a la etapa de ejecución operativa.
+                        </p>
+
+                        <form onSubmit={onSubmitAdjudicar} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black uppercase text-gray-400 ml-1 tracking-widest">
+                                    Centro de Costo Requerido
+                                </label>
+                                <input 
+                                    type="text"
+                                    placeholder="Ej: CC-2026-001"
+                                    className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e] focus:border-[#c1f75e] font-mono"
+                                    value={data.centro_costo}
+                                    onChange={e => setData('centro_costo', e.target.value.toUpperCase())}
+                                    required
+                                    autoFocus
+                                />
+                                {errors.centro_costo && <p className="text-red-500 text-[10px] font-bold uppercase">{errors.centro_costo}</p>}
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button 
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="flex-1 py-3 text-[10px] font-black uppercase text-gray-500 hover:text-white transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    disabled={processing}
+                                    className="flex-[2] bg-[#c1f75e] text-black py-3 rounded-lg font-black text-xs uppercase tracking-widest shadow-xl shadow-[#c1f75e]/10 hover:brightness-95 active:scale-[0.98] transition-all disabled:opacity-50"
+                                >
+                                    {processing ? 'Procesando...' : 'Confirmar y Crear Proyecto'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }

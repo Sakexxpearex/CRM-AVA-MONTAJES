@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empresa;
+use App\Models\Persona;
+use App\Models\Division;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,7 +13,8 @@ class EmpresaController extends Controller
     public function index()
     {
        return Inertia::render('empresas/Index', [
-            'empresas' => Empresa::all()
+            'empresas' => Empresa::all(),
+            'empresas' => Empresa::with('divisiones')->get()
         ]);
     }
 
@@ -30,11 +33,17 @@ class EmpresaController extends Controller
     
 
     public function show(Empresa $empresa)
-    {
-        return Inertia::render('Empresas/Show', [
-            'empresa' => $empresa->load('divisiones')
-        ]);
-    }
+{
+    return Inertia::render('empresas/Show', [
+        'empresa' => $empresa,
+        'divisiones' => $empresa->divisiones()->withCount('personas')->get(),
+        'contactos' => Persona::whereHas('divisiones', function ($query) use ($empresa) {
+            $query->where('empresa_id', $empresa->id)->where('estado_actual', true);
+        })->with(['divisiones' => function($query) {
+            $query->where('estado_actual', true); // Esto trae el 'pivot' con el cargo
+        }])->get(),
+    ]);
+}
 
     public function update(Request $request, Empresa $empresa)
     {

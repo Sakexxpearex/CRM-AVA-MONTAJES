@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { 
     LayoutDashboard, Building2, FileSpreadsheet, 
-    Users, Calendar, Moon, Sun, LogOut, Menu
+    Users, Calendar, Moon, Sun, LogOut, Menu,
+    Briefcase // Importamos este para Proyectos
 } from 'lucide-react';
 
 export default function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
@@ -21,11 +22,10 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
     return (
         <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300 overflow-hidden">
             
-            {/* Naveción mobile*/}
+            {/* Navegación mobile*/}
             <nav className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#0A0A0A] border-b border-gray-800 px-6 flex justify-between items-center z-50">
                 <img src="/assets/logos/blanco.svg" className="h-8 w-auto" alt="Logo" />
                 <div className="flex items-center gap-4">
-                    {/* Modo oscuro/claro */}   
                     <button 
                         onClick={() => setDarkMode(!darkMode)}
                         className="p-2 text-gray-400 hover:text-white transition-colors"
@@ -33,7 +33,6 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                         {darkMode ? <Sun size={20} className="text-[#86CF00]" /> : <Moon size={20} />}
                     </button>
 
-                    {/* Logout directo*/}
                     <Link 
                         href={route('logout')} 
                         method="post" 
@@ -44,57 +43,65 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                 </div>
             </nav>
 
-            {/* Menú lateral */}
+            {/* Menú lateral (Desktop) */}
             <aside className="hidden md:flex md:w-72 md:flex-col h-screen bg-white dark:bg-[#0A0A0A] border-r border-gray-200 dark:border-gray-800 transition-colors duration-300">
-                <div className="p-10 flex justify-center">
+                <div className="p-8 flex justify-center mb-4">
                     <Link href={route('dashboard')}>
-                        <img src="/assets/logos/negro-verde.svg" className="h-10 w-auto dark:hidden" alt="AVA CRM" />
-                        <img src="/assets/logos/blanco.svg" className="h-10 w-auto hidden dark:block" alt="AVA CRM" />
+                        <img src="/assets/logos/negro-verde.svg" className="h-9 w-auto dark:hidden" alt="AVA CRM" />
+                        <img src="/assets/logos/blanco.svg" className="h-9 w-auto hidden dark:block" alt="AVA CRM" />
                     </Link>
                 </div>
 
                 <nav className="flex-1 px-6 space-y-2">
                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] ml-4 mb-6">Menú Principal</p>
+                    
                     <NavLink href={route('dashboard')} icon={<LayoutDashboard size={20}/>} label="Inicio" active={route().current('dashboard')} />
-                    {/* Navegacion del dashboard a empresas */ }
+                    
                     <NavLink 
                         href={route('empresas.index')} 
-                        icon={<Building2 size={20}/>} 
+                        icon={<Building2 size={18}/>} 
                         label="Empresas" 
                         active={route().current('empresas.*')} 
                     />
 
-                    {/* Navegacion a Licitaciones*/ }
                     <NavLink 
                         href={route('licitaciones.index')}  
-                        icon={<FileSpreadsheet size={20}/>} 
+                        icon={<FileSpreadsheet size={18}/>} 
                         label="Licitaciones" 
                         active={route().current('licitaciones.*')}
                     />
 
-                    {/* Navegacion a Contactos*/ }
+                    {/* BOTÓN PROYECTOS (Desktop) */}
+                    <NavLink 
+                        href={route('proyectos.index')}  
+                        icon={<Briefcase size={18}/>} 
+                        label="Proyectos" 
+                        active={route().current('proyectos.*')}
+                    />
+
                     <NavLink 
                         href={route('personas.index')} 
-                        icon={<Users size={20}/>} 
+                        icon={<Users size={18}/>} 
                         label="Contactos" 
                         active={route().current('personas.*')} 
                     />
-                    <NavLink href="#" icon={<Calendar size={20}/>} label="Bitacora" />
+                    
+                    <NavLink href="#" icon={<Calendar size={18}/>} label="Análisis" />
                 </nav>
 
-                <div className="p-6 border-t border-gray-800 space-y-2">
-                    <button onClick={() => setDarkMode(!darkMode)} className="flex items-center gap-3 w-full p-3 rounded-xl text-gray-400 hover:bg-white/5 transition-all">
-                        {darkMode ? <Sun size={20} className="text-[#86CF00]" /> : <Moon size={20} />}
-                        <span className="text-sm font-medium">{darkMode ? 'Modo Claro' : 'Modo Oscuro'}</span>
+                <div className="p-4 border-t border-gray-100 dark:border-gray-800 space-y-1">
+                    <button onClick={() => setDarkMode(!darkMode)} className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 transition-all group">
+                        {darkMode ? <Sun size={18} className="text-[#c1f75e]" /> : <Moon size={18} />}
+                        <span className="text-sm font-bold">Modo {darkMode ? 'Claro' : 'Oscuro'}</span>
                     </button>
-                    <Link href={route('logout')} method="post" as="button" className="flex items-center gap-3 w-full p-3 rounded-xl text-red-500 hover:bg-red-500/10 transition-all text-left">
-                        <LogOut size={20} />
-                        <span className="text-sm font-medium">Cerrar Sesión</span>
+                    <Link href={route('logout')} method="post" as="button" className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all text-left">
+                        <LogOut size={18} />
+                        <span className="text-sm font-bold">Cerrar Sesión</span>
                     </Link>
                 </div>
             </aside>
 
-            {/* Área de contendio */}
+            {/* Área de contenido */}
             <main className="flex-1 flex flex-col min-w-0 relative h-full">
                 <section className="flex-1 overflow-y-auto p-4 md:p-10 mt-16 md:mt-0 mb-20 md:mb-0">
                     <div className="max-w-[1400px] mx-auto">
@@ -103,9 +110,8 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                 </section>
             </main>
 
-            {/* Barra navegador inferior */}
+            {/* Barra navegador inferior (Mobile) */}
             <div className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-[#0A0A0A] border-t border-gray-800 flex justify-around items-center px-2 z-50">
-                {/* Navegacion del dashboard a empresas */ }
                 <MobileNavLink 
                     href={route('empresas.index')} 
                     icon={<Building2 size={22}/>} 
@@ -113,24 +119,27 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                     active={route().current('empresas.*')}
                 />
 
-                {/* Navegacion a personas */ }
+                <MobileNavLink 
+                    href={route('licitaciones.index')} 
+                    icon={<FileSpreadsheet size={22}/>} 
+                    label="Licitaciones" 
+                    active={route().current('licitaciones.*')} 
+                />
+
+                {/* BOTÓN PROYECTOS (Mobile) */}
+                <MobileNavLink 
+                    href={route('proyectos.index')} 
+                    icon={<Briefcase size={22}/>} 
+                    label="Proyectos" 
+                    active={route().current('proyectos.*')} 
+                />
+
                 <MobileNavLink 
                     href={route('personas.index')} 
                     icon={<Users size={22}/>} 
                     label="Contactos" 
                     active={route().current('personas.*')}
                 />
-
-                {/* Navegacion a licitaciones */ }
-                <MobileNavLink 
-                    href={route('licitaciones.index')} 
-                    icon={<Users size={22}/>} 
-                    label="Licitaciones" 
-                    active={route().current('licitaciones.*')} 
-                />
-                
-                <MobileNavLink href="#" icon={<LayoutDashboard size={22}/>} label="Bitácora" />
-                <MobileNavLink href="#" icon={<Calendar size={22}/>} label="Análisis" />
             </div>
         </div>
     );
@@ -141,13 +150,15 @@ function NavLink({ href, icon, label, active = false }: { href: string, icon: an
     return (
         <Link 
             href={href} 
-            className={`flex items-center gap-3 p-4 rounded-2xl font-bold transition-all duration-200 ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all duration-200 group ${
                 active 
-                ? 'bg-black text-white shadow-xl shadow-black/10 dark:bg-[#86CF00] dark:text-black' 
-                : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 dark:text-gray-400'
+                ? 'bg-black text-white shadow-lg shadow-black/5 dark:bg-[#c1f75e] dark:text-black' 
+                : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 dark:text-gray-400'
             }`}
         >
-            <span className={active ? 'text-inherit' : 'text-gray-400'}>{icon}</span>
+            <span className={`transition-colors ${active ? 'text-inherit' : 'text-gray-400 group-hover:text-[#c1f75e]'}`}>
+                {typeof icon === 'object' ? { ...icon, props: { ...icon.props, size: 18 } } : icon}
+            </span>
             <span className="text-sm tracking-tight">{label}</span>
         </Link>
     );

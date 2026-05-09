@@ -19,6 +19,7 @@ interface Props {
   handleRutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+
 export default function EmpresaModal({
   isOpen,
   onClose,
@@ -69,6 +70,7 @@ export default function EmpresaModal({
               className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md py-3 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#C1F75E] transition-all"
               placeholder="12.345.678-9"
               required
+              maxLength={12}
             />
             <InputError message={errors.rut} />
           </div>
@@ -104,7 +106,7 @@ export default function EmpresaModal({
             </select>
           </div>
 
-          {/* Submit */}
+          {/* Enviar */}
           <button
             type="submit"
             disabled={processing}

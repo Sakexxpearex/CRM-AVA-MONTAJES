@@ -1,20 +1,30 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { Factory, Plus, LayoutGrid } from 'lucide-react';
 import { useState } from 'react';
+import { formatRut } from '@/utils/formatters';
 
-//Componentes 
+// Componentes de pagina (para mantener todo igual)
+import PageContainer from '@/components/pages/PageContainer';
+import PageHeader from '@/components/pages/PageHeader';
+import ContentPanel from '@/components/pages/ContentPanel';
+
+// Componentes especificos de empresa
 import EmpresaModal from '@/components/empresas/EmpresaModal';
 import EmpresasTable from '@/components/empresas/EmpresaTable';
 import SearchEmpresa from '@/components/empresas/SearchEmpresa';
-import EmpresasHeader from '@/components/empresas/EmpresaHeader';
-import { Empresa } from '@/types/empresa'
+import DivisionModal from '@/components/empresas/DivisionModal';
+import { Empresa } from '@/types/empresa';
 
 
 export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDivisionModalOpen, setIsDivisionModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingId, setEditingId] = useState<number | null>(null);
+    const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData('rut', formatRut(e.target.value));
+    };
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         nombre: '', 
@@ -22,16 +32,11 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
         tipo: 'Cliente' as any,
     });
 
-    // Formateador de rut
-    const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value.replace(/[^0-9kK]/g, "");
-        if (value.length > 1) {
-            const dv = value.slice(-1).toUpperCase();
-            const digits = value.slice(0, -1);
-            value = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "-" + dv;
-        }
-        setData('rut', value);
-    };
+    // Formulario de division
+    const divisionForm = useForm({
+        nombre: '',
+        empresa_id: '',
+    })
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -52,13 +57,9 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         if (editingId) {
-            put(route('empresas.update', editingId), {
-                onSuccess: () => closeModal(),
-            });
+            put(route('empresas.update', editingId), { onSuccess: () => closeModal() });
         } else {
-            post(route('empresas.store'), { 
-                onSuccess: () => closeModal(),
-            });
+            post(route('empresas.store'), { onSuccess: () => closeModal() });
         }
     };
 
@@ -68,35 +69,48 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
         }
     };
 
-    const empresasFiltradas = empresas.filter(e => 
-        e.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        e.rut.includes(searchTerm)
+    const empresasFiltradas = empresas.filter(e => {
+    const term = searchTerm.toLowerCase();
+    const rutLimpio = e.rut.replace(/[^0-9kK]/g, "");
+    const searchLimpio = searchTerm.replace(/[^0-9kK]/g, "");
+
+    return (
+        e.nombre.toLowerCase().includes(term) || 
+        rutLimpio.includes(searchLimpio) ||
+        formatRut(e.rut).includes(searchTerm) 
     );
+});
 
     return (
         <AuthenticatedLayout>
             <Head title="Empresas - AVA CRM" />
 
-            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-8">
-                
-                <EmpresasHeader onCreate={() => setIsModalOpen(true)} />
-
-                {/* Buscador */}
-                <SearchEmpresa
-                value={searchTerm}
-                onChange={setSearchTerm}
+            <PageContainer>
+                {/* Header */}
+                <PageHeader 
+                    title="Empresas"
+                    subtitle="Directorio de clientes y aliados estratégicos"
+                    icon={Factory}
+                    actionLabel="Nueva Empresa"
+                    onActionClick={() => setIsModalOpen(true)}
                 />
 
-            
-            {/* Tabla */}
-            <EmpresasTable 
-                empresas={empresasFiltradas}
-                onEdit={openEditModal}
-                onDelete={handleDelete}
-            />
-                        </div>
+                {/* Buscador */}
+                <div className="flex justify-start">
+                    <SearchEmpresa value={searchTerm} onChange={setSearchTerm} />
+                </div>
 
-            {/* Modal de creación/actualización) */}
+                {/* Tabla */}
+                <ContentPanel padding={false}>
+                    <EmpresasTable 
+                        empresas={empresasFiltradas}
+                        onEdit={openEditModal}
+                        onDelete={handleDelete}
+                    />
+                </ContentPanel>
+            </PageContainer>
+
+            {/* Modales */}
             <EmpresaModal
                 isOpen={isModalOpen}
                 onClose={closeModal}
@@ -107,13 +121,14 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
                 processing={processing}
                 editingId={editingId}
                 handleRutChange={handleRutChange}
-                />
-            {/* Boton mobile */}
-            <button 
+            />
+
+
+           <button 
                 onClick={() => setIsModalOpen(true)}
-                className="md:hidden fixed bottom-24 right-6 z-50 flex items-center justify-center bg-[#C1F75E] text-black w-14 h-14 rounded-full shadow-2xl active:scale-90 transition-transform"
+                className="md:hidden fixed bottom-24 right-6 z-50 flex items-center justify-center bg-[#c1f75e] text-black w-10 h-10 rounded-full shadow-2xl active:scale-90 transition-transform"
             >
-                <Plus size={30} strokeWidth={3} />
+                <Plus size={16} strokeWidth={3} />
             </button>
         </AuthenticatedLayout>
     );
