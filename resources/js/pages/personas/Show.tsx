@@ -1,48 +1,56 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { 
-    ChevronLeft, Mail, Phone, Building2, Calendar, Briefcase, 
-    MessageSquare, ShieldCheck, Plus, X, User, FileText, 
-    ClipboardList, ChevronRight 
+    ChevronLeft, Mail, Phone, Building2, Briefcase, 
+    MessageSquare, Plus, X, User, Hash, Linkedin, Edit3
 } from 'lucide-react';
 
-import { formatDate, formatRut } from '@/utils/formatters';
+import React from 'react';
 
-// Componentes de pagina (para mantener todo igual)
+import { formatDate, formatRut } from '@/utils/formatters';
 import PageContainer from '@/components/pages/PageContainer';
 import PageHeader from '@/components/pages/PageHeader';
 import ContentPanel from '@/components/pages/ContentPanel';
-import { Persona } from '@/types/persona';
+import PersonaModal from '@/components/personas/PersonaModal';
 
-interface Division {
-    id: number;
-    nombre: string;
-    empresa: { nombre: string };
-}
-
-interface Props {
-    persona: Persona & { interacciones: any[], historial_laboral: any[] };
-    divisiones: Division[]; 
-    licitaciones: any[]; 
-}
-
-export default function PersonaShow({ persona, divisiones, licitaciones }: Props) {
+export default function PersonaShow({ persona, divisiones, licitaciones }: any) {
     const [isExpModalOpen, setIsExpModalOpen] = useState(false);
     const [isInteraccionModalOpen, setIsInteraccionModalOpen] = useState(false);
+    const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
     // Formularios
-    const formExp = useForm({ persona_id: persona.id, division_id: '', cargo: '', fecha_inicio: '', fecha_fin: '', estado_actual: false as boolean });
+    const formExp = useForm({ persona_id: persona.id, division_id: '', cargo: '', fecha_inicio: '', fecha_fin: '', estado_actual: false as boolean});
     const formInt = useForm({ persona_id: persona.id, tipo_contacto: '', fecha: new Date().toISOString().split('T')[0], comentario: '', licitacion_id: '' });
+    
+    // Formulario de edición (Perfil Limitado)
+    const formEdit = useForm({
+        rut: persona.rut || '',
+        nombre_1: persona.nombre_1 || '',
+        nombre_2: persona.nombre_2 || '',
+        apellido_1: persona.apellido_1 || '',
+        apellido_2: persona.apellido_2 || '',
+        email: persona.email || '',
+        telefono: persona.telefono || '',
+        perfil_linkedin: persona.perfil_linkedin || '',
+        // No se usan en isLimited, pero se declaran por consistencia
+        division_id: '', 
+        cargo_actual: '',
+    });
 
-    const getInitials = (nombre: string, apellido: string) => {
-        return `${nombre?.[0] || ''}${apellido?.[0] || ''}`.toUpperCase();
-    };
+    const getInitials = (n1: string, a1: string) => `${n1?.[0] || ''}${a1?.[0] || ''}`.toUpperCase();
 
     const submitExperiencia = (e: React.FormEvent) => {
         e.preventDefault();
         formExp.post(route('historial.store'), {
             onSuccess: () => { setIsExpModalOpen(false); formExp.reset(); },
+        });
+    };
+
+    const submitEdit = (e: React.FormEvent) => {
+        e.preventDefault();
+        formEdit.patch(route('personas.update', persona.id), {
+            onSuccess: () => setIsEditProfileModalOpen(false),
         });
     };
 
@@ -69,21 +77,28 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                 {/* Header */}
                 <PageHeader 
                     title={`${persona.nombre_1} ${persona.apellido_1}`}
-                    subtitle={`RUT: ${formatRut(persona.rut)}`}
+                    subtitle={`RUT: ${formatRut(persona.rut)} • Perfil de Contacto`}
                     icon={User}
-                    actionLabel="Registrar Interacción"
+                    actionLabel="Registrar Gestión"
                     onActionClick={() => setIsInteraccionModalOpen(true)}
-                />
+                >
+                    {/* Boton extra en el header para edicion */}
+                   <button 
+                        onClick={() => setIsEditProfileModalOpen(true)}
+                        className="flex items-center justify-center gap-2 px-5 py-3 h-[44px] bg-white/5 border border-gray-800 rounded text-[10px] font-extrabold uppercase tracking-widest text-gray-400 hover:text-[#c1f75e] hover:border-[#c1f75e]/30 transition-all"
+                    >
+                        <Edit3 size={14} strokeWidth={3} className="shrink-0" />
+                        <span className="leading-none">Editar Perfil</span>
+                    </button>
+                </PageHeader>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     
-                    {/* Perfil y trayectoria */}
+                    {/*  Perfil y trayectoria */}
                     <div className="lg:col-span-8 space-y-8">
-                        
-                        {/* Perfil */}
                         <ContentPanel>
                             <div className="flex flex-col md:flex-row items-center gap-8">
-                                <div className="w-28 h-28 bg-gray-900 text-[#c1f75e] rounded flex items-center justify-center text-4xl font-black border border-gray-800 shadow-xl shrink-0">
+                                <div className="w-28 h-28 bg-gray-900 text-[#c1f75e] rounded-2xl flex items-center justify-center text-4xl font-black border border-gray-800 shadow-xl shrink-0 italic">
                                     {getInitials(persona.nombre_1, persona.apellido_1)}
                                 </div>
                                 <div className="flex-1 space-y-4 text-center md:text-left">
@@ -92,28 +107,29 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                             {persona.nombre_1} {persona.nombre_2} {persona.apellido_1} {persona.apellido_2}
                                         </h2>
                                         <p className="text-[#c1f75e] text-[10px] font-black uppercase tracking-[0.2em] mt-1 italic">
-                                            {persona.trabajo_actual?.cargo|| 'Sin cargo definido'}
+                                            {persona.trabajo_actual?.cargo || 'Sin cargo definido'}
                                         </p>
                                     </div>
                                     <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                                        <a href={`mailto:${persona.email}`} className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-4 py-2 rounded text-[11px] font-bold border border-transparent hover:border-[#c1f75e]/30 transition-all">
-                                            <Mail size={14} className="text-[#c1f75e]" /> {persona.email}
+                                        <a href={`mailto:${persona.email}`} className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-4 py-2 rounded-lg text-[11px] font-bold border border-transparent hover:border-[#c1f75e]/30 transition-all">
+                                            <Mail size={14} className="text-[#c1f75e]" /> {persona.email || 'Sin Email'}
                                         </a>
-                                        <a href={`tel:${persona.telefono}`} className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-4 py-2 rounded text-[11px] font-bold border border-transparent hover:border-[#c1f75e]/30 transition-all">
-                                            <Phone size={14} className="text-[#c1f75e]" /> {persona.telefono}
-                                        </a>
+                                        {persona.perfil_linkedin && (
+                                            <a href={persona.perfil_linkedin} target="_blank" className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-4 py-2 rounded-lg text-[11px] font-bold border border-transparent hover:border-[#c1f75e]/30 transition-all">
+                                                <Linkedin size={14} className="text-[#c1f75e]" /> LinkedIn
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </ContentPanel>
 
-                        {/* Trayectoria */}
                         <ContentPanel>
                             <div className="flex items-center justify-between mb-8">
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
                                     <Briefcase size={14} className="text-[#c1f75e]" /> Trayectoria Laboral
                                 </h3>
-                                <button onClick={() => setIsExpModalOpen(true)} className="p-2 bg-[#c1f75e]/10 text-[#c1f75e] rounded hover:bg-[#c1f75e] hover:text-black transition-all">
+                                <button onClick={() => setIsExpModalOpen(true)} className="p-2 bg-[#c1f75e]/10 text-[#c1f75e] rounded-lg hover:bg-[#c1f75e] hover:text-black transition-all">
                                     <Plus size={16} strokeWidth={3} />
                                 </button>
                             </div>
@@ -145,36 +161,28 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
 
                     {/* Bitácora y stats */}
                     <div className="lg:col-span-4 space-y-8">
-                        
-                        {/* Stast */}
                         <div className="bg-[#c1f75e] rounded-2xl p-6 text-black shadow-lg shadow-[#c1f75e]/10">
-                            <h4 className="text-[9px] font-black uppercase tracking-widest mb-4 opacity-70">Actividad CRM</h4>
+                            <h4 className="text-[9px] font-black uppercase tracking-widest mb-4 opacity-70 italic">Actividad CRM</h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-3xl font-black tracking-tighter">{persona.interacciones?.length || 0}</p>
-                                    <p className="text-[9px] font-bold uppercase">Gestiones</p>
+                                    <p className="text-[9px] font-bold uppercase tracking-widest">Gestiones</p>
                                 </div>
                                 <div>
                                     <p className="text-3xl font-black tracking-tighter">{persona.historial_laboral?.length || 0}</p>
-                                    <p className="text-[9px] font-bold uppercase">Empresas</p>
+                                    <p className="text-[9px] font-bold uppercase tracking-widest">Empresas</p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Bitácora (ultimas 3) */}
                         <ContentPanel>
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
                                     <MessageSquare size={14} className="text-[#c1f75e]" /> Bitácora
                                 </h3>
-                                {persona.interacciones?.length > 0 && (
-                                    <Link 
-                                        href={route('personas.interacciones', persona.id)}
-                                        className="text-[9px] font-black uppercase text-[#c1f75e] hover:underline"
-                                    >
-                                        Ver Todo
-                                    </Link>
-                                )}
+                                <Link href={route('personas.interacciones', persona.id)} className="text-[9px] font-black uppercase text-[#c1f75e] hover:underline">
+                                    Ver Todo
+                                </Link>
                             </div>
 
                             <div className="space-y-6">
@@ -198,10 +206,22 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                         </ContentPanel>
                     </div>
                 </div>
-            </PageContainer>
 
-            {/* Modal de reistro de interaccion */}
-            {isInteraccionModalOpen && (
+                {/* Modales */}
+                <PersonaModal
+                    isOpen={isEditProfileModalOpen}
+                    onClose={() => setIsEditProfileModalOpen(false)}
+                    data={formEdit.data}
+                    setData={formEdit.setData}
+                    submit={submitEdit}
+                    processing={formEdit.processing}
+                    errors={formEdit.errors}
+                    divisiones={divisiones}
+                    editingId={persona.id}
+                    isLimited={true}
+                />
+
+                {isInteraccionModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                     <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 w-full max-w-lg rounded-2xl p-10 relative shadow-2xl">
                         <button onClick={() => setIsInteraccionModalOpen(false)} className="absolute right-8 top-8 text-gray-400 hover:text-white transition-colors">
@@ -232,7 +252,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                 <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Licitación Asociada</label>
                                 <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-white focus:ring-[#c1f75e]" value={formInt.data.licitacion_id} onChange={e => formInt.setData('licitacion_id', e.target.value)}>
                                     <option value="">Sin licitación</option>
-                                    {licitaciones?.map(lic => <option key={lic.id} value={lic.id}>{lic.nombre_proyecto || lic.nombre}</option>)}
+                                    {licitaciones?.map((lic:any) => <option key={lic.id} value={lic.id}>{lic.nombre_proyecto || lic.nombre}</option>)}
                                 </select>
                             </div>
                             <div className="space-y-2">
@@ -258,7 +278,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                                 <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Empresa / División</label>
                                 <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e]" value={formExp.data.division_id} onChange={e => formExp.setData('division_id', e.target.value)} required>
                                     <option value="">Seleccionar...</option>
-                                    {divisiones?.map(div => <option key={div.id} value={div.id}>{div.empresa.nombre} — {div.nombre}</option>)}
+                                    {divisiones?.map((div: any) => <option key={div.id} value={div.id}>{div.empresa.nombre} — {div.nombre}</option>)}
                                 </select>
                             </div>
                             <div className="space-y-2">
@@ -278,6 +298,8 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: Props
                     </div>
                 </div>
             )}
+
+            </PageContainer>
         </AuthenticatedLayout>
     );
 }

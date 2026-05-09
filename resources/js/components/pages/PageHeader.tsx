@@ -8,6 +8,7 @@ interface Props {
     actionLabel?: string;
     actionHref?: string;
     onActionClick?: () => void;
+    children?: React.ReactNode;
 }
 
 export default function PageHeader({ 
@@ -16,7 +17,8 @@ export default function PageHeader({
     icon: Icon, 
     actionLabel, 
     actionHref, 
-    onActionClick 
+    onActionClick,
+    children
 }: Props) {
     
     // Boton para mantener armonia 
@@ -38,21 +40,27 @@ export default function PageHeader({
                 )}
             </div>
 
-            {actionLabel && (
-                <div className="shrink-0">
-                    {actionHref ? (
-                        <Link href={actionHref} className={buttonClass}>
-                            <Plus size={16} strokeWidth={3} />
-                            {actionLabel}
-                        </Link>
-                    ) : (
-                        <button onClick={onActionClick} className={buttonClass}>
-                            <Plus size={16} strokeWidth={3} />
-                            {actionLabel}
-                        </button>
-                    )}
-                </div>
-            )}
+            <div className="flex items-center gap-3 shrink-0 h-fit">
+
+                {children}
+
+                {/* Botón Principal */}
+                {actionLabel && (
+                    <>
+                        {actionHref ? (
+                            <Link href={actionHref} className={buttonClass}>
+                                <Plus size={16} strokeWidth={3} />
+                                {actionLabel}
+                            </Link>
+                        ) : (
+                            <button onClick={onActionClick} className={buttonClass}>
+                                <Plus size={16} strokeWidth={3} />
+                                {actionLabel}
+                            </button>
+                        )}
+                    </>
+                )}
+            </div>
         </div>
     );
 }

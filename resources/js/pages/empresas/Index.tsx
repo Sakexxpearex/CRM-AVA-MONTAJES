@@ -63,16 +63,6 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
         }
     };
 
-    const submitDivision = (e: React.FormEvent) => {
-        e.preventDefault();
-        divisionForm.post(route('divisiones.store'), {
-            onSuccess: () => {
-                setIsDivisionModalOpen(false);
-                divisionForm.reset();
-            }
-        });
-    };
-
     const handleDelete = (id: number) => {
         if (confirm('¿Esta seguro de eliminar este registro?')) {
             router.delete(route('empresas.destroy', id));
@@ -104,14 +94,6 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
                     actionLabel="Nueva Empresa"
                     onActionClick={() => setIsModalOpen(true)}
                 />
-                <div className="flex gap-4 mb-6">
-                    <button 
-                        onClick={() => setIsDivisionModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-gray-800 rounded-xl text-[10px] font-black uppercase text-gray-500 hover:text-[#c1f75e] hover:border-[#c1f75e]/30 transition-all"
-                    >
-                        <LayoutGrid size={14} /> Nueva División
-                    </button>
-                </div>
 
                 {/* Buscador */}
                 <div className="flex justify-start">
@@ -141,16 +123,6 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
                 handleRutChange={handleRutChange}
             />
 
-            <DivisionModal 
-                isOpen={isDivisionModalOpen}
-                onClose={() => setIsDivisionModalOpen(false)}
-                data={divisionForm.data}
-                setData={divisionForm.setData}
-                submit={submitDivision}
-                errors={divisionForm.errors}
-                processing={divisionForm.processing}
-                empresas={empresas} // Lista de mepresas para el select
-            />
 
            <button 
                 onClick={() => setIsModalOpen(true)}

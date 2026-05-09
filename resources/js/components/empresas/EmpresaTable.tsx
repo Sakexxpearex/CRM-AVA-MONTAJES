@@ -1,6 +1,8 @@
-import { Building2, Briefcase, FileText, Users, Trash2, Edit3,LayoutGrid } from 'lucide-react';
+import { Building2, Briefcase, FileText, Users, Trash2, Edit3,LayoutGrid, Eye } from 'lucide-react';
 import { Empresa } from '@/types/empresa';
 import { formatRut } from '@/utils/formatters';
+import { Link } from '@inertiajs/react';
+
 
 const tipoConfig = {
     Cliente: { icon: FileText, color: 'text-green-600', bgColor: 'bg-green-50' },
@@ -25,6 +27,7 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                         return (
                             <div key={empresa.id} className="p-5 space-y-4">
                                 <div className="flex items-center justify-between">
+                                    <Link href={route('empresas.show', empresa.id)} className="flex items-center gap-3"></Link>
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-gray-900 text-[#C1F75E] rounded flex items-center justify-center border border-gray-700">
                                             <Building2 size={20} />
@@ -89,7 +92,13 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                                             <div className="w-8 h-8 bg-gray-100 dark:bg-[#1A1A1A] rounded flex items-center justify-center text-gray-400 group-hover:text-black group-hover:bg-[#C1F75E] transition-all">
                                                 <Building2 size={16} />
                                             </div>
-                                            <span className="font-bold text-sm text-gray-800 dark:text-gray-200 uppercase">{empresa.nombre}</span>
+                                            <Link 
+                                                href={route('empresas.show', empresa.id)} 
+                                                className="font-bold text-sm text-gray-800 dark:text-gray-200 uppercase hover:text-[#c1f75e] transition-colors"
+                                            >
+                                                {empresa.nombre}
+                                            </Link>
+                                            {/* este no se si eliminarlo o ñau*/}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center font-mono text-xs text-gray-500 italic uppercase">{formatRut(empresa.rut)}</td>
@@ -100,6 +109,13 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Link 
+                                                href={route('empresas.show', empresa.id)} 
+                                                className="p-2 text-gray-400 hover:text-[#C1F75E] transition-colors"
+                                                title="Ver ficha técnica"
+                                            >
+                                                <Eye size={18} />
+                                            </Link>
                                             <button onClick={() => onEdit(empresa)} className="p-2 text-gray-400 hover:text-[#C1F75E] transition-colors"><Edit3 size={18} /></button>
                                             <button onClick={() => onDelete(empresa.id)} className="p-2 text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
                                         </div>
