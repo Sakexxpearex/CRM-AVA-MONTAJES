@@ -64,7 +64,6 @@ export default function LicitacionEditModal({
                         <div className="p-2 bg-[#c1f75e]/20 text-[#c1f75e] rounded-lg">
                             <Settings size={20} />
                         </div>
-
                         <h2 className="text-xl font-black uppercase italic dark:text-white tracking-tighter">
                             Editar Ficha de Licitación
                         </h2>
