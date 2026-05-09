@@ -224,7 +224,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                 {isInteraccionModalOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                         <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 w-full max-w-lg rounded-2xl p-10 relative shadow-2xl">
-                            <button onClick={() => setIsInteraccionModalOpen(false)} className="absolute right-8 top-8 text-gray-400 hover:text-white transition-colors">
+                            <button onClick={() => setIsInteraccionModalOpen(false)} className="absolute right-8 top-8 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                                 <X size={24} />
                             </button>
                             <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
@@ -234,32 +234,36 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                                 <div className="grid grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Canal de Contacto</label>
-                                        <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-white focus:ring-[#c1f75e]" value={formInt.data.tipo_contacto} onChange={e => formInt.setData('tipo_contacto', e.target.value)} required>
+                                        {/* CAMBIO AQUÍ: text-gray-900 dark:text-white */}
+                                        <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e]" value={formInt.data.tipo_contacto} onChange={e => formInt.setData('tipo_contacto', e.target.value)} required>
                                             <option value="">Seleccionar...</option>
                                             <option value="Reunión Presencial">Reunión Presencial</option>
                                             <option value="Llamada">Llamada</option>
                                             <option value="Correo">Correo</option>
                                             <option value="WhatsApp">WhatsApp</option>
+                                            <option value="WhatsApp">Nota</option>
                                             <option value="Otro">Otro</option>
                                         </select>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Fecha</label>
-                                        <input type="date" className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-white focus:ring-[#c1f75e]" value={formInt.data.fecha} onChange={e => formInt.setData('fecha', e.target.value)} required />
+                                        {/* CAMBIO AQUÍ: text-gray-900 dark:text-white */}
+                                        <input type="date" className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e]" value={formInt.data.fecha} onChange={e => formInt.setData('fecha', e.target.value)} required />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Licitación Asociada</label>
-                                    <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-white focus:ring-[#c1f75e]" value={formInt.data.licitacion_id} onChange={e => formInt.setData('licitacion_id', e.target.value)}>
+                                    {/* CAMBIO AQUÍ: text-gray-900 dark:text-white */}
+                                    <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e]" value={formInt.data.licitacion_id} onChange={e => formInt.setData('licitacion_id', e.target.value)}>
                                         <option value="">Sin licitación</option>
                                         {licitaciones?.map((lic: any) => <option key={lic.id} value={lic.id}>{lic.nombre_proyecto || lic.nombre}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Resumen de lo conversado</label>
-                                    <textarea className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-white focus:ring-[#c1f75e] min-h-[120px]" value={formInt.data.comentario} onChange={e => formInt.setData('comentario', e.target.value)} required />
+                                    <textarea className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e] min-h-[120px]" value={formInt.data.comentario} onChange={e => formInt.setData('comentario', e.target.value)} required />
                                 </div>
-                                <button type="submit" disabled={formInt.processing} className="w-full bg-[#c1f75e] text-black py-5 rounded-lg font-black text-sm uppercase tracking-widest shadow-xl shadow-[#c1f75e]/10">Guardar en Historial</button>
+                                <button type="submit" disabled={formInt.processing} className="w-full bg-[#c1f75e] text-black py-5 rounded-lg font-black text-sm uppercase tracking-widest shadow-xl shadow-[#c1f75e]/10 hover:bg-[#a8e63a] transition-colors">Guardar en Historial</button>
                             </form>
                         </div>
                     </div>

@@ -170,22 +170,6 @@ export default function PersonaModal({
                         </div>
                     </div>
 
-                    {/* CAMPO LINKEDIN: Solo se muestra si es modo limitado (Edición desde Perfil) */}
-                    {isLimited && (
-                        <div className="animate-in fade-in slide-in-from-top-2">
-                            <label className="text-[10px] font-black text-[#0077b5] uppercase mb-1 block flex items-center gap-1">
-                                <Linkedin size={12} /> Perfil de LinkedIn
-                            </label>
-                            <input
-                                type="url"
-                                value={data.perfil_linkedin || ''}
-                                onChange={e => setData('perfil_linkedin', e.target.value)}
-                                className="w-full bg-blue-50/5 dark:bg-[#0077b5]/5 border border-blue-200 dark:border-[#0077b5]/30 rounded-md p-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#0077b5]"
-                                placeholder="https://www.linkedin.com/in/usuario"
-                            />
-                        </div>
-                    )}
-
                     {/* Solo en perfil (isLimited) */}
                     {isLimited && (
                         <div>

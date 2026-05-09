@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
-import { Head, useForm, router, Link} from '@inertiajs/react';
-import { Building2, MapPin, Globe, Phone, Mail, Plus, Edit3, Trash2, Users, Layers, Hash, Tag,ChevronLeft, } from 'lucide-react';
+import { Head, useForm, router, Link } from '@inertiajs/react';
+import { Building2, MapPin, Globe, Phone, Mail, Plus, Edit3, Trash2, Users, Layers, Hash, Tag, ChevronLeft, } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
 // Componentes de pagina (para mantener todo igual)
@@ -19,7 +19,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
     const [editingDivision, setEditingDivision] = useState<any>(null);
     const [selectedDivisionId, setSelectedDivisionId] = useState<number | null>(null);
 
-    
+
     const { data: empData, setData: setEmpData, put: putEmpresa, processing: processingEmp, errors: errorsEmp } = useForm({
         nombre: empresa.nombre || '',
         rut: empresa.rut || '',
@@ -35,7 +35,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
     const filteredContactos = useMemo(() => {
         if (!selectedDivisionId) return contactos;
-        return contactos.filter((c: any) => 
+        return contactos.filter((c: any) =>
             c.divisiones.some((d: any) => d.id === selectedDivisionId)
         );
     }, [selectedDivisionId, contactos]);
@@ -52,27 +52,27 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
     };
 
     const submitDivision = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (editingDivision) {
-        // Actualizar
-        router.put(route('divisiones.update', editingDivision.id), divData, {
-            onSuccess: () => {
-                setIsDivisionModalOpen(false);
-                setEditingDivision(null);
-                resetDiv();
-            },
-        });
-    } else {
-        // Crear
-        postDivision(route('divisiones.store'), {
-            onSuccess: () => {
-                setIsDivisionModalOpen(false);
-                resetDiv();
-            },
-        });
-    }
-};
+        e.preventDefault();
+
+        if (editingDivision) {
+            // Actualizar
+            router.put(route('divisiones.update', editingDivision.id), divData, {
+                onSuccess: () => {
+                    setIsDivisionModalOpen(false);
+                    setEditingDivision(null);
+                    resetDiv();
+                },
+            });
+        } else {
+            // Crear
+            postDivision(route('divisiones.store'), {
+                onSuccess: () => {
+                    setIsDivisionModalOpen(false);
+                    resetDiv();
+                },
+            });
+        }
+    };
 
     const deleteDivision = (e: React.MouseEvent, id: number) => {
         e.stopPropagation(); // Evita que se active el filtro al querer borrar
@@ -82,16 +82,16 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
     };
 
     const handleEditDivision = (e: React.MouseEvent, div: any) => {
-    e.stopPropagation(); 
-    setEditingDivision(div);
-    
-    // Cargamos los datos de la división en el formulario
-    setDivData({
-        nombre: div.nombre,
-        alias: div.alias || '',
-        empresa_id: empresa.id,
+        e.stopPropagation();
+        setEditingDivision(div);
+
+        // Cargamos los datos de la división en el formulario
+        setDivData({
+            nombre: div.nombre,
+            alias: div.alias || '',
+            empresa_id: empresa.id,
         });
-    
+
         setIsDivisionModalOpen(true);
     };
 
@@ -101,14 +101,14 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
             <PageContainer>
                 {/* Navegación */}
-                <Link 
-                    href={route('empresas.index')} 
+                <Link
+                    href={route('empresas.index')}
                     className="flex items-center gap-2 text-gray-500 hover:text-[#c1f75e] transition-colors text-[10px] font-black uppercase tracking-widest w-fit mb-2"
                 >
                     <ChevronLeft size={14} strokeWidth={3} /> Volver al Directorio
                 </Link>
                 {/* Header */}
-                <PageHeader 
+                <PageHeader
                     title={empresa.nombre}
                     icon={Building2}
                     actionLabel="Editar Empresa"
@@ -116,20 +116,20 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    
+
                     {/* Información basica */}
                     <div className="lg:col-span-4 space-y-6">
                         <ContentPanel title="Identificación Comercial">
                             <div className="space-y-4">
-                                <InfoItem 
-                                    icon={Hash} 
-                                    label="RUT Institucional" 
-                                    value={formatRut(empresa.rut)} 
+                                <InfoItem
+                                    icon={Hash}
+                                    label="RUT Institucional"
+                                    value={formatRut(empresa.rut)}
                                 />
-                                <InfoItem 
-                                    icon={Tag} 
-                                    label="Alias / Nombre Corto" 
-                                    value={empresa.alias || 'No definido'} 
+                                <InfoItem
+                                    icon={Tag}
+                                    label="Alias / Nombre Corto"
+                                    value={empresa.alias || 'No definido'}
                                 />
                             </div>
                         </ContentPanel>
@@ -143,7 +143,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
                     {/* Divisiones y gestión */}
                     <div className="lg:col-span-8 space-y-8">
-                        
+
                         {/* Divisiones (clientes) */}
                         {empresa.tipo === 'Cliente' && (
                             <section>
@@ -152,7 +152,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                         <Layers size={18} className="text-[#c1f75e]" />
                                         <h3 className="text-xs font-black uppercase tracking-widest dark:text-white">Divisiones / Unidades</h3>
                                     </div>
-                                    <button 
+                                    <button
                                         onClick={() => setIsDivisionModalOpen(true)}
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-gray-800 rounded-lg text-[10px] font-black uppercase text-[#c1f75e] hover:bg-[#c1f75e]/10 transition-all"
                                     >
@@ -162,12 +162,11 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {divisiones.map((div: any) => (
-                                        <div 
+                                        <div
                                             key={div.id}
                                             onClick={() => setSelectedDivisionId(selectedDivisionId === div.id ? null : div.id)}
-                                            className={`p-4 border rounded-xl cursor-pointer transition-all group ${
-                                                selectedDivisionId === div.id ? 'border-[#c1f75e] bg-[#c1f75e]/5' : 'border-gray-800 hover:border-gray-700'
-                                            }`}
+                                            className={`p-4 border rounded-xl cursor-pointer transition-all group ${selectedDivisionId === div.id ? 'border-[#c1f75e] bg-[#c1f75e]/5' : 'border-gray-800 hover:border-gray-700'
+                                                }`}
                                         >
                                             <div className="flex justify-between items-start">
                                                 <div>
@@ -175,7 +174,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                                     <p className="text-[10px] text-gray-500 mt-1 uppercase font-medium">{div.personas_count || 0} Personas</p>
                                                 </div>
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={(e) => handleEditDivision(e,div.id)} className="p-1 hover:text-[#c1f75e]"><Edit3 size={14} /></button>
+                                                    <button onClick={(e) => handleEditDivision(e, div.id)} className="p-1 hover:text-[#c1f75e]"><Edit3 size={14} /></button>
                                                     <button onClick={(e) => deleteDivision(e, div.id)} className="p-1 hover:text-red-500"><Trash2 size={14} /></button>
                                                 </div>
                                             </div>
@@ -187,7 +186,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
                         {/* Contactos asociados */}
                         <section>
-                        <div className="flex items-center gap-2 mb-4">
+                            <div className="flex items-center gap-2 mb-4">
                                 <Users size={18} className="text-[#c1f75e]" />
                                 <h3 className="text-xs font-black uppercase tracking-widest dark:text-white">
                                     Personal Clave {selectedDivisionId && <span className="text-[#c1f75e] lowercase text-[10px] opacity-60">(Filtrado)</span>}
@@ -223,9 +222,9 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                     </div>
                 </div>
 
-                <EmpresaModal 
+                <EmpresaModal
                     isOpen={isEditModalOpen}
-                    onClose={() => {setIsEditModalOpen(false);setEditingDivision(null);resetDiv()}}
+                    onClose={() => { setIsEditModalOpen(false); setEditingDivision(null); resetDiv() }}
                     data={empData}
                     setData={setEmpData}
                     submit={submitUpdateEmpresa}
@@ -235,7 +234,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                     handleRutChange={handleRutChange}
                 />
 
-                <DivisionModal 
+                <DivisionModal
                     isOpen={isDivisionModalOpen}
                     onClose={() => setIsDivisionModalOpen(false)}
                     data={divData}
