@@ -75,7 +75,6 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                 </Link>
 
                 {/* Header */}
-                {/* Header */}
                 <PageHeader
                     title={`Perfil de Contacto`}
                     subtitle={`RUT: ${formatRut(persona.rut)}`}
