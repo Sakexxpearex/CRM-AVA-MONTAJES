@@ -42,8 +42,12 @@ class EmpresaController extends Controller
         })->with(['divisiones' => function($query) {
             $query->where('estado_actual', true); // Esto trae el 'pivot' con el cargo
         }])->get(),
+
+        
     ]);
 }
+
+    
 
     public function update(Request $request, Empresa $empresa)
     {
