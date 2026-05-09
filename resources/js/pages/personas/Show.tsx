@@ -75,9 +75,19 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                 </Link>
 
                 {/* Header */}
+<<<<<<< HEAD
                 <PageHeader
+=======
+<<<<<<< Updated upstream
+                <PageHeader 
+>>>>>>> d71cf81 (Cambio de estado pipeline, y edicion de licitacion)
                     title={`${persona.nombre_1} ${persona.apellido_1}`}
                     subtitle={`RUT: ${formatRut(persona.rut)} • Perfil de Contacto`}
+=======
+                <PageHeader
+                    title={`Perfil de Contacto`}
+                    subtitle={`RUT: ${formatRut(persona.rut)}`}
+>>>>>>> Stashed changes
                     icon={User}
                     actionLabel="Registrar Gestión"
                     onActionClick={() => setIsInteraccionModalOpen(true)}
