@@ -1,8 +1,8 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
-import { 
-    ChevronLeft, Mail, Phone, Building2, Briefcase, 
+import {
+    ChevronLeft, Mail, Phone, Building2, Briefcase,
     MessageSquare, Plus, X, User, Hash, Linkedin, Edit3
 } from 'lucide-react';
 
@@ -20,9 +20,9 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
     const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
     // Formularios
-    const formExp = useForm({ persona_id: persona.id, division_id: '', cargo: '', fecha_inicio: '', fecha_fin: '', estado_actual: false as boolean});
+    const formExp = useForm({ persona_id: persona.id, division_id: '', cargo: '', fecha_inicio: '', fecha_fin: '', estado_actual: false as boolean });
     const formInt = useForm({ persona_id: persona.id, tipo_contacto: '', fecha: new Date().toISOString().split('T')[0], comentario: '', licitacion_id: '' });
-    
+
     // Formulario de edición (Perfil Limitado)
     const formEdit = useForm({
         rut: persona.rut || '',
@@ -34,7 +34,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
         telefono: persona.telefono || '',
         perfil_linkedin: persona.perfil_linkedin || '',
         // No se usan en isLimited, pero se declaran por consistencia
-        division_id: '', 
+        division_id: '',
         cargo_actual: '',
     });
 
@@ -67,14 +67,13 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
 
             <PageContainer>
                 {/* Navegación */}
-                <Link 
-                    href={route('personas.index')} 
+                <Link
+                    href={route('personas.index')}
                     className="flex items-center gap-2 text-gray-500 hover:text-[#c1f75e] transition-colors text-[10px] font-black uppercase tracking-widest w-fit mb-2"
                 >
                     <ChevronLeft size={14} strokeWidth={3} /> Volver al Directorio
                 </Link>
 
-                {/* Header */}
                 {/* Header */}
                 <PageHeader
                     title={`Perfil de Contacto`}
@@ -94,7 +93,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                 </PageHeader>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    
+
                     {/*  Perfil y trayectoria */}
                     <div className="lg:col-span-8 space-y-8">
                         <ContentPanel>
@@ -223,82 +222,86 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                 />
 
                 {isInteraccionModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 w-full max-w-lg rounded-2xl p-10 relative shadow-2xl">
-                        <button onClick={() => setIsInteraccionModalOpen(false)} className="absolute right-8 top-8 text-gray-400 hover:text-white transition-colors">
-                            <X size={24}/>
-                        </button>
-                        <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
-                            <MessageSquare className="text-[#c1f75e]" size={28} /> Nueva Gestión
-                        </h2>
-                        <form onSubmit={submitInteraccion} className="space-y-6">
-                            <div className="grid grid-cols-2 gap-6">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 w-full max-w-lg rounded-2xl p-10 relative shadow-2xl">
+                            <button onClick={() => setIsInteraccionModalOpen(false)} className="absolute right-8 top-8 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                <X size={24} />
+                            </button>
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
+                                <MessageSquare className="text-[#c1f75e]" size={28} /> Nueva Gestión
+                            </h2>
+                            <form onSubmit={submitInteraccion} className="space-y-6">
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Canal de Contacto</label>
+                                        {/* CAMBIO AQUÍ: text-gray-900 dark:text-white */}
+                                        <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e]" value={formInt.data.tipo_contacto} onChange={e => formInt.setData('tipo_contacto', e.target.value)} required>
+                                            <option value="">Seleccionar...</option>
+                                            <option value="Reunión Presencial">Reunión Presencial</option>
+                                            <option value="Llamada">Llamada</option>
+                                            <option value="Correo">Correo</option>
+                                            <option value="WhatsApp">WhatsApp</option>
+                                            <option value="WhatsApp">Nota</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Fecha</label>
+                                        {/* CAMBIO AQUÍ: text-gray-900 dark:text-white */}
+                                        <input type="date" className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e]" value={formInt.data.fecha} onChange={e => formInt.setData('fecha', e.target.value)} required />
+                                    </div>
+                                </div>
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Canal de Contacto</label>
-                                    <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-white focus:ring-[#c1f75e]" value={formInt.data.tipo_contacto} onChange={e => formInt.setData('tipo_contacto', e.target.value)} required>
-                                        <option value="">Seleccionar...</option>
-                                        <option value="Reunión Presencial">Reunión Presencial</option>
-                                        <option value="Llamada">Llamada</option>
-                                        <option value="Correo">Correo</option>
-                                        <option value="WhatsApp">WhatsApp</option>
-                                        <option value="Otro">Otro</option>
+                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Licitación Asociada</label>
+                                    {/* CAMBIO AQUÍ: text-gray-900 dark:text-white */}
+                                    <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e]" value={formInt.data.licitacion_id} onChange={e => formInt.setData('licitacion_id', e.target.value)}>
+                                        <option value="">Sin licitación</option>
+                                        {licitaciones?.map((lic: any) => <option key={lic.id} value={lic.id}>{lic.nombre_proyecto || lic.nombre}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Fecha</label>
-                                    <input type="date" className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-white focus:ring-[#c1f75e]" value={formInt.data.fecha} onChange={e => formInt.setData('fecha', e.target.value)} required />
+                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Resumen de lo conversado</label>
+                                    <textarea className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e] min-h-[120px]" value={formInt.data.comentario} onChange={e => formInt.setData('comentario', e.target.value)} required />
                                 </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Licitación Asociada</label>
-                                <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-white focus:ring-[#c1f75e]" value={formInt.data.licitacion_id} onChange={e => formInt.setData('licitacion_id', e.target.value)}>
-                                    <option value="">Sin licitación</option>
-                                    {licitaciones?.map((lic:any) => <option key={lic.id} value={lic.id}>{lic.nombre_proyecto || lic.nombre}</option>)}
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Resumen de lo conversado</label>
-                                <textarea className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-white focus:ring-[#c1f75e] min-h-[120px]" value={formInt.data.comentario} onChange={e => formInt.setData('comentario', e.target.value)} required />
-                            </div>
-                            <button type="submit" disabled={formInt.processing} className="w-full bg-[#c1f75e] text-black py-5 rounded-lg font-black text-sm uppercase tracking-widest shadow-xl shadow-[#c1f75e]/10">Guardar en Historial</button>
-                        </form>
+                                <button type="submit" disabled={formInt.processing} className="w-full bg-[#c1f75e] text-black py-5 rounded-lg font-black text-sm uppercase tracking-widest shadow-xl shadow-[#c1f75e]/10 hover:bg-[#a8e63a] transition-colors">Guardar en Historial</button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Modal cambio division/cargo */}
-            {isExpModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 w-full max-w-md rounded-2xl p-8 relative shadow-2xl">
-                        <button onClick={() => setIsExpModalOpen(false)} className="absolute right-6 top-6 text-gray-400 hover:text-white"><X size={20}/></button>
-                        <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
-                            <Plus className="text-[#c1f75e]" size={24} /> Registrar Nuevo Cargo
-                        </h2>
-                        <form onSubmit={submitExperiencia} className="space-y-5">
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Empresa / División</label>
-                                <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e]" value={formExp.data.division_id} onChange={e => formExp.setData('division_id', e.target.value)} required>
-                                    <option value="">Seleccionar...</option>
-                                    {divisiones?.map((div: any) => <option key={div.id} value={div.id}>{div.empresa.nombre} — {div.nombre}</option>)}
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Nombre del Cargo</label>
-                                <input type="text" className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e]" value={formExp.data.cargo} onChange={e => formExp.setData('cargo', e.target.value)} required />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2"><label className="text-[9px] font-black uppercase text-gray-500">Fecha Inicio</label><input type="date" className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e]" value={formExp.data.fecha_inicio} onChange={e => formExp.setData('fecha_inicio', e.target.value)} required /></div>
-                                <div className="space-y-2"><label className="text-[9px] font-black uppercase text-gray-500">Fecha Fin</label><input type="date" disabled={formExp.data.estado_actual} className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white disabled:opacity-20" value={formExp.data.fecha_fin || ''} onChange={e => formExp.setData('fecha_fin', e.target.value)} /></div>
-                            </div>
-                            <label className="flex items-center gap-3 cursor-pointer py-2">
-                                <input type="checkbox" className="w-5 h-5 rounded border-gray-700 bg-black text-[#c1f75e] focus:ring-[#c1f75e]" checked={formExp.data.estado_actual} onChange={e => formExp.setData('estado_actual', e.target.checked)} />
-                                <span className="text-[10px] font-bold text-gray-400 uppercase italic">Es el cargo actual</span>
-                            </label>
-                            <button type="submit" disabled={formExp.processing} className="w-full bg-[#c1f75e] text-black py-4 rounded-lg font-black text-xs uppercase shadow-xl shadow-[#c1f75e]/10">Confirmar Registro</button>
-                        </form>
+                {/* Modal cambio division/cargo */}
+                {isExpModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 w-full max-w-md rounded-2xl p-8 relative shadow-2xl">
+                            <button onClick={() => setIsExpModalOpen(false)} className="absolute right-6 top-6 text-gray-400 hover:text-white"><X size={20} /></button>
+                            <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
+                                <Plus className="text-[#c1f75e]" size={24} /> Registrar Nuevo Cargo
+                            </h2>
+                            <form onSubmit={submitExperiencia} className="space-y-5">
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Empresa / División</label>
+                                    <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e]" value={formExp.data.division_id} onChange={e => formExp.setData('division_id', e.target.value)} required>
+                                        <option value="">Seleccionar...</option>
+                                        {divisiones?.map((div: any) => <option key={div.id} value={div.id}>{div.empresa.nombre} — {div.nombre}</option>)}
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Nombre del Cargo</label>
+                                    <input type="text" className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e]" value={formExp.data.cargo} onChange={e => formExp.setData('cargo', e.target.value)} required />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2"><label className="text-[9px] font-black uppercase text-gray-500">Fecha Inicio</label><input type="date" className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e]" value={formExp.data.fecha_inicio} onChange={e => formExp.setData('fecha_inicio', e.target.value)} required /></div>
+                                    <div className="space-y-2"><label className="text-[9px] font-black uppercase text-gray-500">Fecha Fin</label><input type="date" disabled={formExp.data.estado_actual} className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white disabled:opacity-20" value={formExp.data.fecha_fin || ''} onChange={e => formExp.setData('fecha_fin', e.target.value)} /></div>
+                                </div>
+                                <label className="flex items-center gap-3 cursor-pointer py-2">
+                                    <input type="checkbox" className="w-5 h-5 rounded border-gray-700 bg-black text-[#c1f75e] focus:ring-[#c1f75e]" checked={formExp.data.estado_actual} onChange={e => formExp.setData('estado_actual', e.target.checked)} />
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase italic">Es el cargo actual</span>
+                                </label>
+                                <button type="submit" disabled={formExp.processing} className="w-full bg-[#c1f75e] text-black py-4 rounded-lg font-black text-xs uppercase shadow-xl shadow-[#c1f75e]/10">Confirmar Registro</button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
             </PageContainer>
         </AuthenticatedLayout>
