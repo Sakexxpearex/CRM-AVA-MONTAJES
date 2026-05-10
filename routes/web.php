@@ -42,9 +42,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/personas/{persona}/interacciones', [PersonaController::class, 'interacciones'])
         ->name('personas.interacciones');
 
-    // Ruta para cambiar de licitacion a proyecto (estado: adjudicado)
-    Route::post('/licitaciones/{licitacion}/adjudicar', [LicitacionController::class, 'adjudicar'])
-    ->name('licitaciones.adjudicar');
+    // Ruta para editar licitacion  
+    Route::put('/licitaciones/{licitacion}', [LicitacionController::class, 'update'])
+    ->name('licitaciones.update');
+
+    // Ruta para cambiar estado_pipeline
+    Route::patch('/licitaciones/{licitacion}/pipeline', [LicitacionController::class, 'updatePipeline'])
+    ->name('licitaciones.update_pipeline');
 
     //Ruta para las divisiones
     Route::post('/divisiones', [DivisionController::class, 'store'])->name('divisiones.store');

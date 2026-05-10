@@ -76,16 +76,16 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
 
                 {/* Header */}
                 <PageHeader
-                    title={`${persona.nombre_1} ${persona.apellido_1}`}
-                    subtitle={`RUT: ${formatRut(persona.rut)} • Perfil de Contacto`}
+                    title={`Perfil de Contacto`}
+                    subtitle={`RUT: ${formatRut(persona.rut)}`}
                     icon={User}
                     actionLabel="Registrar Gestión"
                     onActionClick={() => setIsInteraccionModalOpen(true)}
                 >
-                    {/* Boton extra en el header para edicion */}
-                    <button
+                    {/* Boton secundario para edicion de perfil */}
+                    <button 
                         onClick={() => setIsEditProfileModalOpen(true)}
-                        className="flex items-center justify-center gap-2 px-5 py-3 h-[44px] bg-white/5 border border-gray-800 rounded text-[10px] font-extrabold uppercase tracking-widest text-gray-400 hover:text-[#c1f75e] hover:border-[#c1f75e]/30 transition-all"
+                        className="flex items-center justify-center gap-2 px-5 py-3 h-[44px] bg-white/5 border border-gray-800 rounded text-[10px] font-extrabold uppercase tracking-widest text-gray-400 hover:text-[#c1f75e] hover:border-[#c1f75e]/30 transition-all flex-1 sm:flex-none"
                     >
                         <Edit3 size={14} strokeWidth={3} className="shrink-0" />
                         <span className="leading-none">Editar Perfil</span>

@@ -15,17 +15,13 @@ class LicitacionController extends Controller
 {
     public function index()
     {
-        // 1. Obtenemos TODAS las licitaciones para calcular los stats globales
         $todas = Licitacion::all();
 
-        // 2. Filtramos las licitaciones para la tabla: Solo las que NO están ganadas
-        // Esto hace que "desaparezcan" de la vista y se muevan a Proyectos
         $licitacionesActivas = Licitacion::with(['empresa', 'division'])
             ->where('estado_pipeline', '!=', 'Ganada')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // 3. Stats (Mantenemos la lógica sobre el total para ver el rendimiento)
         $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
             'activos'     => $todas->where('estado_pipeline', '!=', 'Ganada')->count(),
@@ -68,43 +64,71 @@ class LicitacionController extends Controller
         ])->findOrFail($id);
 
         return Inertia::render('licitaciones/Show', [
-            'licitacion' => $licitacion->toArray() 
+            'licitacion' => $licitacion,
+            // Para el PipelineModal
+            'empresasCompetencia' => Empresa::where('tipo', 'Competencia')->orderBy('nombre')->get(),
+            // Para el LicitacionEditModal (Corregido: faltaba coma y sobran llaves)
+            'empresas' => Empresa::all(),
+            'divisiones' => Division::all(),
         ]);
     }
 
-    /**
-     * Proceso de Adjudicación:
-     * Cambia el estado en CRM y crea el registro en la DB de Usuarios/Proyectos
-     */
+    // Método para editar datos estructurales (Nombre, Empresa, etc.)
+    public function update(Request $request, Licitacion $licitacion)
+    {
+        $validated = $request->validate([
+            'nombre_proyecto' => 'required|string|max:255',
+            'empresa_id'      => 'required|exists:crm.empresas,id',
+            'division_id'     => 'required|exists:crm.divisiones,id',
+            'monto_estimado'  => 'nullable|numeric',
+            'descripcion'     => 'nullable|string',
+            'fecha_cierre'    => 'nullable|date',
+        ]);
+
+        $licitacion->update($validated);
+
+        return back()->with('message', 'Ficha técnica actualizada');
+    }
+
+    public function updatePipeline(Request $request, Licitacion $licitacion)
+    {
+        $rules = [
+            'estado_pipeline' => 'required|string',
+            'comentario_cierre' => 'nullable|string',
+        ];
+
+        if ($request->estado_pipeline === 'Perdida') {
+            $rules['competencia_ganadora_id'] = 'required|exists:crm.empresas,id';
+        }
+
+        $validated = $request->validate($rules);
+        $licitacion->update($validated);
+
+        return back()->with('message', 'Pipeline actualizado correctamente');
+    }
+
     public function adjudicar(Request $request, $id)
     {
         $licitacion = Licitacion::findOrFail($id);
 
-        // Validamos que el centro de costo venga en la petición (desde un modal o input)
         $request->validate([
             'centro_costo' => 'required|string|unique:usuarios.proyectos,centro_costo'
         ]);
 
         DB::transaction(function () use ($licitacion, $request) {
-            
-            // 1. Crear el Proyecto en la conexión 'usuarios' (fiel a tu migración)
             Proyecto::create([
                 'centro_costo' => $request->centro_costo,
                 'nombre'       => $licitacion->nombre_proyecto,
                 'alias'        => strtoupper(Str::limit($licitacion->nombre_proyecto, 10, '')),
             ]);
 
-            // 2. Actualizar Licitación en CRM:
-            // Al pasar a 'Ganada', el método Index ya no la mostrará
             $licitacion->update([
                 'estado_pipeline' => 'Ganada',
-                // Si tienes los campos proyecto_id o fecha_adjudicacion en crm.licitaciones:
-                // 'proyecto_id' => $proyecto->id, 
-                // 'fecha_adjudicacion' => now(),
+                // Si tienes campo comentario_cierre, también lo guardamos aquí
+                'comentario_cierre' => $request->comentario_cierre ?? $licitacion->comentario_cierre,
             ]);
         });
 
-        // Redirigimos al Index de Proyectos para que el usuario vea el resultado
-        return redirect()->route('proyectos.index')->with('message', 'Licitación adjudicada con éxito.');
+        return redirect()->route('licitaciones.index')->with('message', 'Licitación adjudicada con éxito.');
     }
 }

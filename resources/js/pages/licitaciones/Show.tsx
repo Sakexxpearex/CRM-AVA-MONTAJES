@@ -1,11 +1,11 @@
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { 
     ChevronLeft, Building2, MessageSquare, 
     Clock, FileText, User, ArrowRight,
-    CheckCircle, Zap
+    Zap, Edit3, TrendingUp,CheckCircle
 } from 'lucide-react';
-import { useState } from 'react';
 import { formatDate } from '@/utils/formatters';
 
 // Componentes de pagina (para mantener todo igual)
@@ -15,13 +15,16 @@ import ContentPanel from '@/components/pages/ContentPanel';
 
 // Componentes especificos para el detalle de licitaciones
 import EstadoBadge from '@/components/licitaciones/EstadoBadge';
+import LicitacionEditModal from '@/components/licitaciones/LicitacionEditModal';
+import PipelineModal from '@/components/licitaciones/PipelineModal';
 
-export default function Show({ licitacion }: any) {
+export default function Show({ licitacion, empresasCompetencia, empresas, divisiones}: any) {
     if (!licitacion) {
         return <div className="p-10 text-white font-black uppercase tracking-widest text-center">Cargando datos...</div>;
     }
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { data, setData, post, processing, errors } = useForm({
         centro_costo: '',
     });
@@ -47,6 +50,14 @@ export default function Show({ licitacion }: any) {
         });
     };
 
+
+    //estado pipeline
+    interface Props {
+    licitacion: any;
+    empresasCompetencia: any[]; 
+    }
+
+    const [isPipelineModalOpen, setIsPipelineModalOpen] = useState(false)
     return (
         <AuthenticatedLayout>
             <Head title={`Licitación: ${licitacion.nombre_proyecto || 'Detalle'}`} />
@@ -63,11 +74,20 @@ export default function Show({ licitacion }: any) {
                 {/* Header */}
                 <PageHeader 
                     title={licitacion.nombre_proyecto || "Sin Nombre"}
-                    subtitle="Detalle técnico y comercial de la licitación"
                     icon={FileText}
-                    actionLabel={!licitacion.proyecto_id && licitacion.estado_pipeline !== 'Ganada' ? "Adjudicar Proyecto" : undefined}
-                    onActionClick={() => setIsModalOpen(true)} // <--- Cambiado para abrir modal
-                />
+                    // Gestionar el flujo comercial
+                    actionLabel="Gestionar Pipeline"
+                    onActionClick={() => setIsPipelineModalOpen(true)}
+                >
+                    {/* Editar datos técnicos/básicos */}
+                    <button 
+                        onClick={() => setIsEditModalOpen(true)}
+                        className="flex items-center justify-center gap-2 px-5 py-3 bg-white/5 border border-gray-800 rounded text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#c1f75e] hover:border-[#c1f75e]/30 transition-all h-[44px]"
+                    >
+                        <Edit3 size={14} strokeWidth={3} />
+                        <span>Editar Ficha</span>
+                    </button>
+                </PageHeader>
 
                 {/* Info */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -112,9 +132,8 @@ export default function Show({ licitacion }: any) {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
                     <div className="lg:col-span-8 space-y-6">
-                        {/* Descripcion */}
                         <ContentPanel>
                             <h3 className="text-[9px] font-black uppercase text-gray-400 tracking-[0.3em] mb-4 flex items-center gap-2">
                                 <FileText size={14} className="text-[#c1f75e]" /> Alcance Técnico
@@ -239,6 +258,21 @@ export default function Show({ licitacion }: any) {
                     </div>
                 </div>
             )}
+
+            <PipelineModal 
+                isOpen={isPipelineModalOpen}
+                onClose={() => setIsPipelineModalOpen(false)}
+                licitacion={licitacion}
+                empresasCompetencia={empresasCompetencia || []}
+            />
+
+            <LicitacionEditModal 
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                licitacion={licitacion}
+                empresas={empresas} 
+                divisiones={divisiones}
+            />
         </AuthenticatedLayout>
     );
 }
