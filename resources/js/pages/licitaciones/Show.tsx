@@ -36,12 +36,7 @@ export default function Show({ licitacion, empresasCompetencia, empresas, divisi
         }).format(num);
     };
 
-    const contactosUnicos = licitacion.interacciones?.reduce((acc: any[], curr: any) => {
-        if (curr.persona && !acc.find((p: any) => p.id === curr.persona.id)) {
-            acc.push(curr.persona);
-        }
-        return acc;
-    }, []) || [];
+    const contactosAsociados = licitacion.division?.personas || [];
 
     const onSubmitAdjudicar = (e: React.FormEvent) => {
         e.preventDefault();
@@ -183,8 +178,8 @@ export default function Show({ licitacion, empresasCompetencia, empresas, divisi
                         <ContentPanel>
                             <h3 className="text-[9px] font-black uppercase text-[#c1f75e] mb-6 tracking-[0.2em]">Contactos Asociados</h3>
                             <div className="space-y-3">
-                                {contactosUnicos.length > 0 ? (
-                                    contactosUnicos.map((p: any) => (
+                                {contactosAsociados.length > 0 ? (
+                                    contactosAsociados.map((p: any) => (
                                         <Link 
                                             key={p.id} 
                                             href={route('personas.show', p.id)} 

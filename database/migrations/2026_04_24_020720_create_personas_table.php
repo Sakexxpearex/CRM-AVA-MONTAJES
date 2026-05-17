@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string("nombre_2");
             $table->string("apellido_1");
             $table->string("apellido_2");
-            
+            $table->foreignId('division_id')->constrained('crm.divisiones');
             // Datos de contacto (nullable por si el gerente no los tiene a mano)
             $table->string('email')->nullable();
             $table->string('telefono')->nullable();

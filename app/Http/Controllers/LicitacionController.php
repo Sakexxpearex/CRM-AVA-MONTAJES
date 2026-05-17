@@ -54,12 +54,11 @@ class LicitacionController extends Controller
     }
 
     public function show($id)
-    {
+{
         $licitacion = Licitacion::with([
-            'empresa', 
-            'division', 
-            'proyecto', 
-            'interacciones.user', 
+            'division.personas', // <-- CLAVE: Trae los contactos de la división específica
+            'empresa',
+            'proyecto',
             'interacciones.persona'
         ])->findOrFail($id);
 

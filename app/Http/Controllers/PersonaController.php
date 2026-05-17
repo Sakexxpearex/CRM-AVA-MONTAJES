@@ -31,7 +31,7 @@ class PersonaController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+public function store(Request $request)
 {
     $telefono = preg_replace('/\D/', '', $request->input('telefono', ''));
 
@@ -52,27 +52,32 @@ class PersonaController extends Controller
         'division_id'   => 'nullable|exists:crm.divisiones,id',
     ]);
 
-    // Usamos DB::transaction para que si algo falla, no se cree la persona a medias
     return DB::transaction(function () use ($request, $validated) {
         
-        // 2. Creamos la persona filtrando SOLO los campos de su tabla
-        $persona = Persona::create($request->only([
-            'nombre_1', 'nombre_2', 'apellido_1', 'apellido_2', 'rut', 'email', 'telefono'
-        ]));
-
-        // 3. Creamos el historial laboral inicial
-        $persona->historialLaboral()->create([
-            'empresa_id'   => $validated['empresa_id'],
-            'division_id'  => $validated['division_id'],
-            'cargo'        => $validated['cargo_actual'],
-            'fecha_inicio' => now(),
-            'estado_actual'       => true
+        // 2. Creamos la persona INCLUYENDO el division_id
+        $persona = Persona::create([
+            'nombre_1'    => $validated['nombre_1'],
+            'nombre_2'    => $request->nombre_2,
+            'apellido_1'  => $validated['apellido_1'],
+            'apellido_2'  => $request->apellido_2,
+            'rut'         => $request->rut,
+            'email'       => $request->email,
+            'telefono'    => $request->telefono,
+            'division_id' => $validated['division_id'], // <-- ESTO ARREGLA EL ERROR 500
         ]);
 
-        return redirect()->route('personas.index')->with('message', 'Persona creada con éxito');
+        // 3. Creamos el historial laboral inicial (esto se mantiene igual)
+        $persona->historialLaboral()->create([
+            'empresa_id'    => $validated['empresa_id'],
+            'division_id'   => $validated['division_id'],
+            'cargo'         => $validated['cargo_actual'],
+            'fecha_inicio'  => now(),
+            'estado_actual' => true
+        ]);
+
+        return redirect()->route('personas.index')->with('message', 'Contacto creado con éxito');
     });
 }
-
     public function show(Persona $persona)
     {
         // Cargamos todas las relaciones para que la página de Detalle se vea completa
