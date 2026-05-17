@@ -35,6 +35,11 @@ export default function PersonaModal({
     isLimited = false // Por defecto es false (modo normal)
 }: Props) {
 
+    const getPhoneDigits = (value: string) => {
+        const cleaned = String(value || '').replace(/\D/g, '');
+        return cleaned.startsWith('56') ? cleaned.slice(2, 11) : cleaned.slice(0, 9);
+    };
+
     useEffect(() => {
         if (data.division_id && !isLimited) {
             const divSeleccionada = divisiones.find(d => d.id === parseInt(data.division_id));
@@ -85,8 +90,9 @@ export default function PersonaModal({
                             type="text"
                             value={data.rut}
                             onChange={e => setData('rut', formatRut(e.target.value))}
+                            maxLength={12}
                             className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#c1f75e]"
-                            placeholder="12345678-K"
+                            placeholder="12.345.678-K"
                             required
                         />
                         <InputError message={errors.rut} />
@@ -112,7 +118,8 @@ export default function PersonaModal({
                                 value={data.nombre_2}
                                 onChange={e => setData('nombre_2', e.target.value)}
                                 className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-800 rounded-md p-3 text-sm dark:text-white outline-none focus:ring-1 focus:ring-[#c1f75e]"
-                                placeholder="Opcional"
+                                placeholder="Obligatorio"
+                                required
                             />
                         </div>
                     </div>
@@ -162,9 +169,12 @@ export default function PersonaModal({
                                 Teléfono
                             </label>
                             <input
-                                type="text"
-                                value={data.telefono}
+                                type='tel'
+                                inputMode='numeric'
+                                maxLength={9}
+                                value={getPhoneDigits(data.telefono)}
                                 onChange={e => setData('telefono', e.target.value)}
+                                placeholder='91234567'
                                 className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white outline-none focus:ring-1 focus:ring-[#c1f75e]"
                             />
                         </div>

@@ -33,14 +33,23 @@ class PersonaController extends Controller
 
 public function store(Request $request)
 {
-    // 1. Validamos (asegúrate de que division_id venga en el request)
+    $telefono = preg_replace('/\D/', '', $request->input('telefono', ''));
+
+    $request->merge([
+        'telefono' => $telefono
+        ? '+56' . substr($telefono, -9)
+        :null,
+    ]);
+
+    // 1. Validamos
     $validated = $request->validate([
-        'nombre_1'    => 'required|string',
-        'apellido_1'  => 'required|string',
-        'empresa_id'  => 'required|exists:crm.empresas,id',
-        'division_id' => 'required|exists:crm.divisiones,id',
-        'cargo_actual'=> 'required|string',
-        // ... el resto de tus validaciones
+        'nombre_1'      => 'required|string',
+        'apellido_1'    => 'required|string',
+        'rut'           => 'required|unique:crm.personas,rut',
+        'empresa_id'    => 'required|exists:crm.empresas,id',
+        'telefono'      => 'required|regex:/^\+56[0-9]{9}$/',
+        'cargo_actual'  => 'required|string',
+        'division_id'   => 'nullable|exists:crm.divisiones,id',
     ]);
 
     return DB::transaction(function () use ($request, $validated) {
@@ -98,11 +107,22 @@ public function store(Request $request)
 
     public function update(Request $request, Persona $persona)
     {
+        $telefono = preg_replace('/\D/', '', $request->input('telefono', ''));
+
+        $request->merge([
+            'telefono' => $telefono
+            ? '+56' . substr($telefono, -9)
+            :null,
+        ]);
+
         $validated = $request->validate([
-            'nombre_1' => 'required|string',
-            'apellido_1' => 'required|string',
-            'email' => 'required|email',
-            'telefono' => 'required|string',
+            'rut'           => 'required|string',
+            'nombre_1'      => 'required|string',
+            'nombre_2'      => 'required|string',
+            'apellido_1'    => 'required|string',
+            'apellido_2'    => 'required|string',
+            'email'         => 'nullable|email',
+            'telefono'      => 'required|regex:/^\+56[0-9]{9}$/'
         ]);
 
         $persona->update($validated);
