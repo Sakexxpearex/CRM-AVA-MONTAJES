@@ -68,12 +68,14 @@ export default function PipelineModal({ isOpen, onClose, licitacion, empresasCom
                             onChange={e => setData('estado_pipeline', e.target.value)}
                             required
                         >
-                            <option value="Preparación">Preparación</option>
-                            <option value="Evaluación">Evaluación</option>
-                            <option value="Filtro">Filtro</option>
-                            <option value="Llenar Cupo">Llenar Cupo</option>
-                            <option value="Ganada">Ganada</option>
-                            <option value="Perdida">Perdida</option>
+                                <option value="Evaluación">Evaluación</option>
+                                <option value="Preparación">Preparación</option>
+                                <option value="Filtro">Filtro</option>
+                                <option value="Adjudicada">Adjudicada (Ganada)</option>
+                                <option value="Operativa">Operativa</option>
+                                <option value="Perdida">Perdida</option>
+                                <option value="Desierta">Desierta</option>
+                                <option value="Presentada">Presentada</option>
                         </select>
                     </div>
 

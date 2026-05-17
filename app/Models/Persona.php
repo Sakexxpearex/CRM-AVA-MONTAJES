@@ -13,6 +13,7 @@ class Persona extends Model
 
     protected $fillable = [
         'rut',
+        'division_id',
         'nombre_1',
         'nombre_2',
         'apellido_1',
