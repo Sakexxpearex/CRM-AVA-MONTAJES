@@ -14,16 +14,18 @@ class Licitacion extends Model
 
     // 2. Definir los campos que pueden ser llenados a través de formularios
 protected $fillable = [
-        'empresa_id',
-        'division_id',
-        'nombre_proyecto',
-        'estado_pipeline',
-        'proyecto_id',
-        'descripcion',       
-        'monto_estimado',   
-        'fecha_cierre',      
-        'fecha_adjudicacion' 
+        'empresa_id', 
+        'division_id', 
+        'nombre_proyecto', 
+        'descripcion', 
+        'monto_estimado', 
+        'monto_adjudicado', 
+        'fecha_cierre', 
+        'fecha_adjudicacion', 
+        'estado_pipeline', 
+        'proyecto_id'
     ];
+
 
     // 3. RELACIONES
 

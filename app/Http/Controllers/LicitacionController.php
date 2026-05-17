@@ -25,7 +25,7 @@ class LicitacionController extends Controller
         $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
             'activos'     => $todas->where('estado_pipeline', '!=', 'Ganada')->count(),
-            'montoGanado' => $todas->where('estado_pipeline', 'Ganada')->sum('monto_estimado'),
+            'montoGanado' => $todas->where('estado_pipeline', 'Adjudicada')->sum('monto_adjudicado'),
         ];
 
         return Inertia::render('licitaciones/Index', [
@@ -74,61 +74,72 @@ class LicitacionController extends Controller
     }
 
     // Método para editar datos estructurales (Nombre, Empresa, etc.)
-    public function update(Request $request, Licitacion $licitacion)
-    {
-        $validated = $request->validate([
-            'nombre_proyecto' => 'required|string|max:255',
-            'empresa_id'      => 'required|exists:crm.empresas,id',
-            'division_id'     => 'required|exists:crm.divisiones,id',
-            'monto_estimado'  => 'nullable|numeric',
-            'descripcion'     => 'nullable|string',
-            'fecha_cierre'    => 'nullable|date',
-        ]);
+public function update(Request $request, Licitacion $licitacion)
+{
+    $validated = $request->validate([
+        'nombre_proyecto' => 'required|string|max:255',
+        'empresa_id'      => 'required|exists:crm.empresas,id',
+        'division_id'     => 'required|exists:crm.divisiones,id',
+        'monto_estimado'  => 'nullable|numeric',
+        'monto_adjudicado' => 'nullable|numeric', // Agregamos esto por si quieren editarlo a mano
+        'descripcion'     => 'nullable|string',
+        'fecha_cierre'    => 'nullable|date',
+        'estado_pipeline' => 'nullable|string', // Por si lo cambian aquí
+    ]);
 
-        $licitacion->update($validated);
-
-        return back()->with('message', 'Ficha técnica actualizada');
-    }
-
-    public function updatePipeline(Request $request, Licitacion $licitacion)
-    {
-        $rules = [
-            'estado_pipeline' => 'required|string',
-            'comentario_cierre' => 'nullable|string',
-        ];
-
-        if ($request->estado_pipeline === 'Perdida') {
-            $rules['competencia_ganadora_id'] = 'required|exists:crm.empresas,id';
+    // Si al editar la ficha técnica el estado ya es ganador, aseguramos el monto
+    if (in_array($request->estado_pipeline ?? $licitacion->estado_pipeline, ['Adjudicada', 'Operativa'])) {
+        if (empty($validated['monto_adjudicado'])) {
+            $validated['monto_adjudicado'] = $request->monto_estimado ?? $licitacion->monto_estimado;
         }
-
-        $validated = $request->validate($rules);
-        $licitacion->update($validated);
-
-        return back()->with('message', 'Pipeline actualizado correctamente');
     }
+
+    $licitacion->update($validated);
+
+    return back()->with('message', 'Ficha técnica actualizada');
+}
+
+public function updatePipeline(Request $request, Licitacion $licitacion)
+{
+    $validated = $request->validate([
+        'estado_pipeline' => 'required|string',
+    ]);
+
+    // Si pasa a ganada, forzamos el valor del dinero antes de guardar
+    if ($request->estado_pipeline === 'Adjudicada') {
+        $licitacion->monto_adjudicado = $licitacion->monto_estimado;
+        $licitacion->fecha_adjudicacion = now();
+    }
+
+    $licitacion->estado_pipeline = $request->estado_pipeline;
+    $licitacion->save(); // Usar save() después de asignar manualmente es más seguro
+
+    return back();
+}
 
     public function adjudicar(Request $request, $id)
     {
+        // 1. Buscamos la licitación
         $licitacion = Licitacion::findOrFail($id);
 
+        // 2. Validamos el Centro de Costo (para la tabla proyectos en la conexión 'usuarios')
         $request->validate([
             'centro_costo' => 'required|string|unique:usuarios.proyectos,centro_costo'
         ]);
 
+        // 3. Iniciamos la transacción para asegurar que ambos pasos ocurran
         DB::transaction(function () use ($licitacion, $request) {
+            
+            // PASO A: Crear el Proyecto en la base de datos de Ingeniería
             Proyecto::create([
                 'centro_costo' => $request->centro_costo,
                 'nombre'       => $licitacion->nombre_proyecto,
                 'alias'        => strtoupper(Str::limit($licitacion->nombre_proyecto, 10, '')),
             ]);
 
-            $licitacion->update([
-                'estado_pipeline' => 'Ganada',
-                // Si tienes campo comentario_cierre, también lo guardamos aquí
-                'comentario_cierre' => $request->comentario_cierre ?? $licitacion->comentario_cierre,
-            ]);
+
         });
 
-        return redirect()->route('licitaciones.index')->with('message', 'Licitación adjudicada con éxito.');
+        return redirect()->route('licitaciones.index')->with('message', '¡Éxito! Proyecto creado y métricas de AVA actualizadas.');
     }
 }
