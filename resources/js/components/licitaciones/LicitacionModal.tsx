@@ -141,9 +141,11 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                                 <option value="Evaluación">Evaluación</option>
                                 <option value="Preparación">Preparación</option>
                                 <option value="Filtro">Filtro</option>
-                                <option value="Ganada">Ganada</option>
+                                <option value="Adjudicada">Adjudicada (Ganada)</option>
+                                <option value="Operativa">Operativa</option>
                                 <option value="Perdida">Perdida</option>
-                                <option value="Llenar Cupo">Llenar Cupo</option>
+                                <option value="Desierta">Desierta</option>
+                                <option value="Presentada">Presentada</option>
                             </select>
                         </div>
                         {/* Fecha de cierre */}

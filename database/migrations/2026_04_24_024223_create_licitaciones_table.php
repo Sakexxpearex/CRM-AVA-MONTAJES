@@ -18,15 +18,18 @@ return new class extends Migration
             $table->text('descripcion')->nullable(); // Para detallar el alcance del servicio
             $table->decimal('monto_estimado', 15, 2)->nullable(); // Ej: 1500000.50 (Vital para el CRM)
             $table->date('fecha_cierre')->nullable(); // Cuándo se debe entregar la propuesta
+            $table->decimal('monto_adjudicado', 15, 2)->nullable()->default(0);
             $table->date('fecha_adjudicacion')->nullable(); // Cuándo da la respuesta la minera
             
-            $table->enum('estado_pipeline', [
-                'Evaluación', 
+           $table->enum('estado_pipeline', [
+                'Evaluación',
                 'Preparación', 
+                'Presentada',
                 'Filtro', 
-                'Ganada', 
+                'Adjudicada',    
+                'Operativa',
                 'Perdida', 
-                'Llenar Cupo'
+                'Desierta',
             ])->default('Evaluación');
 
             
