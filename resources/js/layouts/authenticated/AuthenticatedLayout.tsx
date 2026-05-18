@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage , router} from '@inertiajs/react';
 import { 
     LayoutDashboard, Building2, FileSpreadsheet, 
     Users, Calendar, Moon, Sun, LogOut, Menu,
     Briefcase // Importamos este para Proyectos
 } from 'lucide-react';
+import VoiceButton from '@/components/voice-button';
 
 export default function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
     const [darkMode, setDarkMode] = useState(localStorage.getItem('theme') === 'dark');
@@ -19,7 +20,24 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
         }
     }, [darkMode]);
 
+
+
+const handleVoiceTranscription = (text: string) => {
+    console.log("Comando recibido:", text);
+    
+    // Enviamos el texto al controlador para que el Servicio lo procese
+    router.post(route('licitaciones.comando-voz'), {
+        texto_hablado: text
+    }, {
+        preserveScroll: true,
+        onError: (err) => alert("Error: " + err.error)
+    });
+};
+
+
+
     return (
+        
         <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300 overflow-hidden">
             
             {/* Navegación mobile*/}
@@ -141,6 +159,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                     active={route().current('personas.*')}
                 />
             </div>
+            <VoiceButton onTranscriptionComplete={handleVoiceTranscription} />
         </div>
     );
 }

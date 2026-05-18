@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CommandParserService;
 use App\Models\Licitacion;
 use App\Models\Empresa;
 use App\Models\Division;
@@ -21,11 +22,11 @@ class LicitacionController extends Controller
             ->where('estado_pipeline', '!=', 'Ganada')
             ->orderBy('created_at', 'desc')
             ->get();
-
+        $estadosganadores = ['Adjudicada', 'Operativa'];
         $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
             'activos'     => $todas->where('estado_pipeline', '!=', 'Ganada')->count(),
-            'montoGanado' => $todas->where('estado_pipeline', 'Adjudicada')->sum('monto_adjudicado'),
+            'montoGanado' => $todas->wherein('estado_pipeline', $estadosganadores)->sum('monto_adjudicado'),
         ];
 
         return Inertia::render('licitaciones/Index', [
@@ -105,7 +106,7 @@ public function updatePipeline(Request $request, Licitacion $licitacion)
     ]);
 
     // Si pasa a ganada, forzamos el valor del dinero antes de guardar
-    if ($request->estado_pipeline === 'Adjudicada') {
+    if ($request->estado_pipeline === 'Adjudicada' || $request->estado_pipeline === 'Operativa' ) {
         $licitacion->monto_adjudicado = $licitacion->monto_estimado;
         $licitacion->fecha_adjudicacion = now();
     }
@@ -141,4 +142,75 @@ public function updatePipeline(Request $request, Licitacion $licitacion)
 
         return redirect()->route('licitaciones.index')->with('message', '¡Éxito! Proyecto creado y métricas de AVA actualizadas.');
     }
+   public function transcribe(Request $request)
+{
+    // 1. Verificar si el archivo llega
+    if (!$request->hasFile('audio')) {
+        return response()->json(['res' => 'No llega el archivo audio'], 500);
+    }
+
+    try {
+        $file = $request->file('audio');
+        $apiKey = env('GROQ_API_KEY');
+
+        // 2. Intentar la conexión
+        $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+            ->attach('file', file_get_contents($file->getRealPath()), 'audio.wav')
+            ->post('https://api.groq.com/openai/v1/audio/transcriptions', [
+                'model' => 'whisper-large-v3',
+                'language' => 'es',
+            ]);
+
+        return $response->json();
+
+    } catch (\Exception $e) {
+        // ESTO va a hacer que el error 500 se convierta en un mensaje de texto
+        return response()->json([
+            'error_real' => $e->getMessage(),
+            'donde' => $e->getFile() . ' linea ' . $e->getLine()
+        ], 500);
+    }
+}
+
+    // 2. Ejecuta la acción (Cambiar estado o buscar)
+public function comandoVoz(Request $request, CommandParserService $parser)
+{
+    // 1. Hablamos con la IA
+    $comando = $parser->parseCommand($request->texto_hablado);
+    
+    // 2. Extraemos la intención de forma segura
+    $intent = strtoupper($comando['intent'] ?? 'DESCONOCIDO');
+    $nombre = $comando['nombre'] ?? 'vacio';
+    $estado = $comando['estado'] ?? 'vacio';
+
+    // 3. Si la IA entendió que es cambiar estado...
+    if ($intent === 'CAMBIAR_ESTADO') {
+        
+        $licitacion = Licitacion::where('nombre_proyecto', 'ILIKE', '%' . $nombre . '%')->first();
+        
+        if ($licitacion) {
+            $licitacion->estado_pipeline = $estado;
+            
+            // Automatización
+            if (in_array($estado, ['Adjudicada', 'Operativa'])) {
+                $licitacion->monto_adjudicado = $licitacion->monto_estimado;
+                $licitacion->fecha_adjudicacion = now();
+            }
+            
+            $licitacion->save();
+            return back()->with('message', "✅ Éxito: {$nombre} ahora es {$estado}");
+        } else {
+            // ERROR TIPO 1: La IA entendió, pero la Base de Datos no encontró el nombre
+            return back()->withErrors(['error' => "❌ La IA buscó el proyecto '{$nombre}', pero no existe en tu base de datos con ese nombre."]);
+        }
+    }
+
+    if ($intent === 'BUSCAR') {
+        return redirect()->route('licitaciones.index', ['search' => $nombre ?? $comando['empresa']]);
+    }
+
+    // ERROR TIPO 2: La IA devolvió algo raro o se mareó. Te mostramos qué diablos pensó Llama 3.
+    $respuestaIA = json_encode($comando);
+    return back()->withErrors(['error' => "🤖 La IA se confundió. Esto fue lo que intentó devolver: {$respuestaIA}"]);
+}
 }

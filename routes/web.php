@@ -9,6 +9,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+ use App\Http\Controllers\VoiceController;
 use Inertia\Inertia;
 
 Route::get('/test', function () {
@@ -63,8 +64,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+   
 
+// 1. Ruta para que el VoiceButton mande el audio y reciba el texto de Whisper
+    Route::post('/voice/transcribe', [LicitacionController::class, 'transcribe'])
+        ->name('voice.transcribe');
 
+    // 2. Ruta para que el Layout mande el texto y la IA ejecute la acción proactiva
+    Route::post('/licitaciones/comando-voz', [LicitacionController::class, 'comandoVoz'])
+        ->name('licitaciones.comando-voz');
 });
 
 require __DIR__.'/settings.php';
