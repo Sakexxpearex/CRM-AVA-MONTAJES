@@ -141,4 +141,30 @@ public function updatePipeline(Request $request, Licitacion $licitacion)
 
         return redirect()->route('licitaciones.index')->with('message', '¡Éxito! Proyecto creado y métricas de AVA actualizadas.');
     }
+    public function comandoVoz(Request $request)
+{
+    // Recibimos los datos ya masticados por React
+    $nombreBuscado = $request->nombre_proyecto; // Ej: "mantenimiento enap"
+    $nuevoEstado = $request->estado_nuevo;        // Ej: "Adjudicada"
+
+    // Buscamos la primera licitación que CONTENGA ese nombre (LIKE)
+    $licitacion = Licitacion::where('nombre_proyecto', 'LIKE', '%' . $nombreBuscado . '%')->first();
+
+    if ($licitacion) {
+        $licitacion->estado_pipeline = $nuevoEstado;
+
+        // La lógica del flujo de caja que ya tenías
+        if (in_array($nuevoEstado, ['Adjudicada', 'Operativa'])) {
+            $licitacion->monto_adjudicado = $licitacion->monto_estimado;
+            $licitacion->fecha_adjudicacion = now();
+        }
+
+        $licitacion->save();
+
+        return back()->with('success', 'Actualizado por voz');
+    }
+
+    // Si no encuentra nada parecido, tira error y salta el "onError" de React
+    return back()->withErrors(['error' => 'Licitación no encontrada']);
+}
 }
