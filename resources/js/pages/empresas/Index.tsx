@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { Factory, Plus, LayoutGrid } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { formatRut } from '@/utils/formatters';
 
 // Componentes de pagina (para mantener todo igual)
@@ -17,10 +17,18 @@ import DivisionModal from '@/components/empresas/DivisionModal';
 import { Empresa } from '@/types/empresa';
 
 
-export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
+export default function EmpresasIndex({
+    empresas,
+    filters = {},
+}: { 
+    empresas: Empresa[];
+    filters?: {search?: string; tipo?: string }; 
+}) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDivisionModalOpen, setIsDivisionModalOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(filters.search ?? '');
+    const [tipoFiltro, setTipoFiltro] = useState(filters.tipo ?? '');
+    const firstRender = useRef(true);
     const [editingId, setEditingId] = useState<number | null>(null);
     const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData('rut', formatRut(e.target.value));
@@ -69,17 +77,26 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
         }
     };
 
-    const empresasFiltradas = empresas.filter(e => {
-    const term = searchTerm.toLowerCase();
-    const rutLimpio = e.rut.replace(/[^0-9kK]/g, "");
-    const searchLimpio = searchTerm.replace(/[^0-9kK]/g, "");
+    useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false;
+            return;
+        }
 
-    return (
-        e.nombre.toLowerCase().includes(term) || 
-        rutLimpio.includes(searchLimpio) ||
-        formatRut(e.rut).includes(searchTerm) 
-    );
-});
+        const timeout = window.setTimeout(() =>{
+            router.get(route('empresas.index'), {
+                search: searchTerm.trim() || undefined,
+                tipo: tipoFiltro || undefined,
+            }, {
+                preserveState: true, 
+                preserveScroll: true,
+                replace:true,
+                only: ['empresas', 'filters'],
+            });
+        }, 350);
+
+        return() =>window.clearTimeout(timeout);
+    }, [searchTerm, tipoFiltro]);
 
     return (
         <AuthenticatedLayout>
@@ -97,13 +114,14 @@ export default function EmpresasIndex({ empresas }: { empresas: Empresa[] }) {
 
                 {/* Buscador */}
                 <div className="flex justify-start">
-                    <SearchEmpresa value={searchTerm} onChange={setSearchTerm} />
+                    <SearchEmpresa value={searchTerm} onChange={setSearchTerm} tipo={tipoFiltro} onTipoChange={setTipoFiltro}
+                    />
                 </div>
 
                 {/* Tabla */}
                 <ContentPanel padding={false}>
                     <EmpresasTable 
-                        empresas={empresasFiltradas}
+                        empresas={empresas}
                         onEdit={openEditModal}
                         onDelete={handleDelete}
                     />
