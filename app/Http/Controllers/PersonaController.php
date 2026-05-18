@@ -13,23 +13,38 @@ use Inertia\Inertia;
 
 class PersonaController extends Controller
 {
-    public function index()
-    {
-        // Traemos a las personas y el nombre de la empresa donde trabajan
-        $personas = Persona::with(['trabajoActual.division.empresa'])->get();
+    public function index(Request $request)
+{
+    $personas = Persona::with(['trabajoActual.division.empresa'])
+        ->when($request->filled('search'), function ($query) use ($request) {
+            $search = $request->string('search')->trim();
 
-        // Traemos las divisiones con sus empresas para el <select>
-        $divisiones = Division::with('empresa')->get();
-        
-        // Mandamos las empresas para el <select> del modal de creación
-        $empresas = Empresa::all();
+            $query->where(function ($query) use ($search) {
+                $query->where('nombre_1', 'like', '%' . $search . '%')
+                    ->orWhere('apellido_1', 'like', '%' . $search . '%')
+                    ->orWhere('apellido_2', 'like', '%' . $search . '%');
+            });
+        })
+        ->when($request->filled('empresa_id'), function ($query) use ($request) {
+            $query->whereHas('trabajoActual.division', function ($query) use ($request) {
+                $query->where('empresa_id', $request->integer('empresa_id'));
+            });
+        })
+        ->orderBy('apellido_1')
+        ->orderBy('apellido_2')
+        ->orderBy('nombre_1')
+        ->get();
 
-        return Inertia::render('personas/Index', [
-            'personas' => $personas,
-            'divisiones' => $divisiones,
-            'empresas' => $empresas
-        ]);
-    }
+    $divisiones = Division::with('empresa')->get();
+    $empresas = Empresa::orderBy('nombre')->get(['id', 'nombre']);
+
+    return Inertia::render('personas/Index', [
+        'personas' => $personas,
+        'divisiones' => $divisiones,
+        'empresas' => $empresas,
+        'filters' => $request->only(['search', 'empresa_id']),
+    ]);
+}
 
 public function store(Request $request)
 {

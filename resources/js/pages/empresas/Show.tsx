@@ -27,7 +27,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
         alias: empresa.alias || '',
     });
 
-    const { data: divData, setData: setDivData, post: postDivision, processing: processingDiv, errors: errorsDiv, reset: resetDiv } = useForm({
+    const { data: divData, setData: setDivData, post: postDivision, put: putDivision, processing: processingDiv, errors: errorsDiv, reset: resetDiv } = useForm({
         nombre: '',
         alias: '',
         empresa_id: empresa.id,
@@ -56,7 +56,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
         if (editingDivision) {
             // Actualizar
-            router.put(route('divisiones.update', editingDivision.id), divData, {
+            putDivision(route('divisiones.update', editingDivision.id), {
                 onSuccess: () => {
                     setIsDivisionModalOpen(false);
                     setEditingDivision(null);
@@ -153,7 +153,11 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                         <h3 className="text-xs font-black uppercase tracking-widest dark:text-white">Divisiones / Unidades</h3>
                                     </div>
                                     <button
-                                        onClick={() => setIsDivisionModalOpen(true)}
+                                        onClick={() => {
+                                            setEditingDivision(null);
+                                            resetDiv();
+                                            setIsDivisionModalOpen(true);
+                                        }}
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-gray-800 rounded-lg text-[10px] font-black uppercase text-[#c1f75e] hover:bg-[#c1f75e]/10 transition-all"
                                     >
                                         <Plus size={14} /> Nueva División
@@ -174,7 +178,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                                     <p className="text-[10px] text-gray-500 mt-1 uppercase font-medium">{div.personas_count || 0} Personas</p>
                                                 </div>
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={(e) => handleEditDivision(e, div.id)} className="p-1 hover:text-[#c1f75e]"><Edit3 size={14} /></button>
+                                                    <button onClick={(e) => handleEditDivision(e, div)} className="p-1 hover:text-[#c1f75e]"><Edit3 size={14} /></button>
                                                     <button onClick={(e) => deleteDivision(e, div.id)} className="p-1 hover:text-red-500"><Trash2 size={14} /></button>
                                                 </div>
                                             </div>
@@ -236,7 +240,11 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
                 <DivisionModal
                     isOpen={isDivisionModalOpen}
-                    onClose={() => setIsDivisionModalOpen(false)}
+                    onClose={() => {
+                        setIsDivisionModalOpen(false);
+                        setEditingDivision(null);
+                        resetDiv();
+                    }}
                     data={divData}
                     setData={setDivData}
                     submit={submitDivision}
