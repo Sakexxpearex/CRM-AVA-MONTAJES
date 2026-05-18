@@ -9,6 +9,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+ use App\Http\Controllers\VoiceController;
 use Inertia\Inertia;
 
 Route::get('/test', function () {
@@ -61,8 +62,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+   
 
-
+    //Transcripcion
+    Route::post('/voice/transcribe', [VoiceController::class, 'transcribe'])->name('voice.transcribe');
+    //Comandos por voz
+    Route::post('/licitaciones/comando-voz', [LicitacionController::class, 'comandoVoz'])->name('licitaciones.comando-voz');
 });
 
 require __DIR__.'/settings.php';

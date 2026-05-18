@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage , router} from '@inertiajs/react';
 import { 
     LayoutDashboard, Building2, FileSpreadsheet, 
     Users, Calendar, Moon, Sun, LogOut, Menu,
     Briefcase // Importamos este para Proyectos
 } from 'lucide-react';
+import VoiceButton from '@/components/voice-button';
 
 export default function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
     const [darkMode, setDarkMode] = useState(localStorage.getItem('theme') === 'dark');
@@ -18,6 +19,46 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
             localStorage.setItem('theme', 'light');
         }
     }, [darkMode]);
+
+
+
+const handleVoiceTranscription = (text: string) => {
+    if (!text.trim()) return;
+
+    // 1. Limpiamos las comas y puntos que inventa la IA al escuchar respiraciones
+    const command = text.toLowerCase().replace(/[,.]/g, '');
+    console.log("Comando limpio:", command);
+
+    // 2. LA FÓRMULA INDESTRUCTIBLE
+    // Le pusimos un '?' al final del grupo de (a|como) para que sea OPCIONAL.
+    const regex = /licitaci[oó]n(?:es)?\s+(.+?)\s*(?:a\s+|como\s+|al\s+estado\s+)?(adjudicada|operativa|perdida|enviada|presentada)/i;
+    const match = command.match(regex);
+
+    if (match) {
+        // Sacamos el nombre y el estado
+        const nombreLicitacion = match[1].trim(); // Ej: "mantencion planta"
+        const estadoDetectado = match[2].trim();  // Ej: "adjudicada"
+
+        const estadoFormateado = estadoDetectado.charAt(0).toUpperCase() + estadoDetectado.slice(1);
+
+        console.log(`¡Detectado! -> Nombre: ${nombreLicitacion} | Estado: ${estadoFormateado}`);
+
+        router.post(route('licitaciones.comando-voz'), {
+            nombre_licitacion: nombreLicitacion,
+            estado_nuevo: estadoFormateado
+        }, {
+            onSuccess: () => alert(`✅ ¡Listo! Licitación "${nombreLicitacion}" pasada a ${estadoFormateado}`),
+            onError: () => alert('Ojo: No encontré ninguna licitación con ese nombre en la base de datos.')
+        });
+
+        return; 
+    }
+
+    // Si todo falla, al buscador
+    router.get(route('licitaciones.index'), { search: text }, { preserveState: true });
+};
+
+
 
     return (
         <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300 overflow-hidden">
@@ -141,6 +182,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                     active={route().current('personas.*')}
                 />
             </div>
+            <VoiceButton onTranscription={handleVoiceTranscription} />
         </div>
     );
 }
