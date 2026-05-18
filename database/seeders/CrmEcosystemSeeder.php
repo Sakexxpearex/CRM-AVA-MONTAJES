@@ -74,6 +74,7 @@ class CrmEcosystemSeeder extends Seeder
                     'apellido_2' => 'García',
                     'email' => "contacto.{$d['alias']}@minera.cl",
                     'telefono' => '+56912345678',
+                    'division_id' => $division->id
                 ]);
 
                 // 4. Vincular Persona con su Trabajo Actual
@@ -83,6 +84,7 @@ class CrmEcosystemSeeder extends Seeder
                     'cargo' => 'Gerente de Operaciones',
                     'estado_actual' => true,
                     'fecha_inicio' => now()->subYears(2),
+                    
                 ]);
 
                 // 5. Crear una nota polimórfica inicial
