@@ -21,11 +21,11 @@ class LicitacionController extends Controller
             ->where('estado_pipeline', '!=', 'Ganada')
             ->orderBy('created_at', 'desc')
             ->get();
-
+        $estadosganadores = ['Adjudicada', 'Operativa'];
         $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
             'activos'     => $todas->where('estado_pipeline', '!=', 'Ganada')->count(),
-            'montoGanado' => $todas->where('estado_pipeline', 'Adjudicada')->sum('monto_adjudicado'),
+            'montoGanado' => $todas->wherein('estado_pipeline', $estadosganadores)->sum('monto_adjudicado'),
         ];
 
         return Inertia::render('licitaciones/Index', [
@@ -105,7 +105,7 @@ public function updatePipeline(Request $request, Licitacion $licitacion)
     ]);
 
     // Si pasa a ganada, forzamos el valor del dinero antes de guardar
-    if ($request->estado_pipeline === 'Adjudicada') {
+    if ($request->estado_pipeline === 'Adjudicada' || $request->estado_pipeline === 'Operativa' ) {
         $licitacion->monto_adjudicado = $licitacion->monto_estimado;
         $licitacion->fecha_adjudicacion = now();
     }
