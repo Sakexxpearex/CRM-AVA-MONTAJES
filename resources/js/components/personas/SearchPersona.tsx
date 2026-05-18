@@ -1,0 +1,50 @@
+import { Search } from 'lucide-react';
+
+interface EmpresaOption {
+    id: number;
+    nombre: string;
+}
+
+interface Props {
+    value: string;
+    onChange: (value: string) => void;
+    empresaId: string;
+    onEmpresaChange: (value: string) => void;
+    empresas: EmpresaOption[];
+}
+
+export default function SearchPersona({
+    value,
+    onChange,
+    empresaId,
+    onEmpresaChange,
+    empresas,
+}: Props) {
+    return (
+        <div className="flex w-full max-w-4xl flex-col gap-3 md:flex-row">
+            <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                <input
+                    type="text"
+                    className="w-full bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-lg py-3 pl-12 text-[11px] font-bold tracking-wider outline-none focus:ring-2 focus:ring-[#c1f75e] transition-all"
+                    placeholder="BUSCAR POR NOMBRE O APELLIDO"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                />
+            </div>
+
+            <select
+                className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-3 text-[11px] font-bold uppercase outline-none focus:ring-2 focus:ring-[#c1f75e]"
+                value={empresaId}
+                onChange={(e) => onEmpresaChange(e.target.value)}
+            >
+                <option value="">Todas</option>
+                {empresas.map((empresa) => (
+                    <option key={empresa.id} value={empresa.id}>
+                        {empresa.nombre}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
+}

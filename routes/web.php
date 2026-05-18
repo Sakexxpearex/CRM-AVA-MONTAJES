@@ -52,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
 
     //Ruta para las divisiones
     Route::post('/divisiones', [DivisionController::class, 'store'])->name('divisiones.store');
+    Route::put('/divisiones/{division}', [DivisionController::class, 'update'])->name('divisiones.update');
+    Route::delete('/divisiones/{division}', [DivisionController::class, 'destroy'])->name('divisiones.destroy');
 
     // Rutas de Proyectos
     Route::get('/proyectos', [ProyectoController::class, 'index'])->name('proyectos.index');
