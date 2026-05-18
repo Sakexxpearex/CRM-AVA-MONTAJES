@@ -23,10 +23,12 @@ class LicitacionController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         $estadosganadores = ['Adjudicada', 'Operativa'];
-        $stats = [
+            $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
-            'activos'     => $todas->where('estado_pipeline', '!=', 'Ganada')->count(),
-            'montoGanado' => $todas->wherein('estado_pipeline', $estadosganadores)->sum('monto_adjudicado'),
+            'activos' => $todas->whereIn('estado_pipeline', [ // <-- Asegúrate que use guion bajo
+                'Preparación', 'Filtro', 'Presentada', 'Evaluación'
+            ])->count(),
+            'montoGanado' => $todas->whereIn('estado_pipeline', $estadosganadores)->sum('monto_adjudicado'),
         ];
 
         return Inertia::render('licitaciones/Index', [
