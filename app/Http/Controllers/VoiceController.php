@@ -7,30 +7,33 @@ use Illuminate\Support\Facades\Http;
 
 class VoiceController extends Controller
 {
-    public function transcribe(Request $request)
-    {
-        // Validamos que llegue un archivo de audio
-        $request->validate([
-            'audio' => 'required|file',
-        ]);
+public function transcribe(Request $request)
+{
+    // 1. Validar que el archivo llegó
+    if (!$request->hasFile('audio')) {
+        return response()->json(['error' => 'No se encontró el campo audio'], 400);
+    }
 
-        $audio = $request->file('audio');
+    $file = $request->file('audio');
 
-        // Llamada a Groq (Es ultra rápida)
+    try {
         $response = Http::withToken(env('GROQ_API_KEY'))
-            ->attach('file', file_get_contents($audio), 'recording.m4a')
+            // IMPORTANTE: Groq espera que el campo se llame 'file'
+            ->attach('file', file_get_contents($file->getRealPath()), 'audio.wav')
             ->post('https://api.groq.com/openai/v1/audio/transcriptions', [
-                'model' => 'whisper-large-v3',
+                'model' => 'whisper-large-v3', // Asegúrate de que el nombre del modelo sea exacto
                 'language' => 'es',
-                'response_format' => 'json',
             ]);
 
         if ($response->failed()) {
-            return response()->json(['error' => 'Error en Groq: ' . $response->body()], 500);
+            // Esto nos dirá qué campo específico le falta a Groq
+            return response()->json($response->json(), $response->status());
         }
 
-        return response()->json([
-            'text' => $response->json()['text']
-        ]);
+        return response()->json($response->json());
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
 }
