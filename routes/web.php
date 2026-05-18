@@ -64,10 +64,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
    
 
-    //Transcripcion
-    Route::post('/voice/transcribe', [VoiceController::class, 'transcribe'])->name('voice.transcribe');
-    //Comandos por voz
-    Route::post('/licitaciones/comando-voz', [LicitacionController::class, 'comandoVoz'])->name('licitaciones.comando-voz');
+// 1. Ruta para que el VoiceButton mande el audio y reciba el texto de Whisper
+    Route::post('/voice/transcribe', [LicitacionController::class, 'transcribe'])
+        ->name('voice.transcribe');
+
+    // 2. Ruta para que el Layout mande el texto y la IA ejecute la acción proactiva
+    Route::post('/licitaciones/comando-voz', [LicitacionController::class, 'comandoVoz'])
+        ->name('licitaciones.comando-voz');
 });
 
 require __DIR__.'/settings.php';
