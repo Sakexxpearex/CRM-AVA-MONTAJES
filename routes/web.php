@@ -8,8 +8,9 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
- use App\Http\Controllers\VoiceController;
+use App\Http\Controllers\VoiceController;
 use Inertia\Inertia;
 
 Route::get('/test', function () {

@@ -14,14 +14,26 @@ use Inertia\Inertia;
 
 class LicitacionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $todas = Licitacion::all();
 
+        $montoOrder = $request->input('monto_order');
+
         $licitacionesActivas = Licitacion::with(['empresa', 'division'])
-            ->where('estado_pipeline', '!=', 'Ganada')
-            ->orderBy('created_at', 'desc')
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $query->where('nombre_proyecto', 'like', '%' . $request->string('search')->trim() . '%');
+            })
+            ->when($request->filled('estado'), function($query) use ($request) {
+                $query->where('estado_pipeline', $request->string('estado'));
+            })
+            ->when(in_array($montoOrder, ['asc', 'desc'], true), function ($query) use ($montoOrder) {
+                $query->orderBy('monto_estimado', $montoOrder);
+            }, function ($query) {
+                $query->orderBy('created_at', 'desc');
+            })
             ->get();
+
         $estadosganadores = ['Adjudicada', 'Operativa'];
             $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
@@ -35,7 +47,17 @@ class LicitacionController extends Controller
             'licitaciones' => $licitacionesActivas,
             'empresas'     => Empresa::all(),
             'divisiones'   => Division::with('empresa')->get(),
-            'stats'        => $stats
+            'stats'        => $stats,
+            'filters'      => $request->only(['search', 'estado', 'monto_order']),
+            'estados'      => [
+                'Evaluación',
+                'Preparación',
+                'Presentada',
+                'Adjudicada',
+                'Operativa',
+                'Perdida',
+                'Desierta'
+            ],
         ]);
     }
 
