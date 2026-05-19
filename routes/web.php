@@ -30,7 +30,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('empresas', EmpresaController::class);
 
     // Rutas Licitaciones, Personas e interacciones
-    Route::resource('licitaciones', LicitacionController::class);
+    Route::resource('licitaciones', LicitacionController::class)
+        ->parameters(['licitaciones' => 'licitacion']);
     Route::resource('personas', PersonaController::class);
    
     Route::resource('interacciones', InteraccionController::class);
@@ -42,11 +43,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Ruta para el historial de interacciones del contacto (TimeLine)
     Route::get('/personas/{persona}/interacciones', [PersonaController::class, 'interacciones'])
-        ->name('personas.interacciones');
-
-    // Ruta para editar licitacion  
-    Route::put('/licitaciones/{licitacion}', [LicitacionController::class, 'update'])
-    ->name('licitaciones.update');
+    ->name('personas.interacciones');
 
     // Ruta para cambiar estado_pipeline
     Route::patch('/licitaciones/{licitacion}/pipeline', [LicitacionController::class, 'updatePipeline'])
