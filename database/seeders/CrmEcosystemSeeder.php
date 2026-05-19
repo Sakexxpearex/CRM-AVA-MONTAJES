@@ -310,7 +310,7 @@ class CrmEcosystemSeeder extends Seeder
 
     private function montoAleatorio(string $texto): int
     {
-        return 1000000 + ((crc32($texto) % 191) * 100000);
+        return 1000000000 + ((crc32($texto) % 9001) * 1000000);
     }
 
     private function rutAleatorio(int $seed): string

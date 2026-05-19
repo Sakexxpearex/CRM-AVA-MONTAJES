@@ -108,7 +108,7 @@ public function update(Request $request, Licitacion $licitacion)
         'monto_adjudicado' => 'nullable|numeric', // Agregamos esto por si quieren editarlo a mano
         'descripcion'     => 'nullable|string',
         'fecha_cierre'    => 'nullable|date',
-        'estado_pipeline' => 'nullable|string', // Por si lo cambian aquí
+        'estado_pipeline' => 'nullable|in:Evaluación,Preparación,Presentada,Filtro,Adjudicada,Operativa,Perdida,Desierta', // Por si lo cambian aquí
     ]);
 
     // Si al editar la ficha técnica el estado ya es ganador, aseguramos el monto
