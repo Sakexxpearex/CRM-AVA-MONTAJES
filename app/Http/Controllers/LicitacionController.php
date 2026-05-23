@@ -37,15 +37,10 @@ class LicitacionController extends Controller
         $estadosganadores = ['Adjudicada', 'Operativa'];
             $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
-<<<<<<< Updated upstream
             'activos' => $todas->whereIn('estado_pipeline', [ // <-- Asegúrate que use guion bajo
                 'Preparación', 'Filtro', 'Presentada', 'Evaluación'
             ])->count(),
             'montoGanado' => $todas->whereIn('estado_pipeline', $estadosganadores)->sum('monto_adjudicado'),
-=======
-            'activos'     => $todas->where('estado_pipeline', '!=', 'Adjudicada')->count(),
-            'montoGanado' => $todas->wherein('estado_pipeline', $estadosganadores)->sum('monto_adjudicado'),
->>>>>>> Stashed changes
         ];
 
         return Inertia::render('licitaciones/Index', [
@@ -201,44 +196,63 @@ public function updatePipeline(Request $request, Licitacion $licitacion)
     }
 }
 
-    // 2. Ejecuta la acción (Cambiar estado o buscar)
+
 public function comandoVoz(Request $request, CommandParserService $parser)
 {
-    // 1. Hablamos con la IA
+    // 1. Hablamos con el "Cerebro" (Llama 3)
     $comando = $parser->parseCommand($request->texto_hablado);
     
-    // 2. Extraemos la intención de forma segura
-    $intent = strtoupper($comando['intent'] ?? 'DESCONOCIDO');
-    $nombre = $comando['nombre'] ?? 'vacio';
-    $estado = $comando['estado'] ?? 'vacio';
+    // 2. Extraemos la intención y las variables de forma segura
+    $intent    = strtoupper($comando['intent'] ?? 'DESCONOCIDO');
+    $codigoDpc = $comando['codigo_dpc'] ?? null; // ¡Novedad! Extraemos el DPC
+    $nombre    = $comando['nombre'] ?? 'vacio';
+    $estado    = $comando['estado'] ?? 'vacio';
 
-    // 3. Si la IA entendió que es cambiar estado...
+    // 3. ESCENARIO: CAMBIAR ESTADO
     if ($intent === 'CAMBIAR_ESTADO') {
         
-        $licitacion = Licitacion::where('nombre_proyecto', 'ILIKE', '%' . $nombre . '%')->first();
+        $licitacion = null;
+        $busquedaRealizada = ''; // Para mostrarle al usuario qué buscó la IA
+
+        // PLAN A: Búsqueda exacta por código (Ej: "DPC 101")
+        if ($codigoDpc) {
+            $busquedaRealizada = "DPC {$codigoDpc}";
+            $licitacion = Licitacion::where('nombre_proyecto', 'ILIKE', '%' . $busquedaRealizada . '%')->first();
+        }
         
+        // PLAN B: Si no mandó código (o si el código falló), buscamos por el nombre del proyecto
+        if (!$licitacion && $nombre !== 'vacio') {
+            $busquedaRealizada = $nombre;
+            $licitacion = Licitacion::where('nombre_proyecto', 'ILIKE', '%' . $nombre . '%')->first();
+        }
+        
+        // RESULTADO DE LA BÚSQUEDA
         if ($licitacion) {
             $licitacion->estado_pipeline = $estado;
             
-            // Automatización
+            // Automatización financiera
             if (in_array($estado, ['Adjudicada', 'Operativa'])) {
                 $licitacion->monto_adjudicado = $licitacion->monto_estimado;
                 $licitacion->fecha_adjudicacion = now();
             }
             
             $licitacion->save();
-            return back()->with('message', "✅ Éxito: {$nombre} ahora es {$estado}");
+            return back()->with('message', "✅ Éxito: La licitación '{$licitacion->nombre_proyecto}' ahora está en estado {$estado}");
         } else {
-            // ERROR TIPO 1: La IA entendió, pero la Base de Datos no encontró el nombre
-            return back()->withErrors(['error' => "❌ La IA buscó el proyecto '{$nombre}', pero no existe en tu base de datos con ese nombre."]);
+            // ERROR TIPO 1: La IA entendió todo, pero no existe en la BD
+            return back()->withErrors(['error' => "❌ La IA buscó el proyecto por '{$busquedaRealizada}', pero no existe en tu base de datos."]);
         }
     }
 
+    // 4. ESCENARIO: BUSCAR / FILTRAR
     if ($intent === 'BUSCAR') {
-        return redirect()->route('licitaciones.index', ['search' => $nombre ?? $comando['empresa']]);
+        // Armamos qué va a poner en el buscador (Prioriza el código, luego el nombre, luego la empresa)
+        $terminoBusqueda = $codigoDpc ? "DPC {$codigoDpc}" : ($nombre !== 'vacio' ? $nombre : ($comando['empresa'] ?? ''));
+        
+        return redirect()->route('licitaciones.index', ['search' => $terminoBusqueda]);
     }
 
-    // ERROR TIPO 2: La IA devolvió algo raro o se mareó. Te mostramos qué diablos pensó Llama 3.
+    // 5. ERROR TIPO 2: La IA devolvió un JSON raro o no entendió
     $respuestaIA = json_encode($comando);
     return back()->withErrors(['error' => "🤖 La IA se confundió. Esto fue lo que intentó devolver: {$respuestaIA}"]);
 }
