@@ -37,10 +37,15 @@ class LicitacionController extends Controller
         $estadosganadores = ['Adjudicada', 'Operativa'];
             $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
+<<<<<<< Updated upstream
             'activos' => $todas->whereIn('estado_pipeline', [ // <-- Asegúrate que use guion bajo
                 'Preparación', 'Filtro', 'Presentada', 'Evaluación'
             ])->count(),
             'montoGanado' => $todas->whereIn('estado_pipeline', $estadosganadores)->sum('monto_adjudicado'),
+=======
+            'activos'     => $todas->where('estado_pipeline', '!=', 'Adjudicada')->count(),
+            'montoGanado' => $todas->wherein('estado_pipeline', $estadosganadores)->sum('monto_adjudicado'),
+>>>>>>> Stashed changes
         ];
 
         return Inertia::render('licitaciones/Index', [
@@ -112,7 +117,7 @@ public function update(Request $request, Licitacion $licitacion)
     ]);
 
     // Si al editar la ficha técnica el estado ya es ganador, aseguramos el monto
-    if (in_array($request->estado_pipeline ?? $licitacion->estado_pipeline, ['Adjudicada', 'Operativa'])) {
+    if (in_array($request->estado_pipeline ?? $licitacion->estado_pipeline, ['Adjudicada'])) {
         if (empty($validated['monto_adjudicado'])) {
             $validated['monto_adjudicado'] = $request->monto_estimado ?? $licitacion->monto_estimado;
         }

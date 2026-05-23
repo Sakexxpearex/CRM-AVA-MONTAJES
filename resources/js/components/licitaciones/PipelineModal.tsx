@@ -34,8 +34,8 @@ export default function PipelineModal({ isOpen, onClose, licitacion, empresasCom
 
     if (!isOpen) return null;
 
-    const isPerdida = data.estado_pipeline === 'Perdida';
-    const isGanada = data.estado_pipeline === 'Ganada';
+    const isPerdida = data.estado_pipeline === 'Desierta' || data.estado_pipeline === 'Perdida';
+    const isGanada = data.estado_pipeline === 'Adjudicada';
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -70,9 +70,7 @@ export default function PipelineModal({ isOpen, onClose, licitacion, empresasCom
                         >
                                 <option value="Evaluación">Evaluación</option>
                                 <option value="Preparación">Preparación</option>
-                                <option value="Filtro">Filtro</option>
-                                <option value="Adjudicada">Adjudicada (Ganada)</option>
-                                <option value="Operativa">Operativa</option>
+                                <option value="Adjudicada">Adjudicada</option>
                                 <option value="Perdida">Perdida</option>
                                 <option value="Desierta">Desierta</option>
                                 <option value="Presentada">Presentada</option>
