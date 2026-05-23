@@ -8,25 +8,34 @@ class CommandParserService
 {
     public function parseCommand(string $textoHablado): array
     {
-    $prompt = '
-                Eres el motor de procesamiento de lenguaje natural de un CRM minero.
-                Tu trabajo es leer lo que dice el usuario y extraer la intención y las variables en formato JSON estricto.
-                
-                Reglas de Extracción de Licitaciones:
-                - El usuario suele identificar las licitaciones por un código, generalmente "DPC" seguido de un número (ej. DPC 101, dpc 205).
-                - A veces el usuario dirá el número con palabras ("dpc ciento uno"). Debes transformarlo a número ("101").
-                - Si detectas el código, extrae SOLO el número en la variable "codigo_dpc".
-                
-                Ejemplos:
-                Texto: "Cambia el estado de la de pe ce ciento uno a adjudicada"
-                JSON: {"intent": "CAMBIAR_ESTADO", "codigo_dpc": "101", "nuevo_estado": "Adjudicada"}
-                
-                Texto: "Pasa la licitación dpc 304 a perdida"
-                JSON: {"intent": "CAMBIAR_ESTADO", "codigo_dpc": "304", "nuevo_estado": "Perdida"}
-                
-                Texto: "Búscame la 101"
-                JSON: {"intent": "BUSCAR", "codigo_dpc": "101"}
-            ';
+$prompt = '
+            Eres el motor de procesamiento de lenguaje natural de un CRM minero.
+            Tu trabajo es leer lo que dice el usuario y extraer la intención y las variables en formato JSON estricto.
+            
+            Reglas de Extracción de Licitaciones:
+            - El usuario suele identificar las licitaciones por un código, generalmente "DPC" seguido de un número (ej. DPC 101, dpc 205).
+            - Si detectas el código, extrae SOLO el número en la variable "codigo_dpc".
+            
+            REGLA ESTRICTA DE ESTADOS (NORMALIZACIÓN):
+            El usuario puede hablar con modismos o cambiar el género de las palabras, pero tú DEBES traducir su intención EXACTAMENTE a una de estas palabras oficiales: "Precalificación", "Presentada", "En Evaluación", "Adjudicada", "Perdida".
+            
+            Usa este diccionario mental:
+            - Si dice "adjudicado", "ganada", "ganamos", "adjudicamos" -> devuelves "Adjudicada".
+            - Si dice "perdido", "perdimos", "fuera" -> devuelves "Perdida".
+            - Si dice "evaluando", "en revisión", "revisando" -> devuelves "En Evaluación".
+            - Si dice "presentado", "enviada" -> devuelves "Presentada".
+
+            
+            Ejemplos:
+            Texto: "Pasa la dpc 101 a adjudicado"
+            JSON: {"intent": "CAMBIAR_ESTADO", "codigo_dpc": "101", "nuevo_estado": "Adjudicada"}
+            
+            Texto: "Oye, la licitación 205 la perdimos"
+            JSON: {"intent": "CAMBIAR_ESTADO", "codigo_dpc": "205", "nuevo_estado": "Perdida"}
+            
+            Texto: "Búscame la 101"
+            JSON: {"intent": "BUSCAR", "codigo_dpc": "101"}
+        ';
         try {
             $response = Http::withToken(env('GROQ_API_KEY'))
                 ->post('https://api.groq.com/openai/v1/chat/completions', [

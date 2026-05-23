@@ -206,7 +206,7 @@ public function comandoVoz(Request $request, CommandParserService $parser)
     $intent    = strtoupper($comando['intent'] ?? 'DESCONOCIDO');
     $codigoDpc = $comando['codigo_dpc'] ?? null; // ¡Novedad! Extraemos el DPC
     $nombre    = $comando['nombre'] ?? 'vacio';
-    $estado    = $comando['estado'] ?? 'vacio';
+    $estado = $comando['nuevo_estado'] ?? ($comando['estado'] ?? 'vacio');
 
     // 3. ESCENARIO: CAMBIAR ESTADO
     if ($intent === 'CAMBIAR_ESTADO') {
@@ -214,10 +214,18 @@ public function comandoVoz(Request $request, CommandParserService $parser)
         $licitacion = null;
         $busquedaRealizada = ''; // Para mostrarle al usuario qué buscó la IA
 
-        // PLAN A: Búsqueda exacta por código (Ej: "DPC 101")
+// PLAN A: Búsqueda elástica avanzada (Limpia espacios, guiones y símbolos)
         if ($codigoDpc) {
             $busquedaRealizada = "DPC {$codigoDpc}";
-            $licitacion = Licitacion::where('nombre_proyecto', 'ILIKE', '%' . $busquedaRealizada . '%')->first();
+            
+            // 1. Limpiamos el código que viene de la IA en PHP (ej: "6-6-2" pasa a "662")
+            $codigoLimpio = preg_replace('/[^a-zA-Z0-9]/', '', $codigoDpc);
+
+            // 2. Le decimos a PostgreSQL que limpie el título de la BD al vuelo antes de comparar
+            // Esto transforma "DPC 6-6-2" o "DPC - 6 - 6 - 2" en "DPC662"
+            $licitacion = Licitacion::whereRaw("regexp_replace(nombre_proyecto, '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ["%DPC%{$codigoLimpio}%"])
+                                    ->orWhereRaw("regexp_replace(nombre_proyecto, '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ["%{$codigoLimpio}%"])
+                                    ->first();
         }
         
         // PLAN B: Si no mandó código (o si el código falló), buscamos por el nombre del proyecto
