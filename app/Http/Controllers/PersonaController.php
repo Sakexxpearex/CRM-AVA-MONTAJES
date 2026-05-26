@@ -17,21 +17,60 @@ class PersonaController extends Controller
 {
     $personas = Persona::with(['trabajoActual.division.empresa'])
         ->when($request->filled('search'), function ($query) use ($request) {
-            $search = $request->string('search')->trim();
 
-            $query->where(function ($query) use ($search) {
-                $query->where('nombre_1', 'like', '%' . $search . '%')
-                    ->orWhere('apellido_1', 'like', '%' . $search . '%')
-                    ->orWhere('apellido_2', 'like', '%' . $search . '%');
-            });
-        })
+    $search = trim($request->input('search'));
+
+    $palabras = explode(' ', $search);
+
+    if (count($palabras) >= 3) {
+
+        $query->whereRaw(
+            "unaccent(nombre_1) ILIKE unaccent(?)",
+            ['%' . $palabras[0] . '%']
+        )->whereRaw(
+            "unaccent(apellido_1) ILIKE unaccent(?)",
+            ['%' . $palabras[1] . '%']
+        )->whereRaw(
+            "unaccent(apellido_2) ILIKE unaccent(?)",
+            ['%' . $palabras[2] . '%']
+        );
+
+    } elseif (count($palabras) == 2) {
+
+        $query->whereRaw(
+            "unaccent(nombre_1) ILIKE unaccent(?)",
+            ['%' . $palabras[0] . '%']
+        )->whereRaw(
+            "unaccent(apellido_1) ILIKE unaccent(?)",
+            ['%' . $palabras[1] . '%']
+        );
+
+    } else {
+
+        $query->where(function ($q) use ($search) {
+
+            $q->whereRaw(
+                "unaccent(nombre_1) ILIKE unaccent(?)",
+                ['%' . $search . '%']
+            )->orWhereRaw(
+                "unaccent(apellido_1) ILIKE unaccent(?)",
+                ['%' . $search . '%']
+            )->orWhereRaw(
+                "unaccent(apellido_2) ILIKE unaccent(?)",
+                ['%' . $search . '%']
+            );
+
+        });
+
+    }
+
+})
         ->when($request->filled('empresa_id'), function ($query) use ($request) {
             $query->whereHas('trabajoActual.division', function ($query) use ($request) {
                 $query->where('empresa_id', $request->integer('empresa_id'));
             });
         })
         ->orderBy('apellido_1')
-        ->orderBy('apellido_2')
         ->orderBy('nombre_1')
         ->get();
 

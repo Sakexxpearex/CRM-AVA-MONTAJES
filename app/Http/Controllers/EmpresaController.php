@@ -15,7 +15,7 @@ class EmpresaController extends Controller
        return Inertia::render('empresas/Index', [
             'empresas' => Empresa::with('divisiones')
                 ->when($request->filled('search'), function ($query) use ($request){
-                    $query->where('nombre', 'like', '%' . $request->string('search')->trim(). '%');
+                    $query->where('nombre', 'ilike', '%' . $request->string('search')->trim(). '%');
                 })
                 ->when($request->filled('tipo'), function ($query) use ($request) {
                     $query->where('tipo', $request->string('tipo'));
