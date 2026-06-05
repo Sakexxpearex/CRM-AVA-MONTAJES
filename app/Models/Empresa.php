@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Empresa extends Model
 {
@@ -16,6 +17,26 @@ class Empresa extends Model
         'tipo',
         'alias',
     ];
+
+    /**
+     * Asegura que el nombre siempre se guarde en mayúsculas (incluyendo tildes y ñ).
+     */
+    protected function nombre(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => $value ? mb_strtoupper($value, 'UTF-8') : null,
+        );
+    }
+
+    /**
+     * Asegura que el alias siempre se guarde en mayúsculas (incluyendo tildes y ñ).
+     */
+    protected function alias(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => $value ? mb_strtoupper($value, 'UTF-8') : null,
+        );
+    }
 
     // 3. RELACIONES
 

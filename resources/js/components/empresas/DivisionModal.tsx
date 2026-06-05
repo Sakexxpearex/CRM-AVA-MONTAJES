@@ -62,6 +62,18 @@ export default function DivisionModal({ isOpen, onClose, data, setData, submit, 
                         {errors.nombre && <p className="text-red-500 text-[10px] font-bold uppercase">{errors.nombre}</p>}
                     </div>
 
+                    <div className="space-y-2">
+                        <label className="text-[9px] font-black uppercase text-gray-500 ml-1 tracking-widest">Alias</label>
+                        <input
+                            type="text"
+                            placeholder="Ej: IT, Planta Norte..."
+                            className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 dark:text-white focus:ring-[#c1f75e]"
+                            value={data.alias || ''}
+                            onChange={e => setData('alias', e.target.value)}
+                        />
+                        {errors.alias && <p className="text-red-500 text-[10px] font-bold uppercase">{errors.alias}</p>}
+                    </div>
+
                     <button 
                         type="submit" 
                         disabled={processing}

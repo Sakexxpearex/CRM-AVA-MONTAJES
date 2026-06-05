@@ -13,34 +13,97 @@ use Inertia\Inertia;
 
 class PersonaController extends Controller
 {
-    public function index()
-    {
-        // Traemos a las personas y el nombre de la empresa donde trabajan
-        $personas = Persona::with(['trabajoActual.division.empresa'])->get();
+    public function index(Request $request)
+{
+    $personas = Persona::with(['trabajoActual.division.empresa'])
+        ->when($request->filled('search'), function ($query) use ($request) {
 
-        // Traemos las divisiones con sus empresas para el <select>
-        $divisiones = Division::with('empresa')->get();
-        
-        // Mandamos las empresas para el <select> del modal de creación
-        $empresas = Empresa::all();
+    $search = trim($request->input('search'));
 
-        return Inertia::render('personas/Index', [
-            'personas' => $personas,
-            'divisiones' => $divisiones,
-            'empresas' => $empresas
-        ]);
+    $palabras = explode(' ', $search);
+
+    if (count($palabras) >= 3) {
+
+        $query->whereRaw(
+            "unaccent(nombre_1) ILIKE unaccent(?)",
+            ['%' . $palabras[0] . '%']
+        )->whereRaw(
+            "unaccent(apellido_1) ILIKE unaccent(?)",
+            ['%' . $palabras[1] . '%']
+        )->whereRaw(
+            "unaccent(apellido_2) ILIKE unaccent(?)",
+            ['%' . $palabras[2] . '%']
+        );
+
+    } elseif (count($palabras) == 2) {
+
+        $query->whereRaw(
+            "unaccent(nombre_1) ILIKE unaccent(?)",
+            ['%' . $palabras[0] . '%']
+        )->whereRaw(
+            "unaccent(apellido_1) ILIKE unaccent(?)",
+            ['%' . $palabras[1] . '%']
+        );
+
+    } else {
+
+        $query->where(function ($q) use ($search) {
+
+            $q->whereRaw(
+                "unaccent(nombre_1) ILIKE unaccent(?)",
+                ['%' . $search . '%']
+            )->orWhereRaw(
+                "unaccent(apellido_1) ILIKE unaccent(?)",
+                ['%' . $search . '%']
+            )->orWhereRaw(
+                "unaccent(apellido_2) ILIKE unaccent(?)",
+                ['%' . $search . '%']
+            );
+
+        });
+
     }
+
+})
+        ->when($request->filled('empresa_id'), function ($query) use ($request) {
+            $query->whereHas('trabajoActual.division', function ($query) use ($request) {
+                $query->where('empresa_id', $request->integer('empresa_id'));
+            });
+        })
+        ->orderBy('apellido_1')
+        ->orderBy('nombre_1')
+        ->get();
+
+    $divisiones = Division::with('empresa')->get();
+    $empresas = Empresa::orderBy('nombre')->get(['id', 'nombre']);
+
+    return Inertia::render('personas/Index', [
+        'personas' => $personas,
+        'divisiones' => $divisiones,
+        'empresas' => $empresas,
+        'filters' => $request->only(['search', 'empresa_id']),
+    ]);
+}
 
 public function store(Request $request)
 {
-    // 1. Validamos (asegúrate de que division_id venga en el request)
+    $telefono = preg_replace('/\D/', '', $request->input('telefono', ''));
+
+    $request->merge([
+        'telefono' => $telefono
+        ? '+56' . substr($telefono, -9)
+        :null,
+    ]);
+
+    // 1. Validamos
     $validated = $request->validate([
-        'nombre_1'    => 'required|string',
-        'apellido_1'  => 'required|string',
-        'empresa_id'  => 'required|exists:crm.empresas,id',
-        'division_id' => 'required|exists:crm.divisiones,id',
-        'cargo_actual'=> 'required|string',
-        // ... el resto de tus validaciones
+        'nombre_1'      => 'required|string',
+        'apellido_1'    => 'required|string',
+        'rut'           => 'required|unique:crm.personas,rut',
+        'empresa_id'    => 'required|exists:crm.empresas,id',
+        'telefono'      => 'required|regex:/^\+56[0-9]{9}$/',
+        'cargo_actual'  => 'required|string',
+        'division_id'   => 'nullable|exists:crm.divisiones,id',
     ]);
 
     return DB::transaction(function () use ($request, $validated) {
@@ -98,11 +161,22 @@ public function store(Request $request)
 
     public function update(Request $request, Persona $persona)
     {
+        $telefono = preg_replace('/\D/', '', $request->input('telefono', ''));
+
+        $request->merge([
+            'telefono' => $telefono
+            ? '+56' . substr($telefono, -9)
+            :null,
+        ]);
+
         $validated = $request->validate([
-            'nombre_1' => 'required|string',
-            'apellido_1' => 'required|string',
-            'email' => 'required|email',
-            'telefono' => 'required|string',
+            'rut'           => 'required|string',
+            'nombre_1'      => 'required|string',
+            'nombre_2'      => 'required|string',
+            'apellido_1'    => 'required|string',
+            'apellido_2'    => 'required|string',
+            'email'         => 'nullable|email',
+            'telefono'      => 'required|regex:/^\+56[0-9]{9}$/'
         ]);
 
         $persona->update($validated);

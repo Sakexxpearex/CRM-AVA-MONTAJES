@@ -8,7 +8,9 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VoiceController;
 use Inertia\Inertia;
 
 Route::get('/test', function () {
@@ -28,7 +30,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('empresas', EmpresaController::class);
 
     // Rutas Licitaciones, Personas e interacciones
-    Route::resource('licitaciones', LicitacionController::class);
+    Route::resource('licitaciones', LicitacionController::class)
+        ->parameters(['licitaciones' => 'licitacion']);
     Route::resource('personas', PersonaController::class);
    
     Route::resource('interacciones', InteraccionController::class);
@@ -37,11 +40,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Ruta para el historial de interacciones del contacto (TimeLine)
     Route::get('/personas/{persona}/interacciones', [PersonaController::class, 'interacciones'])
-        ->name('personas.interacciones');
-
-    // Ruta para editar licitacion  
-    Route::put('/licitaciones/{licitacion}', [LicitacionController::class, 'update'])
-    ->name('licitaciones.update');
+    ->name('personas.interacciones');
 
     // Ruta para cambiar estado_pipeline
     Route::patch('/licitaciones/{licitacion}/pipeline', [LicitacionController::class, 'updatePipeline'])
@@ -53,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
 
     //Ruta para las divisiones
     Route::post('/divisiones', [DivisionController::class, 'store'])->name('divisiones.store');
+    Route::put('/divisiones/{division}', [DivisionController::class, 'update'])->name('divisiones.update');
+    Route::delete('/divisiones/{division}', [DivisionController::class, 'destroy'])->name('divisiones.destroy');
 
     // Rutas de Proyectos
     Route::get('/proyectos', [ProyectoController::class, 'index'])->name('proyectos.index');
@@ -62,8 +63,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+   
 
+// 1. Ruta para que el VoiceButton mande el audio y reciba el texto de Whisper
+    Route::post('/voice/transcribe', [LicitacionController::class, 'transcribe'])
+        ->name('voice.transcribe');
 
+    // 2. Ruta para que el Layout mande el texto y la IA ejecute la acción proactiva
+    Route::post('/licitaciones/comando-voz', [LicitacionController::class, 'comandoVoz'])
+        ->name('licitaciones.comando-voz');
 });
 
 require __DIR__.'/settings.php';

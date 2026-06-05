@@ -31,13 +31,26 @@ class DivisionController extends Controller
         return Redirect::back()->with('success', 'División creada correctamente.');
     }
 
+    public function update(Request $request, Division $division)
+    {
+        $validated = $request->validate([
+            'nombre'     => 'required|string|max:255',
+            'empresa_id' => 'required|exists:crm.empresas,id',
+            'alias'      => 'nullable|string|max:50',
+        ]);
+
+        $division->update($validated);
+
+        return Redirect::back()->with('success', 'División actualizada correctamente.');
+    }
+
     /**
      * Eliminar una división (opcional)
      */
     public function destroy(Division $division)
     {
         // Verificar si tiene personas asociadas antes de borrar si quieres evitar errores
-        if ($division->historialesLaborales()->count() > 0) {
+        if ($division->personas()->exists() || $division->historialPersonas()->exists()) {
             return Redirect::back()->with('error', 'No se puede eliminar una división con personal asociado.');
         }
 
