@@ -36,6 +36,7 @@ export default function EmpresasIndex({
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         nombre: '', 
+        alias: '',
         rut: '', 
         tipo: 'Cliente' as any,
     });
@@ -56,6 +57,7 @@ export default function EmpresasIndex({
         setEditingId(empresa.id);
         setData({
             nombre: empresa.nombre,
+            alias: empresa.alias || '',
             rut: empresa.rut,
             tipo: empresa.tipo,
         });
