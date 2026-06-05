@@ -1,4 +1,3 @@
-
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
@@ -10,8 +9,10 @@ import ContentPanel from '@/components/pages/ContentPanel';
 
 import LicitacionStats from '@/components/licitaciones/LicitacionStats';
 import LicitacionesTable from '@/components/licitaciones/LicitacionesTable';
+import LicitacionesKanban from '@/components/licitaciones/LicitacionesKanban';
 import LicitacionModal from '@/components/licitaciones/LicitacionModal';
 import SearchLicitacion from '@/components/licitaciones/SearchLicitaciones';
+
 
 export default function Index({
     licitaciones,
@@ -68,7 +69,7 @@ export default function Index({
                     actionLabel="Nueva Licitación"
                     onActionClick={() => setIsModalOpen(true)}
                 >
-                    {/* Selector para elegir entre el tablero o la vista*/}
+                    {/* Selector para elegir entre el tablero o la lista */}
                     <div className="flex bg-white/5 p-1 rounded-lg border border-gray-800 gap-1 w-full sm:w-auto justify-center sm:mr-4">
                         <button 
                             onClick={() => setVista('kanban')}
@@ -109,9 +110,16 @@ export default function Index({
                     />
                 </div>
 
-                <ContentPanel padding={false}>
-                    <LicitacionesTable licitaciones={licitaciones} />
-                </ContentPanel>
+                {/* renderizado segun lo que se selecciona*/}
+                {vista === 'kanban' ? (
+                    <div className="mt-4">
+                        <LicitacionesKanban licitaciones={licitaciones} />
+                    </div>
+                ) : (
+                    <ContentPanel padding={false}>
+                        <LicitacionesTable licitaciones={licitaciones} />
+                    </ContentPanel>
+                )}
             </PageContainer>
 
             <button
