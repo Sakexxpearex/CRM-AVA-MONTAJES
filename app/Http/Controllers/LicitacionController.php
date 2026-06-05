@@ -116,29 +116,5 @@ public function updatePipeline(Request $request, Licitacion $licitacion)
     return back();
 }
 
-    public function adjudicar(Request $request, $id)
-    {
-        // 1. Buscamos la licitación
-        $licitacion = Licitacion::findOrFail($id);
 
-        // 2. Validamos el Centro de Costo (para la tabla proyectos en la conexión 'usuarios')
-        $request->validate([
-            'centro_costo' => 'required|string|unique:usuarios.proyectos,centro_costo'
-        ]);
-
-        // 3. Iniciamos la transacción para asegurar que ambos pasos ocurran
-        DB::transaction(function () use ($licitacion, $request) {
-            
-            // PASO A: Crear el Proyecto en la base de datos de Ingeniería
-            Proyecto::create([
-                'centro_costo' => $request->centro_costo,
-                'nombre'       => $licitacion->nombre_proyecto,
-                'alias'        => strtoupper(Str::limit($licitacion->nombre_proyecto, 10, '')),
-            ]);
-
-
-        });
-
-        return redirect()->route('licitaciones.index')->with('message', '¡Éxito! Proyecto creado y métricas de AVA actualizadas.');
-    }
 }
