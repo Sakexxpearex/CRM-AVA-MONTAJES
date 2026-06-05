@@ -17,12 +17,12 @@ class LicitacionController extends Controller
     public function index(Request $request)
     {
         $todas = Licitacion::all();
-
+        
         $montoOrder = $request->input('monto_order');
 
         $licitacionesActivas = Licitacion::with(['empresa', 'division'])
             ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('nombre_proyecto', 'like', '%' . $request->string('search')->trim() . '%');
+                $query->whereRaw("unaccent(nombre_proyecto) ILIKE unaccent(?)", ['%' . $request->string('search')->trim() . '%']);
             })
             ->when($request->filled('estado'), function($query) use ($request) {
                 $query->where('estado_pipeline', $request->string('estado'));
