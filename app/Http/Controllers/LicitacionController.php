@@ -204,37 +204,45 @@ public function comandoVoz(Request $request, CommandParserService $parser)
     
     // 2. Extraemos la intención y las variables de forma segura
     $intent    = strtoupper($comando['intent'] ?? 'DESCONOCIDO');
-    $codigoDpc = $comando['codigo_dpc'] ?? null; // ¡Novedad! Extraemos el DPC
+    $codigoDpc = $comando['codigo_dpc'] ?? null; 
     $nombre    = $comando['nombre'] ?? 'vacio';
-    $estado = $comando['nuevo_estado'] ?? ($comando['estado'] ?? 'vacio');
+    $estado    = $comando['nuevo_estado'] ?? ($comando['estado'] ?? 'vacio');
 
-    // 3. ESCENARIO: CAMBIAR ESTADO
+    // Variables nuevas para la Interacción/Bitácora
+    $contacto        = $comando['contacto'] ?? 'No especificado';
+    $tipoInteraccion = $comando['tipo'] ?? 'No especificado'; // Ej: Llamada, Reunión
+    $descripcion     = $comando['nota'] ?? ($comando['descripcion'] ?? null);
+
+    // Variables para Radar y Competencia
+    $criterio   = $comando['criterio'] ?? null;
+    $competidor = $comando['empresa_competidora'] ?? null;
+
+    // --- 🔎 BÚSQUEDA UNIVERSAL DE LA LICITACIÓN ---
+    // (La sacamos del if para que sirva tanto para cambiar estado como para la bitácora)
+    $licitacion = null;
+    $busquedaRealizada = ''; 
+
+    // PLAN A: Búsqueda elástica avanzada (Limpia espacios, guiones y símbolos)
+    if ($codigoDpc) {
+        $busquedaRealizada = "DPC {$codigoDpc}";
+        
+        $codigoLimpio = preg_replace('/[^a-zA-Z0-9]/', '', $codigoDpc);
+
+        $licitacion = \App\Models\Licitacion::whereRaw("regexp_replace(nombre_proyecto, '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ["%DPC%{$codigoLimpio}%"])
+                                            ->orWhereRaw("regexp_replace(nombre_proyecto, '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ["%{$codigoLimpio}%"])
+                                            ->first();
+    }
+    
+    // PLAN B: Si no mandó código (o si el código falló), buscamos por el nombre del proyecto
+    if (!$licitacion && $nombre !== 'vacio') {
+        $busquedaRealizada = $nombre;
+        $licitacion = \App\Models\Licitacion::where('nombre_proyecto', 'ILIKE', '%' . $nombre . '%')->first();
+    }
+    // ----------------------------------------------
+
+
+    // 3. ESCENARIO: CAMBIAR ESTADO (Tu código intacto)
     if ($intent === 'CAMBIAR_ESTADO') {
-        
-        $licitacion = null;
-        $busquedaRealizada = ''; // Para mostrarle al usuario qué buscó la IA
-
-// PLAN A: Búsqueda elástica avanzada (Limpia espacios, guiones y símbolos)
-        if ($codigoDpc) {
-            $busquedaRealizada = "DPC {$codigoDpc}";
-            
-            // 1. Limpiamos el código que viene de la IA en PHP (ej: "6-6-2" pasa a "662")
-            $codigoLimpio = preg_replace('/[^a-zA-Z0-9]/', '', $codigoDpc);
-
-            // 2. Le decimos a PostgreSQL que limpie el título de la BD al vuelo antes de comparar
-            // Esto transforma "DPC 6-6-2" o "DPC - 6 - 6 - 2" en "DPC662"
-            $licitacion = Licitacion::whereRaw("regexp_replace(nombre_proyecto, '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ["%DPC%{$codigoLimpio}%"])
-                                    ->orWhereRaw("regexp_replace(nombre_proyecto, '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ["%{$codigoLimpio}%"])
-                                    ->first();
-        }
-        
-        // PLAN B: Si no mandó código (o si el código falló), buscamos por el nombre del proyecto
-        if (!$licitacion && $nombre !== 'vacio') {
-            $busquedaRealizada = $nombre;
-            $licitacion = Licitacion::where('nombre_proyecto', 'ILIKE', '%' . $nombre . '%')->first();
-        }
-        
-        // RESULTADO DE LA BÚSQUEDA
         if ($licitacion) {
             $licitacion->estado_pipeline = $estado;
             
@@ -252,15 +260,79 @@ public function comandoVoz(Request $request, CommandParserService $parser)
         }
     }
 
-    // 4. ESCENARIO: BUSCAR / FILTRAR
+// 4. 🔥 ESCENARIO: REGISTRAR BITÁCORA / INTERACCIÓN
+    if ($intent === 'REGISTRAR_BITACORA') {
+        if ($licitacion && $descripcion) {
+            
+            // 1. Pasamos lo que entendió Llama 3 a minúsculas para compararlo fácil
+            $tipoExtraido = strtolower(trim($tipoInteraccion));
+            
+            // 2. Nuestro "embudo" blindado. Por defecto será 'Otro' para que NUNCA falle.
+            $tipoStr = 'Otro'; 
+
+            if (str_contains($tipoExtraido, 'presencial') || str_contains($tipoExtraido, 'reunión') || str_contains($tipoExtraido, 'reunion')) {
+                $tipoStr = 'Reunión Presencial';
+            } elseif (str_contains($tipoExtraido, 'llamada') || str_contains($tipoExtraido, 'fono') || str_contains($tipoExtraido, 'teléfono') || str_contains($tipoExtraido, 'telefono')) {
+                $tipoStr = 'Llamada';
+            } elseif (str_contains($tipoExtraido, 'correo') || str_contains($tipoExtraido, 'email') || str_contains($tipoExtraido, 'mail')) {
+                $tipoStr = 'Correo';
+            } elseif (str_contains($tipoExtraido, 'whatsapp') || str_contains($tipoExtraido, 'wsp')) {
+                $tipoStr = 'WhatsApp';
+            }
+
+            // 3. Guardamos la interacción con el dato 100% legal
+            $licitacion->interacciones()->create([
+                'persona_id'    => 1, // ID temporal
+                'user_id'       => auth()->id() ?? 1, 
+                'fecha'         => now(), 
+                'comentario'    => $descripcion,
+                'tipo_contacto' => $tipoStr, // Ahora sí, PostgreSQL te dará el abrazo
+            ]);
+
+            // Actualizamos la fecha de la licitación para el modelo predictivo
+            $licitacion->touch(); 
+
+            return back()->with('message', "📝 Interacción guardada en {$licitacion->nombre_proyecto}");
+        }
+        return back()->withErrors(['error' => "❌ No encontré el proyecto '{$busquedaRealizada}' o faltó la descripción para la nota."]);
+    }
+
+// 5. ESCENARIO: REGISTRAR COMPETENCIA
+    if ($intent === 'REGISTRAR_COMPETENCIA') {
+        if ($licitacion && $competidor) {
+            
+            // 1. Buscamos por nombre. Si NO existe, la crea asignándole el tipo "Competidor".
+            // (Ajusta 'Competidor' si en tu BD usas otro término como 'Competencia' o 'Rival')
+            $empresa = \App\Models\Empresa::firstOrCreate(
+                ['nombre' => trim($competidor)],
+                ['tipo'   => 'Competencia'] // <-- Aquí matamos el error del Not Null
+            );
+
+            // 2. Asociamos el competidor a la licitación en la tabla pivote
+            \App\Models\CompetenciaEnLicitacion::firstOrCreate([
+                'licitacion_id' => $licitacion->id,
+                'empresa_id'    => $empresa->id, 
+            ]);
+
+            // 3. Actualizamos la fecha
+            $licitacion->touch();
+
+            return back()->with('message', "🕵️ Competencia registrada: {$empresa->nombre} asociada a {$licitacion->nombre_proyecto}");
+        }
+        return back()->withErrors(['error' => "❌ No encontré el proyecto '{$busquedaRealizada}' para registrar la competencia."]);
+    }
+    // 6. ESCENARIO: RADAR (Filtrar Alertas)
+    if ($intent === 'CONSULTAR_ESTADO_URGENTE') {
+        return redirect()->route('licitaciones.index', ['urgentes' => true, 'criterio' => $criterio]);
+    }
+
+    // 7. ESCENARIO: BUSCAR / FILTRAR (Tu código intacto)
     if ($intent === 'BUSCAR') {
-        // Armamos qué va a poner en el buscador (Prioriza el código, luego el nombre, luego la empresa)
         $terminoBusqueda = $codigoDpc ? "DPC {$codigoDpc}" : ($nombre !== 'vacio' ? $nombre : ($comando['empresa'] ?? ''));
-        
         return redirect()->route('licitaciones.index', ['search' => $terminoBusqueda]);
     }
 
-    // 5. ERROR TIPO 2: La IA devolvió un JSON raro o no entendió
+    // 8. ERROR TIPO 2: La IA devolvió un JSON raro o no entendió
     $respuestaIA = json_encode($comando);
     return back()->withErrors(['error' => "🤖 La IA se confundió. Esto fue lo que intentó devolver: {$respuestaIA}"]);
 }
