@@ -22,7 +22,7 @@ class LicitacionController extends Controller
 
         $licitacionesActivas = Licitacion::with(['empresa', 'division'])
             ->when($request->filled('search'), function ($query) use ($request) {
-                $query->whereRaw("unaccent(nombre_proyecto) ILIKE unaccent(?)", ['%' . $request->string('search')->trim() . '%']);
+                $query->where('nombre_proyecto', 'ILIKE', '%' . $request->string('search')->trim() . '%');
             })
             ->when($request->filled('estado'), function($query) use ($request) {
                 $query->where('estado_pipeline', $request->string('estado'));
@@ -253,48 +253,107 @@ public function comandoVoz(Request $request, CommandParserService $parser)
             }
             
             $licitacion->save();
-            return back()->with('message', "✅ Éxito: La licitación '{$licitacion->nombre_proyecto}' ahora está en estado {$estado}");
+            return back()->with('message', " Éxito: La licitación '{$licitacion->nombre_proyecto}' ahora está en estado {$estado}");
         } else {
             // ERROR TIPO 1: La IA entendió todo, pero no existe en la BD
-            return back()->withErrors(['error' => "❌ La IA buscó el proyecto por '{$busquedaRealizada}', pero no existe en tu base de datos."]);
+            return back()->withErrors(['error' => " La IA buscó el proyecto por '{$busquedaRealizada}', pero no existe en tu base de datos."]);
         }
     }
 
-// 4. 🔥 ESCENARIO: REGISTRAR BITÁCORA / INTERACCIÓN
+// 4. ESCENARIO: REGISTRAR BITACORA / INTERACCION
     if ($intent === 'REGISTRAR_BITACORA') {
         if ($licitacion && $descripcion) {
             
-            // 1. Pasamos lo que entendió Llama 3 a minúsculas para compararlo fácil
-            $tipoExtraido = strtolower(trim($tipoInteraccion));
+            // 1. Funcion para normalizar el texto (quitar tildes y mayusculas)
+            $quitarTildes = function($cadena) {
+                return str_replace(
+                    ['á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú'],
+                    ['a', 'e', 'i', 'o', 'u', 'a', 'e', 'i', 'o', 'u'],
+                    strtolower(trim($cadena))
+                );
+            };
+
+            $textoHablado = $quitarTildes($request->texto_hablado ?? $descripcion);
             
-            // 2. Nuestro "embudo" blindado. Por defecto será 'Otro' para que NUNCA falle.
+            // 2. Filtramos los contactos que pertenecen a la misma division que la licitacion
+            // Esto equivale exactamente a la lista de "Contactos Asociados" de la pantalla
+            $contactosAsociados = \App\Models\Persona::where('division_id', $licitacion->division_id)->get();
+
+            $personaId = 1; // ID de resguardo por defecto
+            $encontrado = false;
+
+            if ($contactosAsociados && $contactosAsociados->count() > 0) {
+                // PLAN A: Buscar al contacto correcto dentro de la division de la licitacion palabra por palabra
+                foreach ($contactosAsociados as $persona) {
+                    $nombreLimpio = $quitarTildes($persona->nombre_completo);
+                    $palabrasDelNombre = explode(' ', $nombreLimpio);
+
+                    foreach ($palabrasDelNombre as $palabra) {
+                        if (strlen($palabra) > 2 && str_contains($textoHablado, $palabra)) {
+                            $personaId = $persona->id;
+                            $encontrado = true;
+                            break 2; // Rompe ambos bucles al encontrar la coincidencia
+                        }
+                    }
+                }
+
+                // PLAN B: Si no mencionaste ningun nombre en el audio, pero la licitacion tiene un UNICO contacto,
+                // se lo asignamos a el por logica pura.
+                if (!$encontrado && $contactosAsociados->count() === 1) {
+                    $personaId = $contactosAsociados->first()->id;
+                    $encontrado = true;
+                }
+            }
+
+            // PLAN C: Si no habia contactos en la division o no hubo coincidencia, buscamos a nivel global
+            if (!$encontrado) {
+                $personasGlobales = \App\Models\Persona::all(); 
+                foreach ($personasGlobales as $persona) {
+                    $nombreLimpio = $quitarTildes($persona->nombre_completo);
+                    $palabrasDelNombre = explode(' ', $nombreLimpio);
+
+                    foreach ($palabrasDelNombre as $palabra) {
+                        if (strlen($palabra) > 2 && str_contains($textoHablado, $palabra)) {
+                            $personaId = $persona->id;
+                            $encontrado = true;
+                            break 2;
+                        }
+                    }
+                }
+            }
+
+            // 3. Normalizamos el tipo de contacto
+            $tipoExtraido = strtolower(trim($tipoInteraccion));
             $tipoStr = 'Otro'; 
 
-            if (str_contains($tipoExtraido, 'presencial') || str_contains($tipoExtraido, 'reunión') || str_contains($tipoExtraido, 'reunion')) {
+            if (str_contains($tipoExtraido, 'presencial') || str_contains($tipoExtraido, 'reunion')) {
                 $tipoStr = 'Reunión Presencial';
-            } elseif (str_contains($tipoExtraido, 'llamada') || str_contains($tipoExtraido, 'fono') || str_contains($tipoExtraido, 'teléfono') || str_contains($tipoExtraido, 'telefono')) {
+            } elseif (str_contains($tipoExtraido, 'llamada') || str_contains($tipoExtraido, 'fono')) {
                 $tipoStr = 'Llamada';
-            } elseif (str_contains($tipoExtraido, 'correo') || str_contains($tipoExtraido, 'email') || str_contains($tipoExtraido, 'mail')) {
+            } elseif (str_contains($tipoExtraido, 'correo') || str_contains($tipoExtraido, 'email')) {
                 $tipoStr = 'Correo';
             } elseif (str_contains($tipoExtraido, 'whatsapp') || str_contains($tipoExtraido, 'wsp')) {
                 $tipoStr = 'WhatsApp';
             }
 
-            // 3. Guardamos la interacción con el dato 100% legal
+            // 4. Guardamos la interaccion inyectando el ID verificado
             $licitacion->interacciones()->create([
-                'persona_id'    => 1, // ID temporal
+                'persona_id'    => $personaId, 
                 'user_id'       => auth()->id() ?? 1, 
                 'fecha'         => now(), 
                 'comentario'    => $descripcion,
-                'tipo_contacto' => $tipoStr, // Ahora sí, PostgreSQL te dará el abrazo
+                'tipo_contacto' => $tipoStr,
             ]);
 
-            // Actualizamos la fecha de la licitación para el modelo predictivo
             $licitacion->touch(); 
 
-            return back()->with('message', "📝 Interacción guardada en {$licitacion->nombre_proyecto}");
+            // 5. Retornamos confirmando el nombre_completo real del contacto asignado
+            $personaAsignada = \App\Models\Persona::find($personaId);
+            $nombreFinal = $personaAsignada ? $personaAsignada->nombre_completo : 'Contacto por defecto';
+            
+            return back()->with('message', "Nota guardada. Cliente asignado: {$nombreFinal}");
         }
-        return back()->withErrors(['error' => "❌ No encontré el proyecto '{$busquedaRealizada}' o faltó la descripción para la nota."]);
+        return back()->withErrors(['error' => "Faltan datos para registrar la nota."]);
     }
 
 // 5. ESCENARIO: REGISTRAR COMPETENCIA
@@ -317,23 +376,19 @@ public function comandoVoz(Request $request, CommandParserService $parser)
             // 3. Actualizamos la fecha
             $licitacion->touch();
 
-            return back()->with('message', "🕵️ Competencia registrada: {$empresa->nombre} asociada a {$licitacion->nombre_proyecto}");
+            return back()->with('message', " Competencia registrada: {$empresa->nombre} asociada a {$licitacion->nombre_proyecto}");
         }
         return back()->withErrors(['error' => "❌ No encontré el proyecto '{$busquedaRealizada}' para registrar la competencia."]);
     }
-    // 6. ESCENARIO: RADAR (Filtrar Alertas)
-    if ($intent === 'CONSULTAR_ESTADO_URGENTE') {
-        return redirect()->route('licitaciones.index', ['urgentes' => true, 'criterio' => $criterio]);
-    }
-
-    // 7. ESCENARIO: BUSCAR / FILTRAR (Tu código intacto)
+    
+    // 6. ESCENARIO: BUSCAR / FILTRAR (Tu código intacto)
     if ($intent === 'BUSCAR') {
         $terminoBusqueda = $codigoDpc ? "DPC {$codigoDpc}" : ($nombre !== 'vacio' ? $nombre : ($comando['empresa'] ?? ''));
         return redirect()->route('licitaciones.index', ['search' => $terminoBusqueda]);
     }
 
-    // 8. ERROR TIPO 2: La IA devolvió un JSON raro o no entendió
+    // 9. ERROR TIPO 2: La IA devolvió un JSON raro o no entendió
     $respuestaIA = json_encode($comando);
-    return back()->withErrors(['error' => "🤖 La IA se confundió. Esto fue lo que intentó devolver: {$respuestaIA}"]);
+    return back()->withErrors(['error' => "No se entendio el Mensaje."]);
 }
 }

@@ -6,6 +6,7 @@ import {
     Briefcase // Importamos este para Proyectos
 } from 'lucide-react';
 import VoiceButton from '@/components/voice-button';
+import GlobalToast from '@/components/GlobalToast';
 
 export default function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
     const [darkMode, setDarkMode] = useState(localStorage.getItem('theme') === 'dark');
@@ -160,6 +161,7 @@ const handleVoiceTranscription = (text: string) => {
                 />
             </div>
             <VoiceButton onTranscriptionComplete={handleVoiceTranscription} />
+            <GlobalToast />
         </div>
     );
 }
