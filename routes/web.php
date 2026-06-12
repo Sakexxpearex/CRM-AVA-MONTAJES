@@ -8,6 +8,7 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PrecalificacionController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VoiceController;
@@ -72,6 +73,11 @@ Route::middleware(['auth'])->group(function () {
     // 2. Ruta para que el Layout mande el texto y la IA ejecute la acción proactiva
     Route::post('/licitaciones/comando-voz', [LicitacionController::class, 'comandoVoz'])
         ->name('licitaciones.comando-voz');
+
+// Rutas para Precalificaciones
+    Route::get('/precalificaciones', [PrecalificacionController::class, 'index'])->name('precalificaciones.index');
+    Route::post('/precalificaciones', [PrecalificacionController::class, 'store'])->name('precalificaciones.store');
+    Route::patch('/precalificaciones/{precalificacion}/estado', [PrecalificacionController::class, 'cambiarEstado'])->name('precalificaciones.estado');
 });
 
 require __DIR__.'/settings.php';

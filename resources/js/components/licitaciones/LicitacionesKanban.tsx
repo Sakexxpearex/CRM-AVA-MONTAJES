@@ -14,13 +14,10 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import EstadoBadge from './EstadoBadge';
 
-
 const COLUMNAS = [
     { id: 'Evaluación', titulo: 'Evaluación', color: 'border-t-blue-500 text-blue-500 bg-blue-500/5' },
     { id: 'Preparación', titulo: 'Preparación', color: 'border-t-orange-500 text-orange-500 bg-orange-500/5' },
     { id: 'Presentada', titulo: 'Presentada', color: 'border-t-cyan-500 text-cyan-500 bg-cyan-500/5' },
-    { id: 'Perdida', titulo: 'Perdida', color: 'border-t-red-500 text-red-500 bg-red-500/5' },
-    { id: 'Adjudicada', titulo: 'Adjudicada / Ganada', color: 'border-t-emerald-500 text-emerald-500 bg-emerald-500/5' } // 🌟 Estilizado completo
 ];
 
 // Subcomponente para las tarjetas
@@ -104,7 +101,7 @@ function ColumnaDroppable({ columna, children, tarjetasColumna, formatMoney }: {
                 </span>
             </div>
 
-            {/* Cuerpo receptor (Modificado con min-h-[400px] para asegurar el área de colisión) */}
+            {/* Cuerpo receptor */}
             <div 
                 ref={setNodeRef}
                 className={`p-3 space-y-3 max-h-[65vh] min-h-[400px] h-full overflow-y-auto flex-1 transition-colors duration-150 ${
@@ -125,11 +122,10 @@ export default function LicitacionesKanban({ licitaciones = [] }: { licitaciones
         setLocalLicitaciones(licitaciones);
     }, [licitaciones]);
 
-    // Evita que los clics normales o scroll de página activen un "arrastre accidental"
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                distance: 8, // Tienes que mover el mouse 8 pixeles antes de empezar a arrastrar
+                distance: 8,
             },
         })
     );
@@ -144,40 +140,32 @@ export default function LicitacionesKanban({ licitaciones = [] }: { licitaciones
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
-        // Si se soltó fuera de una columna válida, no hacemos nada
         if (!over) return;
 
         const licitacionId = parseInt(active.id as string);
         const nuevoEstado = over.id as string;
 
-        // Buscamos la tarjeta en nuestro estado local
         const licitacionClave = localLicitaciones.find(l => l.id === licitacionId);
         
-        // Si la tarjeta no existe o se soltó en la misma columna donde ya estaba, cancelamos
         if (!licitacionClave || licitacionClave.estado_pipeline === nuevoEstado) return;
 
-        // 1. REACCIÓN OPTIMISTA: Movemos la tarjeta de inmediato en interfaz
         setLocalLicitaciones(prev => prev.map(lic => 
             lic.id === licitacionId ? { ...lic, estado_pipeline: nuevoEstado } : lic
         ));
 
-        // 2. PERSISTENCIA REAL: Cambiamos el estado en la base de datos a través de Laravel
         router.put(route('licitaciones.updatePipeline', licitacionId), {
             estado_pipeline: nuevoEstado
         }, {
-            preserveScroll: true, // Evita saltos raros de scroll si la página es larga
+            preserveScroll: true,
             onError: () => {
-                // Si se rechaza el cambio, se devuelve automáticamente la tarjeta a su columna de origen
                 setLocalLicitaciones(licitaciones);
             }
         });
     };
 
     return (
-        // 🌟 Cambiado a closestPointer para máxima precisión táctil y de cursor
         <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
-            {/* 🌟 Grid adaptativo: muta a 5 columnas en monitores grandes (xl) para calzar el pipeline completo */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 items-start bg-slate-50/50 dark:bg-transparent p-1 rounded-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5 items-start bg-slate-50/50 dark:bg-transparent p-1 rounded-2xl w-full">
                 {COLUMNAS.map((columna) => {
                     const tarjetasColumna = localLicitaciones.filter(lic => lic.estado_pipeline === columna.id);
 
