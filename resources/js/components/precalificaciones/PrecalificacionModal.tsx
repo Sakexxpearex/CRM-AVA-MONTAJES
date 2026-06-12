@@ -22,7 +22,7 @@ export default function PrecalificacionModal({ isOpen, onClose, empresas, divisi
         nombre_precalificacion: '', 
         monto_estimado: '',
         resumen_visita: '',
-        archivo_multimedia: null as File | null, 
+        
     });
 
     // Limpiar el formulario al cerrar el modal
@@ -183,36 +183,6 @@ export default function PrecalificacionModal({ isOpen, onClose, empresas, divisi
                             className="w-full px-3 py-2.5 text-sm bg-gray-50/50 dark:bg-white/[0.02] border border-gray-200 dark:border-gray-800 focus:border-[#c1f75e] text-gray-900 dark:text-white rounded-md outline-none transition-all resize-none"
                         />
                         {errors.resumen_visita && <p className="text-xs text-rose-500 mt-1">{errors.resumen_visita}</p>}
-                    </div>
-
-                    {/* Archivo multimedia */}
-                    <div>
-                        <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider italic mb-1">
-                            Adjuntar Documento Técnico o Imagen (Max 10MB)
-                        </label>
-                        <div className="mt-1 flex items-center gap-3">
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                accept=".jpg,.jpeg,.png,.pdf"
-                                onChange={(e) => setData('archivo_multimedia', e.target.files ? e.target.files[0] : null)}
-                                className="hidden"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => fileInputRef.current?.click()}
-                                className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-bold rounded border border-gray-200 dark:border-gray-700 transition-all"
-                            >
-                                <Paperclip size={14} />
-                                {data.archivo_multimedia ? 'Cambiar Archivo' : 'Seleccionar PDF o Imagen'}
-                            </button>
-                            {data.archivo_multimedia && (
-                                <span className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[250px]">
-                                    {data.archivo_multimedia.name}
-                                </span>
-                            )}
-                        </div>
-                        {errors.archivo_multimedia && <p className="text-xs text-rose-500 mt-1">{errors.archivo_multimedia}</p>}
                     </div>
 
                     <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">

@@ -17,7 +17,6 @@ class PrecalificacionController extends Controller
     public function index(Request $request)
     {
         // Traemos las precalificaciones filtrando SOLO las 'Pendiente'
-        // e incluimos relaciones inyectando el appends 'dias_retraso_alerta'
         $precalificaciones = Precalificacion::with(['empresa', 'division', 'persona'])
             ->where('estado', 'Pendiente') 
             ->when($request->filled('search'), function ($query) use ($request) {
@@ -47,19 +46,9 @@ class PrecalificacionController extends Controller
             'resumen_visita'         => 'required|string',
             'monto_estimado'         => 'nullable|numeric|min:0',
             'descripcion'            => 'nullable|string',
-            'archivo_multimedia'     => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
-        ], [
-           
-            'archivo_multimedia.mimes' => 'El archivo multimedia debe ser una imagen (.jpg, .png) o un documento técnico (.pdf).',
-            'archivo_multimedia.max'   => 'El archivo técnico no puede superar el peso máximo restringido de 10MB.',
-        ]);
+        ], );
 
     
-        if ($request->hasFile('archivo_multimedia')) {
-            $path = $request->file('archivo_multimedia')->store('precalificaciones', 'public');
-            $validated['archivo_multimedia'] = $path;
-        }
-
         // Definir el estado por defecto inicial
         $validated['estado'] = 'Pendiente';
 

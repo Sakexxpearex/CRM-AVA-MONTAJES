@@ -25,7 +25,6 @@ class Precalificacion extends Model
     ];
 
     
-    protected $appends = ['dias_retraso_alerta'];
 
     
     public function empresa(): BelongsTo

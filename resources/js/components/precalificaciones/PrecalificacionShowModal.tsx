@@ -9,7 +9,7 @@ interface ShowProps {
 export default function PrecalificacionShowModal({ precalificacion, onClose }: ShowProps) {
     const { data, setData, patch, processing } = useForm({
         id: precalificacion?.id || null,
-        nombre_precalificacion: precalificacion?.nombre_precalificacion || '', // Mapeado exacto con el controlador
+        nombre_precalificacion: precalificacion?.nombre_precalificacion || '', 
         estado: precalificacion?.estado || 'Pendiente'
     });
 
@@ -88,13 +88,7 @@ export default function PrecalificacionShowModal({ precalificacion, onClose }: S
                         </div>
                     </div>
 
-                    {/* Alerta */}
-                    {precalificacion.estado === 'Pendiente' && (
-                        <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[11px] leading-normal">
-                            <AlertTriangle size={15} className="shrink-0 mt-0.5" />
-                            <p>Si decides <strong className="font-black uppercase tracking-wide">Aprobar</strong> esta propuesta, pasará al Kanban comercial bajo el estado inicial de <span className="font-bold text-gray-900 dark:text-white underline decoration-[#c1f75e] decoration-2">Evaluación</span>.</p>
-                        </div>
-                    )}
+        
                 </div>
 
                 {/* Botones de acción */}
