@@ -10,6 +10,7 @@ use App\Models\Licitacion; // Importación indispensable para clonar la data
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class PrecalificacionController extends Controller
 {
@@ -74,51 +75,51 @@ class PrecalificacionController extends Controller
     }
 
     
-    public function cambiarEstado(Request $request, $id)
-    {
-        
-        $validated = $request->validate([
-            'estado'                 => 'required|string|in:Pendiente,Aprobada,Rechazada',
-            'nombre_precalificacion' => 'nullable|string|max:255',
-        ]);
+   public function cambiarEstado(Request $request, $id)
+{
+    $validated = $request->validate([
+        'estado' => 'required|in:Pendiente,Aprobada,Rechazada'
+    ]);
 
-        
+
         $precalificacion = Precalificacion::findOrFail($id);
+        $precalificacion->estado = $validated['estado'];
+        $precalificacion->save();
 
-        
-        $updateData = [
-            'estado' => $validated['estado']
-        ];
-
-        if (!empty($validated['nombre_precalificacion'])) {
-            $updateData['nombre_precalificacion'] = $validated['nombre_precalificacion'];
-            $precalificacion->nombre_precalificacion = $validated['nombre_precalificacion']; 
-        }
-
-        $precalificacion->update($updateData);
-
-        
         if ($validated['estado'] === 'Aprobada') {
-            
-          
-            $existeLicitacion = Licitacion::where('nombre_proyecto', $precalificacion->nombre_precalificacion)
-                ->where('empresa_id', $precalificacion->empresa_id)
-                ->exists();
-
-            if (!$existeLicitacion) {
-               
-                $licitacion = new Licitacion();
-                
-                $licitacion->nombre_proyecto = $precalificacion->nombre_precalificacion;
-                $licitacion->empresa_id      = $precalificacion->empresa_id;
-                $licitacion->division_id     = $precalificacion->division_id;
-                $licitacion->persona_id      = $precalificacion->persona_id;
-                $licitacion->monto_estimado  = $precalificacion->monto_estimado;
-                $licitacion->descripcion     = $precalificacion->descripcion;
-                $licitacion->estado_pipeline = 'Evaluación'; 
-                $licitacion->save();
-            }
+            Licitacion::create([
+                'empresa_id'       => $precalificacion->empresa_id,
+                'division_id'      => $precalificacion->division_id,
+                'nombre_proyecto'  => $precalificacion->nombre_precalificacion, 
+                'descripcion'      => $precalificacion->descripcion ?? $precalificacion->resumen_visita,
+                'monto_estimado'   => $precalificacion->monto_estimado,
+                'monto_adjudicado' => 0,
+                'estado_pipeline'  => 'Evaluación',
+            ]);
         }
-        return redirect()->back()->with('message', 'Evaluación procesada con éxito y licitación añadida al pipeline.');
-    }
+
+        return redirect()->back()->with('message', 'Estado actualizado correctamente.');
+
+
+}
+    public function storeInteraccion(Request $request, $id)
+{
+    $validated = $request->validate([
+        'comentario'    => 'required|string',
+        'tipo_contacto' => 'required|string|in:Reunión Presencial,Llamada,Correo,WhatsApp,Otro' // 🌟 Validamos el canal
+    ]);
+
+    $precalificacion = Precalificacion::findOrFail($id);
+
+    $precalificacion->interacciones()->create([
+        'comentario'    => $validated['comentario'],
+        'tipo_contacto' => $validated['tipo_contacto'], // 🌟 Guardado dinámico
+        'persona_id'    => $precalificacion->persona_id, 
+        'user_id'       => auth()->id(),                 
+        'fecha'         => now()->format('Y-m-d'),       
+        'licitacion_id' => null,                         
+    ]);
+
+    return redirect()->back()->with('message', 'Nota registrada en la bitácora.');
+}
 }

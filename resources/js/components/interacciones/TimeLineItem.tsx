@@ -22,9 +22,24 @@ export default function TimeLineItem({ interaccion }: any) {
             <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm hover:border-gray-700 transition-all">
                 <div className="flex justify-between items-start mb-4">
                     <div>
-                        <span className="text-[10px] font-black uppercase text-[#c1f75e] tracking-widest bg-[#c1f75e]/5 px-2 py-1 rounded">
-                            {interaccion.tipo_contacto}
-                        </span>
+                        {/* Contenedor */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[10px] font-black uppercase text-[#c1f75e] tracking-widest bg-[#c1f75e]/5 px-2 py-1 rounded">
+                                {interaccion.tipo_contacto}
+                            </span>
+
+                            {/* Tag  */}
+                            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded border ${
+                                interaccion.origen === 'Precalificación'
+                                    ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                    : interaccion.origen === 'Licitación Pipeline'
+                                    ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+                                    : 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                            }`}>
+                                {interaccion.origen || 'General'}
+                            </span>
+                        </div>
+
                         <p className="text-[11px] text-gray-500 font-mono mt-2">{formatDate(interaccion.fecha)}</p>
                     </div>
                     <button className="text-gray-600 hover:text-white"><MoreHorizontal size={18} /></button>
@@ -40,10 +55,19 @@ export default function TimeLineItem({ interaccion }: any) {
                         Registrado por: <span className="text-gray-700 dark:text-gray-300">{interaccion.user?.name}</span>
                     </div>
                     
+                    {/* Licitaciones */}
                     {interaccion.licitacion && (
                         <div className="flex items-center gap-2 text-[9px] font-black uppercase text-gray-500">
                             <FileText size={12} className="text-[#c1f75e]" />
-                            Proyecto: <span className="text-gray-700 dark:text-gray-300">{interaccion.licitacion.nombre_proyecto || interaccion.licitacion.nombre}</span>
+                            Licitación: <span className="text-gray-700 dark:text-gray-300">{interaccion.licitacion.nombre_proyecto || interaccion.licitacion.nombre}</span>
+                        </div>
+                    )}
+
+                    {/*  Precalificaciones */}
+                    {interaccion.precalificacion && (
+                        <div className="flex items-center gap-2 text-[9px] font-black uppercase text-gray-500">
+                            <FileText size={12} className="text-amber-500" />
+                            Precalif: <span className="text-gray-700 dark:text-gray-300">{interaccion.precalificacion.nombre_precalificacion}</span>
                         </div>
                     )}
                 </div>

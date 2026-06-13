@@ -52,4 +52,20 @@ class Interaccion extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function getOrigenAttribute(): string
+{
+    if ($this->precalificacion_id) {
+        return 'Precalificación';
+    }
+    
+    if ($this->licitacion_id) {
+        return 'Licitación Pipeline';
+    }
+    
+    return 'Contacto General';
+}
+
+// Opcional: Para asegurar que se incluya siempre en las respuestas JSON/Inertia
+protected $appends = ['origen'];
 }
