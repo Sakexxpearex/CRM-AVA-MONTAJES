@@ -6,7 +6,6 @@ use App\Services\CommandParserService;
 use App\Models\Licitacion;
 use App\Models\Empresa;
 use App\Models\Division;
-use App\Models\Proyecto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -23,7 +22,7 @@ class LicitacionController extends Controller
 
         $licitacionesActivas = Licitacion::with(['empresa', 'division'])
             ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('nombre_proyecto', 'like', '%' . $request->string('search')->trim() . '%');
+                $query->whereRaw("unaccent(nombre_proyecto) ILIKE unaccent(?)", ['%' . $request->string('search')->trim() . '%']);
             })
             ->when($request->filled('estado'), function ($query) use ($request) {
                 $query->where('estado_pipeline', $request->string('estado'));
@@ -43,7 +42,10 @@ class LicitacionController extends Controller
         $estadosganadores = ['Adjudicada', 'Operativa'];
         
         $stats = [
+        
+        $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
+            'activos'     => $todas->whereIn('estado_pipeline', [
             'activos'     => $todas->whereIn('estado_pipeline', [
                 'Preparación', 'Filtro', 'Presentada', 'Evaluación'
             ])->count(),
@@ -88,10 +90,10 @@ class LicitacionController extends Controller
 
     public function show($id)
     {
+    {
         $licitacion = Licitacion::with([
-            'division.personas', // <-- CLAVE: Trae los contactos de la división específica
+            'division.personas', 
             'empresa',
-            'proyecto',
             'interacciones.persona'
         ])->findOrFail($id);
 
@@ -127,7 +129,10 @@ class LicitacionController extends Controller
         }
 
         $licitacion->update($validated);
+        $licitacion->update($validated);
 
+        return back()->with('message', 'Ficha técnica actualizada');
+    }
         return back()->with('message', 'Ficha técnica actualizada');
     }
 
@@ -146,6 +151,8 @@ class LicitacionController extends Controller
         $licitacion->estado_pipeline = $request->estado_pipeline;
         $licitacion->save(); // Usar save() después de asignar manualmente es más seguro
 
+        return back();
+    }
         return back();
     }
 
@@ -184,6 +191,9 @@ class LicitacionController extends Controller
         try {
             $file = $request->file('audio');
             $apiKey = env('GROQ_API_KEY');
+        try {
+            $file = $request->file('audio');
+            $apiKey = env('GROQ_API_KEY');
 
             // 2. Intentar la conexión usando el Facade ya importado
             $response = Http::withToken($apiKey)
@@ -193,6 +203,7 @@ class LicitacionController extends Controller
                     'language' => 'es',
                 ]);
 
+            return $response->json();
             return $response->json();
 
         } catch (\Exception $e) {
@@ -238,6 +249,9 @@ class LicitacionController extends Controller
             }
         }
 
+        if ($intent === 'BUSCAR') {
+            return redirect()->route('licitaciones.index', ['search' => $nombre ?? $comando['empresa']]);
+        }
         if ($intent === 'BUSCAR') {
             return redirect()->route('licitaciones.index', ['search' => $nombre ?? $comando['empresa']]);
         }

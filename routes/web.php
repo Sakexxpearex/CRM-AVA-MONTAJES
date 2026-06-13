@@ -8,6 +8,7 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PrecalificacionController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VoiceController;
@@ -37,9 +38,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('interacciones', InteraccionController::class);
     Route::post('/historial-laboral', [HistorialController::class, 'store'])->name('historial.store');
 
-    // Ruta para redirigir una licitacion a proyectos
-    Route::post('/licitaciones/{id}/adjudicar', [LicitacionController::class, 'adjudicar'])
-    ->name('licitaciones.adjudicar');
 
     // Ruta para el historial de interacciones del contacto (TimeLine)
     Route::get('/personas/{persona}/interacciones', [PersonaController::class, 'interacciones'])
@@ -48,6 +46,10 @@ Route::middleware(['auth'])->group(function () {
     // Ruta para cambiar estado_pipeline
     Route::patch('/licitaciones/{licitacion}/pipeline', [LicitacionController::class, 'updatePipeline'])
     ->name('licitaciones.update_pipeline');
+
+    // Ruta para cambiar  tablero kanban
+    Route::put('/licitaciones/{licitacion}/pipeline', [LicitacionController::class, 'updatePipeline'])
+    ->name('licitaciones.updatePipeline'); // <--- Revisa que se llame EXACTAMENTE así
 
     //Ruta para las divisiones
     Route::post('/divisiones', [DivisionController::class, 'store'])->name('divisiones.store');
@@ -73,6 +75,11 @@ Route::middleware(['auth'])->group(function () {
         ->name('licitaciones.comando-voz');
     
     Route::get('/alertas-estancadas', [App\Http\Controllers\LicitacionController::class, 'alertasIndex'])->name('alertas.index');
+
+// Rutas para Precalificaciones
+    Route::get('/precalificaciones', [PrecalificacionController::class, 'index'])->name('precalificaciones.index');
+    Route::post('/precalificaciones', [PrecalificacionController::class, 'store'])->name('precalificaciones.store');
+    Route::patch('/precalificaciones/{precalificacion}/estado', [PrecalificacionController::class, 'cambiarEstado'])->name('precalificaciones.estado');
 });
 
 require __DIR__.'/settings.php';

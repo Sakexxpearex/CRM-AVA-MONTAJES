@@ -3,6 +3,7 @@ import InputError from '@/components/input-error';
 
 interface EmpresaForm {
   nombre: string;
+  alias?: string;
   rut: string;
   tipo: 'Cliente' | 'Competencia' | 'Subcontratista';
 }
@@ -88,6 +89,20 @@ export default function EmpresaModal({
               required
             />
             <InputError message={errors.nombre} />
+          </div>
+
+          {/* Alias */}
+          <div>
+            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">
+              Alias
+            </label>
+            <input
+              type="text"
+              value={data.alias || ''}
+              onChange={(e) => setData('alias', e.target.value)}
+              className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md py-3 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#C1F75E] transition-all"
+            />
+            <InputError message={errors.alias} />
           </div>
 
           {/* Tipo */}

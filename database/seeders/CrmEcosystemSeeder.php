@@ -261,8 +261,10 @@ class CrmEcosystemSeeder extends Seeder
 
     private function crearContactoParaDivision(Division $division, string $empresaAlias): void
     {
-        $primerosNombres = ['Camila', 'Ignacio', 'Valentina', 'Matías', 'Fernanda', 'Sebastián', 'Paula', 'Rodrigo'];
-        $segundosNombres = ['Andrea', 'Javier', 'Isabel', 'Antonio', 'Paz', 'Eduardo', 'Francisca', 'Nicolás'];
+        $nombresFemeninos1 = ['Camila', 'Valentina', 'Fernanda', 'Paula', 'Catalina', 'Daniela', 'Carolina', 'María'];
+        $nombresFemeninos2 = ['Andrea', 'Isabel', 'Paz', 'Francisca', 'Ignacia', 'Antonia', 'Belén', 'Jesús'];
+        $nombresMasculinos1 = ['Ignacio', 'Matías', 'Sebastián', 'Rodrigo', 'Felipe', 'Diego', 'Nicolás', 'José'];
+        $nombresMasculinos2 = ['Javier', 'Antonio', 'Eduardo', 'Andrés', 'Tomás', 'Alejandro', 'Pablo', 'Luis'];
         $apellidos = ['González', 'Muñoz', 'Rojas', 'Díaz', 'Pérez', 'Soto', 'Contreras', 'Silva'];
         $cargos = [
             'Gerente de Operaciones',
@@ -273,8 +275,17 @@ class CrmEcosystemSeeder extends Seeder
         ];
 
         $seed = crc32($empresaAlias . '-' . $division->nombre);
-        $nombre1 = $primerosNombres[$seed % count($primerosNombres)];
-        $nombre2 = $segundosNombres[($seed + 1) % count($segundosNombres)];
+
+        $esMujer = ($seed % 2) === 0;
+
+        if ($esMujer) {
+            $nombre1 = $nombresFemeninos1[$seed % count($nombresFemeninos1)];
+            $nombre2 = $nombresFemeninos2[($seed + 1) % count($nombresFemeninos2)];
+        } else {
+            $nombre1 = $nombresMasculinos1[$seed % count($nombresMasculinos1)];
+            $nombre2 = $nombresMasculinos2[($seed + 1) % count($nombresMasculinos2)];
+        }
+
         $apellido1 = $apellidos[($seed + 2) % count($apellidos)];
         $apellido2 = $apellidos[($seed + 3) % count($apellidos)];
         $cargo = $cargos[$seed % count($cargos)];
