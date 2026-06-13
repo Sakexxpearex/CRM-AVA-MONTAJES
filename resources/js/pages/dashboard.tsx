@@ -1,17 +1,17 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
-import { Head, usePage } from '@inertiajs/react';
-import { 
-    LayoutDashboard, 
-    BarChart3, 
-    Building2, 
-    Users, 
-    Zap, 
-    DollarSign, 
-    Target, 
-    Trophy 
+import { Head, usePage, router } from '@inertiajs/react';
+import {
+    LayoutDashboard,
+    BarChart3,
+    Building2,
+    Users,
+    Zap,
+    DollarSign,
+    Target,
+    Trophy,
+    OctagonAlert
 } from 'lucide-react';
 
-// Componentes de pagina
 import PageContainer from '@/components/pages/PageContainer';
 import PageHeader from '@/components/pages/PageHeader';
 import StatCard from '@/components/dashboard/StatCard';
@@ -35,7 +35,7 @@ export default function Dashboard({ stats }: any) {
                         <p className="text-sm font-bold dark:text-white leading-none">
                             {user.nombre_1} {user.apellido_1}
                         </p>
-                        <p className="text-[10px] text-gray-500 font-medium tracking-tighter uppercase">
+                        <p className="text-[10px] text-gray-500 font-medium tracking-tighter uppercase mt-1">
                             {user.email}
                         </p>
                     </div>
@@ -51,7 +51,7 @@ export default function Dashboard({ stats }: any) {
                     icon={LayoutDashboard}
                 />
 
-                {/* SECCIÓN 1: RENDIMIENTO COMERCIAL (NUEVO) */}
+                {/* SECCIÓN 1: RENDIMIENTO COMERCIAL */}
                 <div className="mb-8">
                     <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 ml-1">
                         Rendimiento Comercial
@@ -82,36 +82,59 @@ export default function Dashboard({ stats }: any) {
                 </div>
 
                 {/* SECCIÓN 2: MÉTRICAS OPERATIVAS */}
-                <div>
+                <div className="mb-8">
                     <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 ml-1">
                         Gestión de Base de Datos
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <StatCard
                             label="Licitaciones Activas"
-                            value={stats.totalLicitaciones}
-                            trend={`${stats.nuevasLicitaciones} nuevas`}
+                            value={stats.totalLicitaciones || 0}
+                            trend={`${stats.nuevasLicitaciones || 0} nuevas`}
                             icon={BarChart3}
                         />
                         <StatCard
                             label="Empresas"
-                            value={stats.totalEmpresas}
+                            value={stats.totalEmpresas || 0}
                             icon={Building2}
                             color="gray"
                         />
                         <StatCard
                             label="Contactos"
-                            value={stats.totalPersonas}
+                            value={stats.totalPersonas || 0}
                             icon={Users}
                             color="gray"
                         />
                         <StatCard
                             label="Ritmo Mensual"
-                            value={stats.nuevasLicitaciones}
+                            value={stats.nuevasLicitaciones || 0}
                             trend="Nuevos ingresos"
                             icon={Zap}
                             color="neon"
                         />
+                    </div>
+                </div>
+
+                {/* SECCIÓN 3: ALERTAS DE ATENCIÓN */}
+                <div className="mb-8">
+                    <h2 className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4 ml-1">
+                        Atención Requerida
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+                        {/* Aquí está la magia: Usamos un div con router.get en lugar de un Link */}
+                        <div
+                            onClick={() => router.get('/alertas-estancadas')}
+                            className="block transition-transform duration-300 hover:scale-105 hover:shadow-lg rounded-xl cursor-pointer"
+                        >
+                            <StatCard
+                                label="Licitaciones Estancadas"
+                                value={stats.alertas_vencidas}
+                                trend="Sin gestión comercial por más de 30 días"
+                                icon={OctagonAlert}
+                            />
+                        </div>
+
                     </div>
                 </div>
             </PageContainer>

@@ -73,6 +73,8 @@ Route::middleware(['auth'])->group(function () {
     // 2. Ruta para que el Layout mande el texto y la IA ejecute la acción proactiva
     Route::post('/licitaciones/comando-voz', [LicitacionController::class, 'comandoVoz'])
         ->name('licitaciones.comando-voz');
+    
+    Route::get('/alertas-estancadas', [App\Http\Controllers\LicitacionController::class, 'alertasIndex'])->name('alertas.index');
 
 // Rutas para Precalificaciones
     Route::get('/precalificaciones', [PrecalificacionController::class, 'index'])->name('precalificaciones.index');
