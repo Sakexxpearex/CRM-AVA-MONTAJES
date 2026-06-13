@@ -40,12 +40,10 @@ class LicitacionController extends Controller
             ->get();
 
         $estadosganadores = ['Adjudicada', 'Operativa'];
-        
-        $stats = [
-        
+              
         $stats = [
             'montoTotal'  => $todas->sum('monto_estimado'),
-            'activos'     => $todas->whereIn('estado_pipeline', [
+
             'activos'     => $todas->whereIn('estado_pipeline', [
                 'Preparación', 'Filtro', 'Presentada', 'Evaluación'
             ])->count(),
@@ -90,7 +88,6 @@ class LicitacionController extends Controller
 
     public function show($id)
     {
-    {
         $licitacion = Licitacion::with([
             'division.personas', 
             'empresa',
@@ -129,10 +126,6 @@ class LicitacionController extends Controller
         }
 
         $licitacion->update($validated);
-        $licitacion->update($validated);
-
-        return back()->with('message', 'Ficha técnica actualizada');
-    }
         return back()->with('message', 'Ficha técnica actualizada');
     }
 
@@ -153,8 +146,8 @@ class LicitacionController extends Controller
 
         return back();
     }
-        return back();
-    }
+  
+  
 
     public function adjudicar(Request $request, $id)
     {
@@ -191,9 +184,6 @@ class LicitacionController extends Controller
         try {
             $file = $request->file('audio');
             $apiKey = env('GROQ_API_KEY');
-        try {
-            $file = $request->file('audio');
-            $apiKey = env('GROQ_API_KEY');
 
             // 2. Intentar la conexión usando el Facade ya importado
             $response = Http::withToken($apiKey)
@@ -202,8 +192,6 @@ class LicitacionController extends Controller
                     'model'    => 'whisper-large-v3',
                     'language' => 'es',
                 ]);
-
-            return $response->json();
             return $response->json();
 
         } catch (\Exception $e) {
@@ -214,37 +202,29 @@ class LicitacionController extends Controller
             ], 500);
         }
     }
-
-    // 2. Ejecuta la acción (Cambiar estado o buscar)
-    public function comandoVoz(Request $request, CommandParserService $parser)
+public function comandoVoz(Request $request, CommandParserService $parser)
     {
-        // 1. Hablamos con la IA
         $comando = $parser->parseCommand($request->texto_hablado);
-        
-        // 2. Extraemos la intención de forma segura
+
         $intent = strtoupper($comando['intent'] ?? 'DESCONOCIDO');
         $nombre = $comando['nombre'] ?? 'vacio';
         $estado = $comando['estado'] ?? 'vacio';
 
-        // 3. Si la IA entendió que es cambiar estado...
         if ($intent === 'CAMBIAR_ESTADO') {
-            
-            // Nota: ILIKE es específico de PostgreSQL. Si usas MySQL en el futuro, cámbialo a LIKE
+
             $licitacion = Licitacion::where('nombre_proyecto', 'ILIKE', '%' . $nombre . '%')->first();
-            
+
             if ($licitacion) {
                 $licitacion->estado_pipeline = $estado;
-                
-                // Automatización
+
                 if (in_array($estado, ['Adjudicada', 'Operativa'])) {
                     $licitacion->monto_adjudicado = $licitacion->monto_estimado;
                     $licitacion->fecha_adjudicacion = now();
                 }
-                
+
                 $licitacion->save();
                 return back()->with('message', "✅ Éxito: {$nombre} ahora es {$estado}");
             } else {
-                // ERROR TIPO 1: La IA entendió, pero la Base de Datos no encontró el nombre
                 return back()->withErrors(['error' => "❌ La IA buscó el proyecto '{$nombre}', pero no existe en tu base de datos con ese nombre."]);
             }
         }
@@ -252,15 +232,10 @@ class LicitacionController extends Controller
         if ($intent === 'BUSCAR') {
             return redirect()->route('licitaciones.index', ['search' => $nombre ?? $comando['empresa']]);
         }
-        if ($intent === 'BUSCAR') {
-            return redirect()->route('licitaciones.index', ['search' => $nombre ?? $comando['empresa']]);
-        }
 
-        // ERROR TIPO 2: La IA devolvió algo raro o se mareó. Te mostramos qué diablos pensó Llama 3.
         $respuestaIA = json_encode($comando);
         return back()->withErrors(['error' => "🤖 La IA se confundió. Esto fue lo que intentó devolver: {$respuestaIA}"]);
     }
-
     public function alertas()
     {
         return Licitacion::with(['empresa', 'division'])
