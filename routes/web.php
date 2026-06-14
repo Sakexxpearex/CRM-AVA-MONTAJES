@@ -26,6 +26,7 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     // Dashboard principal
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/ocultar-alerta', [App\Http\Controllers\DashboardController::class, 'ocultarAlerta'])->name('dashboard.ocultar-alerta');
 
     // Modulo de empresas
     Route::resource('empresas', EmpresaController::class);

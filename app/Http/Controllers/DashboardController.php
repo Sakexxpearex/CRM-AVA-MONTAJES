@@ -43,28 +43,19 @@ class DashboardController extends Controller
             ->count();
         $tienePrecalificacionesEstancadas = false;
         $tieneLicitacionesEstancadas = $alertasVencidasCount > 0;
-        if (!session()->has('alerta_evaluada')) {
-            $mensajeAlerta = null;
+        $mensajeAlerta = null;
 
-            if ($tieneLicitacionesEstancadas && $tienePrecalificacionesEstancadas) {
-                $mensajeAlerta = "Tienes licitaciones y precalificaciones estancadas.";
-            } elseif ($tieneLicitacionesEstancadas) {
-                $mensajeAlerta = "Tienes licitaciones estancadas.";
-            } elseif ($tienePrecalificacionesEstancadas) {
-                $mensajeAlerta = "Tienes precalificaciones estancadas.";
-            }
-
-            if ($mensajeAlerta) {
-                // 'flash' dura solo para el próximo request
-                session()->flash('alerta_flash', $mensajeAlerta);
-            }
-
-            // Marcamos en la sesión permanente del usuario que ya evaluamos el login
-            session(['alerta_evaluada' => true]);
+        if ($tieneLicitacionesEstancadas && $tienePrecalificacionesEstancadas) {
+            $mensajeAlerta = "Tienes licitaciones y precalificaciones estancadas.";
+        } elseif ($tieneLicitacionesEstancadas) {
+            $mensajeAlerta = "Tienes licitaciones estancadas.";
+        } elseif ($tienePrecalificacionesEstancadas) {
+            $mensajeAlerta = "Tienes precalificaciones estancadas.";
         }
 
         return Inertia::render('dashboard', [
-            'stats' => [
+        'alertaDirecta' => !session()->has('ocultar_alerta') ? $mensajeAlerta : null,    
+        'stats' => [
                 // Métricas Operativas
                 'totalLicitaciones' => $totalLicitacionesActivas,
                 'nuevasLicitaciones' => $nuevasEsteMes,
@@ -79,5 +70,10 @@ class DashboardController extends Controller
                 'alertas_vencidas' => $alertasVencidasCount,
             ]
         ]);
+    }
+    public function ocultarAlerta()
+    {
+        session(['ocultar_alerta' => true]);
+        return back();
     }
 }

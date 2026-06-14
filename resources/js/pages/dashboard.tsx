@@ -17,17 +17,45 @@ import PageHeader from '@/components/pages/PageHeader';
 import StatCard from '@/components/dashboard/StatCard';
 import { useState, useEffect } from 'react';
 
-export default function Dashboard({ stats }: any) {
-    const { auth, flash } = usePage().props as any;
+// Declaramos las props que recibe el componente desde Laravel
+interface DashboardProps {
+    stats: {
+        volumen_total_formateado: string;
+        win_rate: number;
+        licitaciones_ganadas: number;
+        licitaciones_participadas: number;
+        totalLicitaciones: number;
+        nuevasLicitaciones: number;
+        totalEmpresas: number;
+        totalPersonas: number;
+        alertas_vencidas: number;
+    };
+    alertaDirecta: string | null; // <-- Recibimos la nueva prop limpia del backend
+}
+
+export default function Dashboard({ stats, alertaDirecta }: DashboardProps) {
+    const { auth } = usePage().props as any;
     const user = auth.user;
     const [verAlerta, setVerAlerta] = useState(false);
 
     useEffect(() => {
-        // Si el backend envió una alerta flash, activamos el componente visual
-        if (flash?.alerta_flash) {
+        // Reaccionamos de forma limpia al backend: si viene texto, abrimos la alerta
+        if (alertaDirecta) {
             setVerAlerta(true);
+        } else {
+            setVerAlerta(false);
         }
-    }, [flash]);
+    }, [alertaDirecta]);
+
+    const manejarCerrarAlerta = () => {
+        // 1. La ocultamos visualmente de inmediato para que sea instantáneo
+        setVerAlerta(false);
+
+        // 2. Le avisamos silenciosamente al backend para que guarde en la sesión que ya se cerró
+        router.post(route('dashboard.ocultar-alerta'), {}, {
+            preserveScroll: true,
+        });
+    };
 
     if (!stats) {
         return <div className="p-10 text-white font-mono text-xs">Error: No se recibieron estadísticas del servidor.</div>;
@@ -59,17 +87,21 @@ export default function Dashboard({ stats }: any) {
                     subtitle="Resumen de actividad, métricas y gestión comercial"
                     icon={LayoutDashboard}
                 />
+
+                {/* Banner de Alerta de Atención */}
                 {verAlerta && (
                     <div className="mb-6 flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 animate-pulse">
                         <div className="flex items-center gap-3">
                             <OctagonAlert className="w-5 h-5 flex-shrink-0" />
                             <div>
                                 <p className="text-xs font-black uppercase tracking-wider">Atención Inmediata</p>
-                                <p className="text-sm font-medium text-gray-200 mt-0.5">{flash.alerta_flash}</p>
+                                {/* Imprimimos directamente la variable controlada que nos envió el backend */}
+                                <p className="text-sm font-medium text-gray-200 mt-0.5">{alertaDirecta}</p>
                             </div>
                         </div>
+                        {/* AQUÍ QUEDÓ CONECTADO TU BOTÓN CON LA NUEVA FUNCIÓN */}
                         <button
-                            onClick={() => setVerAlerta(false)}
+                            onClick={manejarCerrarAlerta}
                             className="text-gray-400 hover:text-white text-xs font-bold px-2 py-1 rounded bg-black/20 hover:bg-black/40 transition-colors"
                         >
                             Cerrar
@@ -147,8 +179,6 @@ export default function Dashboard({ stats }: any) {
                         Atención Requerida
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-
-                        {/* Aquí está la magia: Usamos un div con router.get en lugar de un Link */}
                         <div
                             onClick={() => router.get('/alertas-estancadas')}
                             className="block transition-transform duration-300 hover:scale-105 hover:shadow-lg rounded-xl cursor-pointer"
@@ -159,9 +189,7 @@ export default function Dashboard({ stats }: any) {
                                 icon={OctagonAlert}
                             />
                         </div>
-
                     </div>
-
                 </div>
 
             </PageContainer>
