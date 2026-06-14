@@ -29,6 +29,7 @@ interface DashboardProps {
         totalEmpresas: number;
         totalPersonas: number;
         alertas_vencidas: number;
+        precalificaciones_vencidas: number;
     };
     alertaDirecta: string | null; // <-- Recibimos la nueva prop limpia del backend
 }
@@ -175,22 +176,47 @@ export default function Dashboard({ stats, alertaDirecta }: DashboardProps) {
 
                 {/* SECCIÓN 3: ALERTAS DE ATENCIÓN */}
                 <div className="mb-8">
-                    <h2 className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4 ml-1">
-                        Atención Requerida
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div
-                            onClick={() => router.get('/alertas-estancadas')}
-                            className="block transition-transform duration-300 hover:scale-105 hover:shadow-lg rounded-xl cursor-pointer"
-                        >
-                            <StatCard
-                                label="Licitaciones Estancadas"
-                                value={stats.alertas_vencidas}
-                                icon={OctagonAlert}
-                            />
+                    {(stats.alertas_vencidas > 0 || stats.precalificaciones_vencidas > 0) && (
+                        <div className="mb-8">
+                            <h2 className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4 ml-1">
+                                Atención Requerida
+                            </h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                                {/* Tarjeta de Licitaciones */}
+                                {stats.alertas_vencidas > 0 && (
+                                    <div
+                                        onClick={() => router.get('/alertas-estancadas')}
+                                        className="block transition-transform duration-300 hover:scale-105 hover:shadow-lg rounded-xl cursor-pointer border border-orange-500/30"
+                                    >
+                                        <StatCard
+                                            label="Licitaciones Estancadas"
+                                            value={stats.alertas_vencidas}
+                                            icon={OctagonAlert}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Tarjeta de Precalificaciones */}
+                                {stats.precalificaciones_vencidas > 0 && (
+                                    <div
+                                        onClick={() => router.get('/alertas-precalificaciones')}
+                                        className="block transition-transform duration-300 hover:scale-105 hover:shadow-lg rounded-xl cursor-pointer border border-orange-500/30"
+                                    >
+                                        <StatCard
+                                            label="Precalif. Estancadas"
+                                            value={stats.precalificaciones_vencidas}
+                                            icon={OctagonAlert}
+                                        />
+                                    </div>
+                                )}
+
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
+
 
             </PageContainer>
         </AuthenticatedLayout>

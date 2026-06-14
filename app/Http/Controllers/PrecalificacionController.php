@@ -118,7 +118,46 @@ class PrecalificacionController extends Controller
                 $licitacion->estado_pipeline = 'Evaluación'; 
                 $licitacion->save();
             }
+
         }
+        
         return redirect()->back()->with('message', 'Evaluación procesada con éxito y licitación añadida al pipeline.');
+    }
+    public function alertasIndex()
+    {
+        $alertas = Precalificacion::with([
+            'empresa',
+            'division',
+            'interacciones' => function ($query) {
+                $query->orderBy('fecha', 'desc')->with('persona');
+            }
+        ])
+  
+        ->enAlerta() 
+        ->get()
+        ->filter(function ($precalificacion) {
+
+            return $precalificacion->dias_retraso_alerta > 0;
+        })
+        ->map(function ($p) {
+            $ultima = $p->interacciones->first(); 
+            
+            return [
+                'id'                       => $p->id,
+                'nombre_proyecto'          => $p->nombre_precalificacion, 
+                'empresa'                  => $p->empresa->nombre ?? 'N/A',
+                'division'                 => $p->division->nombre ?? 'N/A',
+                'ultima_interaccion_fecha' => $ultima ? Carbon::parse($ultima->fecha)->format('d/m/Y') : 'Sin gestiones',
+                'ultima_interaccion_tipo'  => $ultima->tipo ?? 'N/A',
+                'ultima_interaccion_quien' => $ultima && $ultima->persona 
+                    ? $ultima->persona->nombre_1 . ' ' . $ultima->persona->apellido_1 
+                    : 'N/A',
+                'dias_retraso'             => $p->dias_retraso_alerta 
+            ];
+        });
+
+        return Inertia::render('alertas/PrecalificacionesIndex', [
+            'alertas' => $alertas
+        ]);
     }
 }

@@ -76,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('licitaciones.comando-voz');
     
     Route::get('/alertas-estancadas', [App\Http\Controllers\LicitacionController::class, 'alertasIndex'])->name('alertas.index');
+    Route::get('/alertas-precalificaciones', [PrecalificacionController::class, 'alertasIndex'])->name('alertas-precalificaciones');
 
 // Rutas para Precalificaciones
     Route::get('/precalificaciones', [PrecalificacionController::class, 'index'])->name('precalificaciones.index');

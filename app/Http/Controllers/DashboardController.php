@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Licitacion;
 use App\Models\Empresa;
 use App\Models\Persona;
+use App\Models\Precalificacion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -41,7 +42,10 @@ class DashboardController extends Controller
         $alertasVencidasCount = Licitacion::whereNotIn('estado_pipeline', ['Ganada', 'Adjudicada', 'Operativa', 'Perdida', 'Cerrada', 'Desierta'])
             ->enAlerta()
             ->count();
-        $tienePrecalificacionesEstancadas = false;
+        $alertasPrecalifCount = Precalificacion::where('estado', 'Pendiente')
+            ->enAlerta()
+            ->count();
+        $tienePrecalificacionesEstancadas = $alertasVencidasCount > 0;
         $tieneLicitacionesEstancadas = $alertasVencidasCount > 0;
         $mensajeAlerta = null;
 
@@ -68,6 +72,7 @@ class DashboardController extends Controller
                 'licitaciones_ganadas' => $totalGanadas,
                 'licitaciones_participadas' => $totalParticipadas,
                 'alertas_vencidas' => $alertasVencidasCount,
+                'precalificaciones_vencidas' => $alertasPrecalifCount,
             ]
         ]);
     }
