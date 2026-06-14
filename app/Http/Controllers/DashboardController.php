@@ -41,6 +41,27 @@ class DashboardController extends Controller
         $alertasVencidasCount = Licitacion::whereNotIn('estado_pipeline', ['Ganada', 'Adjudicada', 'Operativa', 'Perdida', 'Cerrada', 'Desierta'])
             ->enAlerta()
             ->count();
+        $tienePrecalificacionesEstancadas = false;
+        $tieneLicitacionesEstancadas = $alertasVencidasCount > 0;
+        if (!session()->has('alerta_evaluada')) {
+            $mensajeAlerta = null;
+
+            if ($tieneLicitacionesEstancadas && $tienePrecalificacionesEstancadas) {
+                $mensajeAlerta = "Tienes licitaciones y precalificaciones estancadas.";
+            } elseif ($tieneLicitacionesEstancadas) {
+                $mensajeAlerta = "Tienes licitaciones estancadas.";
+            } elseif ($tienePrecalificacionesEstancadas) {
+                $mensajeAlerta = "Tienes precalificaciones estancadas.";
+            }
+
+            if ($mensajeAlerta) {
+                // 'flash' dura solo para el próximo request
+                session()->flash('alerta_flash', $mensajeAlerta);
+            }
+
+            // Marcamos en la sesión permanente del usuario que ya evaluamos el login
+            session(['alerta_evaluada' => true]);
+        }
 
         return Inertia::render('dashboard', [
             'stats' => [

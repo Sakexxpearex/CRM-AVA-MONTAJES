@@ -136,7 +136,10 @@ Copie el archivo de plantilla  ```.env.example``` para crear el archivo de confi
 cp .env.example .env
 ```
 
->[!IMPORTANT] Modifique el archivo .env recién creado >para que las credenciales de conexión coincidan >exactamente con los parámetros del contenedor Postgres >dela empresa. (DB_HOST,DB_PORT,DB_USERNAME, DB_PASSWORD).
+>[!IMPORTANT] Modifique el archivo .env recién creado 
+>para que las credenciales de conexión coincidan 
+>exactamente con los parámetros del contenedor Postgres 
+>de la empresa. (DB_HOST,DB_PORT,DB_USERNAME, DB_PASSWORD).
  
 
 ### 3. Comandos de inicialización
@@ -153,4 +156,16 @@ Para la compilación de la interfaz (Tailwind CSS)
 ```bash
 npm install #Instala los paquetes de Node.js
 npm run build
+```
+
+Instalar
+
+```bash
+npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
+```
+Inicializar
+
+```bash
+npm run dev
+php artisan serve
 ```

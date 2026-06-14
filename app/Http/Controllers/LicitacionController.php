@@ -253,7 +253,6 @@ public function comandoVoz(Request $request, CommandParserService $parser)
         $alertas = Licitacion::with([
             'empresa',
             'division',
-            // Traemos las interacciones ordenadas de la más nueva a la más vieja, junto con la persona
             'interacciones' => function ($query) {
                 $query->orderBy('fecha', 'desc')->with('persona');
             }
@@ -277,13 +276,10 @@ public function comandoVoz(Request $request, CommandParserService $parser)
                 'ultima_interaccion_quien' => $ultima && $ultima->persona 
                     ? $ultima->persona->nombre_1 . ' ' . $ultima->persona->apellido_1 
                     : 'N/A',
-                // Usamos el atributo que ya habías creado en tu modelo
                 'dias_retraso'             => $licitacion->dias_retraso_alerta 
             ];
         });
 
-        // Asegúrate de que el componente Inertia 'alertas/index' coincida en mayúsculas/minúsculas 
-        // con tu archivo real (por ej: 'Alertas/Index' si usas Vue y convención PascalCase)
         return Inertia::render('alertas/index', [
             'alertas' => $alertas
         ]);

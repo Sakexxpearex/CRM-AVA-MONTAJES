@@ -15,10 +15,19 @@ import {
 import PageContainer from '@/components/pages/PageContainer';
 import PageHeader from '@/components/pages/PageHeader';
 import StatCard from '@/components/dashboard/StatCard';
+import { useState, useEffect } from 'react';
 
 export default function Dashboard({ stats }: any) {
-    const { auth } = usePage().props as any;
+    const { auth, flash } = usePage().props as any;
     const user = auth.user;
+    const [verAlerta, setVerAlerta] = useState(false);
+
+    useEffect(() => {
+        // Si el backend envió una alerta flash, activamos el componente visual
+        if (flash?.alerta_flash) {
+            setVerAlerta(true);
+        }
+    }, [flash]);
 
     if (!stats) {
         return <div className="p-10 text-white font-mono text-xs">Error: No se recibieron estadísticas del servidor.</div>;
@@ -50,6 +59,23 @@ export default function Dashboard({ stats }: any) {
                     subtitle="Resumen de actividad, métricas y gestión comercial"
                     icon={LayoutDashboard}
                 />
+                {verAlerta && (
+                    <div className="mb-6 flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 animate-pulse">
+                        <div className="flex items-center gap-3">
+                            <OctagonAlert className="w-5 h-5 flex-shrink-0" />
+                            <div>
+                                <p className="text-xs font-black uppercase tracking-wider">Atención Inmediata</p>
+                                <p className="text-sm font-medium text-gray-200 mt-0.5">{flash.alerta_flash}</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setVerAlerta(false)}
+                            className="text-gray-400 hover:text-white text-xs font-bold px-2 py-1 rounded bg-black/20 hover:bg-black/40 transition-colors"
+                        >
+                            Cerrar
+                        </button>
+                    </div>
+                )}
 
                 {/* SECCIÓN 1: RENDIMIENTO COMERCIAL */}
                 <div className="mb-8">
@@ -130,13 +156,14 @@ export default function Dashboard({ stats }: any) {
                             <StatCard
                                 label="Licitaciones Estancadas"
                                 value={stats.alertas_vencidas}
-                                trend="Sin gestión comercial por más de 30 días"
                                 icon={OctagonAlert}
                             />
                         </div>
 
                     </div>
+
                 </div>
+
             </PageContainer>
         </AuthenticatedLayout>
     );
