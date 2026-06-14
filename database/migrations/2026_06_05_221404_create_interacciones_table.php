@@ -13,6 +13,7 @@ return new class extends Migration
             
             // 1. ¿En qué contexto? (Licitación)
             $table->foreignId('licitacion_id')->constrained('licitaciones')->onDelete('cascade');
+            $table->foreignId('precalificacion_id')->nullable()->constrained('crm.precalificaciones')->onDelete('cascade');
             
             // 2. ¿Con quién del cliente? (Persona externa)
             $table->foreignId('persona_id')->constrained('personas')->onDelete('cascade');

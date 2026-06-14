@@ -36,7 +36,7 @@ class LicitacionesSeeder extends Seeder
             'division_id' => $chuquicamata->id,
             'nombre_proyecto' => 'Renovación Sistemas de Control DCH',
             'descripcion' => 'Reemplazo de tableros y sistemas SCADA en planta chancadora.',
-            'estado_pipeline' => 'Ganada',
+            'estado_pipeline' => 'Adjudicada',
             'monto_estimado' => 1500000.00,
             'fecha_cierre' => now()->subDays(10),
             'fecha_adjudicacion' => now()->subDays(2),

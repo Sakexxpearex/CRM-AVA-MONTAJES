@@ -38,7 +38,9 @@ class DashboardController extends Controller
         $winRate = $totalParticipadas > 0 
             ? round(($totalGanadas / $totalParticipadas) * 100, 1) 
             : 0;
-
+        $alertasVencidasCount = Licitacion::whereNotIn('estado_pipeline', ['Ganada', 'Adjudicada', 'Operativa', 'Perdida', 'Cerrada', 'Desierta'])
+            ->enAlerta()
+            ->count();
 
         return Inertia::render('dashboard', [
             'stats' => [
@@ -53,6 +55,7 @@ class DashboardController extends Controller
                 'win_rate' => $winRate,
                 'licitaciones_ganadas' => $totalGanadas,
                 'licitaciones_participadas' => $totalParticipadas,
+                'alertas_vencidas' => $alertasVencidasCount,
             ]
         ]);
     }

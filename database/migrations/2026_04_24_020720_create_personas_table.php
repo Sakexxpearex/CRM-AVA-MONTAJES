@@ -21,6 +21,10 @@ return new class extends Migration
             $table->string("apellido_1");
             $table->string("apellido_2");
             $table->foreignId('division_id')->constrained('crm.divisiones');
+
+            //como no se si el contacto debe estar siosi en ua division, cambie los datos del seeder, en caso
+            // de que no sea obligacion, este codigo de abajo deja ese atributo como nulleable
+            // $table->foreignId('division_id')->nullable()->constrained('crm.divisiones')->onDelete('set null');
             // Datos de contacto (nullable por si el gerente no los tiene a mano)
             $table->string('email')->nullable();
             $table->string('telefono')->nullable();
