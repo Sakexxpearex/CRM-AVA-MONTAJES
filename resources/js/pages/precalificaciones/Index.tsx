@@ -22,6 +22,9 @@ export default function Index({ precalificaciones, empresas, divisiones, persona
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [selectedPrecalificacion, setSelectedPrecalificacion] = useState<any | null>(null);
 
+    // Encontrar la versión fresca de la precalificación seleccionada desde las props reactivas de Inertia
+    const activePrecalificacion = precalificaciones.find(p => p.id === selectedPrecalificacion?.id) || selectedPrecalificacion;
+
     return (
         <AuthenticatedLayout>
             <Head title="Precalificaciones de Proyectos" />
@@ -46,9 +49,10 @@ export default function Index({ precalificaciones, empresas, divisiones, persona
             {/* Botón flotante para móviles */}
             <button
                 onClick={() => setIsCreateOpen(true)}
-                className="md:hidden fixed bottom-24 right-6 z-50 flex items-center justify-center bg-[#c1f75e] text-black w-10 h-10 rounded-full shadow-2xl active:scale-90 transition-transform"
+                className="md:hidden fixed bottom-24 right-6 z-50 flex items-center justify-center bg-[#c1f75e] text-black w-12 h-12 rounded-full shadow-2xl active:scale-95 transition-transform border border-black/10"
+                title="Nueva Propuesta"
             >
-                <Plus size={16} strokeWidth={3} />
+                <Plus size={18} strokeWidth={3} />
             </button>
 
             {/* Modal para Crear */}
@@ -60,9 +64,9 @@ export default function Index({ precalificaciones, empresas, divisiones, persona
                 personas={personas} 
             />
 
-            {/* Modal de detalle y aprobación */}
+            {/* Modal de detalle, bitácora y aprobación */}
             <PrecalificacionShowModal
-                precalificacion={selectedPrecalificacion}
+                precalificacion={activePrecalificacion}
                 onClose={() => setSelectedPrecalificacion(null)}
             />
         </AuthenticatedLayout>

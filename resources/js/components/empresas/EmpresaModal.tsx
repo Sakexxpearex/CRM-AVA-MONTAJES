@@ -20,7 +20,6 @@ interface Props {
   handleRutChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-
 export default function EmpresaModal({
   isOpen,
   onClose,
@@ -36,34 +35,26 @@ export default function EmpresaModal({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      ></div>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
 
-      <div className="relative bg-white dark:bg-[#111] w-full max-w-md rounded-2xl p-8 shadow-2xl border border-gray-100 dark:border-gray-800 animate-in zoom-in-95 duration-200">
+      {/* Controlamos la altura máxima del modal en móviles */}
+      <div className="relative bg-white dark:bg-[#111] w-full max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl p-5 md:p-8 shadow-2xl border border-gray-100 dark:border-gray-800 animate-in zoom-in-95 duration-200 style-scrollbar">
         
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-black uppercase tracking-tighter dark:text-white">
+          <h2 className="text-lg md:text-xl font-black uppercase tracking-tighter dark:text-white">
             {editingId ? 'Actualizar Empresa' : 'Nuevo Registro'}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-black dark:hover:text-white"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-black dark:hover:text-white p-1">
             <X size={20} />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={submit} className="space-y-5">
-          
+        <form onSubmit={submit} className="space-y-4 md:space-y-5">
           {/* RUT */}
           <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">
-              RUT Empresa
-            </label>
+            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">RUT Empresa</label>
             <input
               type="text"
               value={data.rut}
@@ -78,9 +69,7 @@ export default function EmpresaModal({
 
           {/* Nombre */}
           <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">
-              Nombre Comercial
-            </label>
+            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">Nombre Comercial</label>
             <input
               type="text"
               value={data.nombre}
@@ -93,9 +82,7 @@ export default function EmpresaModal({
 
           {/* Alias */}
           <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">
-              Alias
-            </label>
+            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">Alias</label>
             <input
               type="text"
               value={data.alias || ''}
@@ -107,12 +94,10 @@ export default function EmpresaModal({
 
           {/* Tipo */}
           <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">
-              Categoría
-            </label>
+            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block ml-1">Categoría</label>
             <select
               value={data.tipo}
-              onChange={(e) => setData('tipo', e.target.value)}
+              onChange={(e) => setData('tipo', e.target.value as any)}
               className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md py-3 px-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-[#C1F75E] transition-all"
             >
               <option value="Cliente">Cliente</option>
@@ -125,7 +110,7 @@ export default function EmpresaModal({
           <button
             type="submit"
             disabled={processing}
-            className="w-full bg-[#C1F75E] text-black font-black py-4 rounded-lg uppercase text-xs tracking-widest hover:brightness-95 transition-all flex items-center justify-center gap-2"
+            className="w-full bg-[#C1F75E] text-black font-black py-3.5 md:py-4 rounded-lg uppercase text-xs tracking-widest hover:brightness-95 transition-all flex items-center justify-center gap-2 mt-2"
           >
             {processing ? (
               <LoaderCircle className="animate-spin" size={16} />

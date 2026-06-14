@@ -29,8 +29,8 @@ export default function Dashboard({ stats }: any) {
             <Head title="Dashboard" />
 
             <PageContainer>
-                {/* Usuario esquina superior derecha */}
-                <div className="flex justify-end items-center gap-3 mb-6">
+                {/* Perfil: Justificado al centro en móvil para mejor ergonomía, a la derecha en escritorio */}
+                <div className="flex justify-center sm:justify-end items-center gap-3 mb-8 bg-gray-50 dark:bg-[#111] sm:bg-transparent dark:sm:bg-transparent p-3 sm:p-0 rounded-xl border border-gray-100 dark:border-gray-800 sm:border-0">
                     <div className="text-right">
                         <p className="text-sm font-bold dark:text-white leading-none">
                             {user.nombre_1} {user.apellido_1}
@@ -39,7 +39,7 @@ export default function Dashboard({ stats }: any) {
                             {user.email}
                         </p>
                     </div>
-                    <div className="w-9 h-9 bg-[#c1f75e] rounded flex items-center justify-center text-black font-black text-xs shadow-sm">
+                    <div className="w-9 h-9 bg-[#c1f75e] rounded flex items-center justify-center text-black font-black text-xs shadow-sm shrink-0">
                         {user.nombre_1[0]}{user.apellido_1[0]}
                     </div>
                 </div>
@@ -56,7 +56,8 @@ export default function Dashboard({ stats }: any) {
                     <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 ml-1">
                         Rendimiento Comercial
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Grilla fluida: 1 columna en móvil, 2 en tablets chicas, 3 en escritorio */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         <StatCard
                             label="Éxito Acumulado"
                             value={stats.volumen_total_formateado || '$0'}
@@ -71,13 +72,15 @@ export default function Dashboard({ stats }: any) {
                             icon={Target}
                             color="blue"
                         />
-                        <StatCard
-                            label="Proyectos Ganados"
-                            value={stats.licitaciones_ganadas || 0}
-                            trend={`De ${stats.licitaciones_participadas || 0} presentadas`}
-                            icon={Trophy}
-                            color="neon"
-                        />
+                        <div className="sm:col-span-2 lg:col-span-1"> {/* Hace que ocupe el ancho completo si queda sola */}
+                            <StatCard
+                                label="Proyectos Ganados"
+                                value={stats.licitaciones_ganadas || 0}
+                                trend={`De ${stats.licitaciones_participadas || 0} presentadas`}
+                                icon={Trophy}
+                                color="neon"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -86,7 +89,8 @@ export default function Dashboard({ stats }: any) {
                     <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 ml-1">
                         Gestión de Base de Datos
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {/* Grilla fluida: de 1 columna pasa a 2 y luego a 4 en pantallas grandes */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                         <StatCard
                             label="Licitaciones Activas"
                             value={stats.totalLicitaciones || 0}
@@ -120,12 +124,11 @@ export default function Dashboard({ stats }: any) {
                     <h2 className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4 ml-1">
                         Atención Requerida
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-
-                        {/* Aquí está la magia: Usamos un div con router.get en lugar de un Link */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                        {/* Optimizamos el contenedor interactivo para comportamiento táctil (active:scale-98 en móvil) */}
                         <div
                             onClick={() => router.get('/alertas-estancadas')}
-                            className="block transition-transform duration-300 hover:scale-105 hover:shadow-lg rounded-xl cursor-pointer"
+                            className="block transition-all duration-200 lg:hover:scale-[1.02] lg:hover:shadow-md active:scale-95 rounded-2xl cursor-pointer"
                         >
                             <StatCard
                                 label="Licitaciones Estancadas"
@@ -134,7 +137,6 @@ export default function Dashboard({ stats }: any) {
                                 icon={OctagonAlert}
                             />
                         </div>
-
                     </div>
                 </div>
             </PageContainer>

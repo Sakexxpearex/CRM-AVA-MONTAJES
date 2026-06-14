@@ -27,7 +27,7 @@ export default function PrecalificacionesTable({ precalificaciones, onSelectRow 
     return (
         <div className="w-full">
             
-            {/* Mobile */}
+            {/* VISTA MOBILE: Tarjetas (Se mantiene intacta y adaptada) */}
             <div className="block md:hidden space-y-3 px-1">
                 {precalificaciones.map((item) => (
                     <div 
@@ -46,7 +46,7 @@ export default function PrecalificacionesTable({ precalificaciones, onSelectRow 
                             </span>
                         </div>
 
-                        {/* Footer*/}
+                        {/* Footer */}
                         <div className="flex items-center justify-between pt-3 border-t border-gray-50 dark:border-gray-800/60">
                             <div className="flex flex-col">
                                 <span className="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-1 mb-0.5">
@@ -69,7 +69,7 @@ export default function PrecalificacionesTable({ precalificaciones, onSelectRow 
                 ))}
             </div>
 
-            {/* Desktop */}
+            {/* VISTA PC: Tabla tradicional con los ajustes estéticos de la app */}
             <div className="hidden md:block overflow-x-auto w-full">
                 <table className="w-full text-left border-collapse">
                     <thead>
@@ -84,27 +84,30 @@ export default function PrecalificacionesTable({ precalificaciones, onSelectRow 
                             <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                                 <td className="px-6 py-4">
                                     <div className="flex flex-col">
-                                        <span className="font-bold text-sm text-gray-800 dark:text-gray-200 uppercase leading-tight group-hover:text-[#c1f75e] transition-colors">
+                                        {/* Título en mayúscula y con hover a color de la marca */}
+                                        <span className="font-black text-sm text-gray-800 dark:text-gray-200 uppercase tracking-tight leading-tight group-hover:text-[#c1f75e] transition-colors">
                                             {item.nombre_precalificacion}
                                         </span>
-                                        <span className="text-[10px] text-gray-500 font-bold uppercase mt-1 flex items-center gap-1">
-                                            <Building2 size={10} /> {item.empresa?.nombre || 'S/N'} 
+                                        <span className="text-[10px] text-gray-500 font-black uppercase mt-1 flex items-center gap-1.5 tracking-wider">
+                                            <Building2 size={11} className="text-gray-400 dark:text-gray-600" /> 
+                                            {item.empresa?.nombre || 'S/N'} 
                                             {item.division?.nombre && ` — ${item.division.nombre}`}
                                         </span>
                                     </div>
                                 </td>
 
-                                <td className="px-6 py-4 text-center font-mono text-xs font-bold dark:text-gray-300">
+                                <td className="px-6 py-4 text-center font-mono text-xs font-black dark:text-gray-300">
                                     {formatCurrency(item.monto_estimated ?? item.monto_estimado)}
                                 </td>
 
                                 <td className="px-6 py-4 text-right">
                                     <button
                                         onClick={() => onSelectRow(item)}
-                                        className="inline-flex items-center gap-2 p-2 text-gray-400 hover:text-[#c1f75e] transition-colors"
+                                        className="inline-flex items-center gap-2 px-3 py-1.5 text-gray-400 hover:text-black hover:bg-[#c1f75e] border border-transparent hover:border-gray-800 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all"
                                         title="Evaluar Propuesta"
                                     >
-                                        <Eye size={18} />
+                                        <Eye size={14} />
+                                        <span>Evaluar</span>
                                     </button>
                                 </td>
                             </tr>

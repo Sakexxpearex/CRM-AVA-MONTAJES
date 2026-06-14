@@ -18,7 +18,7 @@ class PrecalificacionController extends Controller
     public function index(Request $request)
     {
         // Traemos las precalificaciones filtrando SOLO las 'Pendiente'
-        $precalificaciones = Precalificacion::with(['empresa', 'division', 'persona'])
+        $precalificaciones = Precalificacion::with(['empresa', 'division', 'persona','interacciones.user'])
             ->where('estado', 'Pendiente') 
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->where('nombre_precalificacion', 'ILIKE', '%' . $request->string('search')->trim() . '%');
@@ -66,7 +66,8 @@ class PrecalificacionController extends Controller
             'empresa',
             'division',
             'persona',
-            'interacciones.persona' // Historial de notas de terreno vinculadas
+            'interacciones.persona', // Historial de notas de terreno vinculadas
+            'interacciones.user'
         ])->findOrFail($id);
 
         return Inertia::render('precalificaciones/Show', [
