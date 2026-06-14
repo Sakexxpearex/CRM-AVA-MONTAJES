@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('precalificacion_id')->nullable()->constrained('crm.precalificaciones')->onDelete('cascade');
             
             // 2. ¿Con quién del cliente? (Persona externa)
-            $table->foreignId('persona_id')->constrained('personas')->onDelete('cascade');
+            $table->foreignId('persona_id')->nullable()->constrained('personas')->onDelete('cascade');
             
             // 3. ¿Quién de AVA hizo la gestión? (Usuario interno de la tabla de los profes)
             // Aquí referenciamos el esquema 'usuarios' y la tabla 'users'
