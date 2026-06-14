@@ -1,9 +1,9 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
-import { Building2, MapPin, Globe, Phone, Mail, Plus, Edit3, Trash2, Users, Layers, Hash, Tag, ChevronLeft, } from 'lucide-react';
+import { Building2, Hash, Tag, ChevronLeft, Layers, Plus, Edit3, Trash2, Users, Briefcase, ExternalLink } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
-// Componentes de pagina (para mantener todo igual)
+// Componentes de pagina
 import PageContainer from '@/components/pages/PageContainer';
 import PageHeader from '@/components/pages/PageHeader';
 import ContentPanel from '@/components/pages/ContentPanel';
@@ -13,12 +13,17 @@ import EmpresaModal from '@/components/empresas/EmpresaModal';
 import DivisionModal from '@/components/empresas/DivisionModal';
 import { formatRut } from '@/utils/formatters';
 
+interface InfoItemProps {
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    label: string;
+    value: string | number | null | undefined;
+}
+
 export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDivisionModalOpen, setIsDivisionModalOpen] = useState(false);
     const [editingDivision, setEditingDivision] = useState<any>(null);
     const [selectedDivisionId, setSelectedDivisionId] = useState<number | null>(null);
-
 
     const { data: empData, setData: setEmpData, put: putEmpresa, processing: processingEmp, errors: errorsEmp } = useForm({
         nombre: empresa.nombre || '',
@@ -36,7 +41,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
     const filteredContactos = useMemo(() => {
         if (!selectedDivisionId) return contactos;
         return contactos.filter((c: any) =>
-            c.divisiones.some((d: any) => d.id === selectedDivisionId)
+            c.divisiones?.some((d: any) => d.id === selectedDivisionId)
         );
     }, [selectedDivisionId, contactos]);
 
@@ -55,7 +60,6 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
         e.preventDefault();
 
         if (editingDivision) {
-            // Actualizar
             putDivision(route('divisiones.update', editingDivision.id), {
                 onSuccess: () => {
                     setIsDivisionModalOpen(false);
@@ -64,7 +68,6 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                 },
             });
         } else {
-            // Crear
             postDivision(route('divisiones.store'), {
                 onSuccess: () => {
                     setIsDivisionModalOpen(false);
@@ -75,7 +78,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
     };
 
     const deleteDivision = (e: React.MouseEvent, id: number) => {
-        e.stopPropagation(); // Evita que se active el filtro al querer borrar
+        e.stopPropagation();
         if (confirm('¿Estás seguro de eliminar esta división?')) {
             router.delete(route('divisiones.destroy', id));
         }
@@ -85,7 +88,6 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
         e.stopPropagation();
         setEditingDivision(div);
 
-        // Cargamos los datos de la división en el formulario
         setDivData({
             nombre: div.nombre,
             alias: div.alias || '',
@@ -107,6 +109,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                 >
                     <ChevronLeft size={14} strokeWidth={3} /> Volver al Directorio
                 </Link>
+
                 {/* Header */}
                 <PageHeader
                     title={empresa.nombre}
@@ -116,8 +119,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-                    {/* Información basica */}
+                    {/* Información básica */}
                     <div className="lg:col-span-4 space-y-6">
                         <ContentPanel title="Identificación Comercial">
                             <div className="space-y-4">
@@ -143,7 +145,6 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
                     {/* Divisiones y gestión */}
                     <div className="lg:col-span-8 space-y-8">
-
                         {/* Divisiones (clientes) */}
                         {empresa.tipo === 'Cliente' && (
                             <section>
@@ -169,8 +170,9 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                         <div
                                             key={div.id}
                                             onClick={() => setSelectedDivisionId(selectedDivisionId === div.id ? null : div.id)}
-                                            className={`p-4 border rounded-xl cursor-pointer transition-all group ${selectedDivisionId === div.id ? 'border-[#c1f75e] bg-[#c1f75e]/5' : 'border-gray-800 hover:border-gray-700'
-                                                }`}
+                                            className={`p-4 border rounded-xl cursor-pointer transition-all group ${
+                                                selectedDivisionId === div.id ? 'border-[#c1f75e] bg-[#c1f75e]/5' : 'border-gray-800 hover:border-gray-700'
+                                            }`}
                                         >
                                             <div className="flex justify-between items-start">
                                                 <div>
@@ -188,7 +190,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                             </section>
                         )}
 
-                        {/* Contactos asociados */}
+                        {/* Contactos asociados (Convertidos a Tarjetas) */}
                         <section>
                             <div className="flex items-center gap-2 mb-4">
                                 <Users size={18} className="text-[#c1f75e]" />
@@ -196,32 +198,50 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                     Personal Clave {selectedDivisionId && <span className="text-[#c1f75e] lowercase text-[10px] opacity-60">(Filtrado)</span>}
                                 </h3>
                             </div>
-                            <ContentPanel padding={false}>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left">
-                                        <thead className="bg-gray-50 dark:bg-black/20 text-[9px] font-black uppercase text-gray-500 tracking-widest">
-                                            <tr>
-                                                <th className="px-6 py-3">Nombre</th>
-                                                <th className="px-6 py-3">División</th>
-                                                <th className="px-6 py-3">Cargo</th>
-                                                <th className="px-6 py-3 text-right">Acción</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                                            {filteredContactos.map((c: any) => (
-                                                <tr key={c.id} className="hover:bg-white/5 transition-colors group">
-                                                    <td className="px-6 py-4 text-xs font-bold dark:text-gray-200 uppercase">{c.nombre_1} {c.apellido_1}</td>
-                                                    <td className="px-6 py-4 text-[10px] text-gray-500 uppercase">{c.divisiones?.[0]?.nombre || '---'}</td>
-                                                    <td className="px-6 py-4 text-[10px] text-gray-500 uppercase italic">{c.divisiones?.[0]?.pivot?.cargo || '---'}</td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        <Link href={route('personas.show', c.id)} className="text-[#c1f75e] opacity-0 group-hover:opacity-100 transition-all font-black text-[9px] uppercase">Ver Ficha</Link>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+
+                            {filteredContactos.length === 0 ? (
+                                <div className="p-8 text-center border border-dashed border-gray-800 rounded-2xl text-gray-500 text-xs uppercase font-medium">
+                                    No hay personal clave asociado a esta selección
                                 </div>
-                            </ContentPanel>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {filteredContactos.map((c: any) => (
+                                        <div 
+                                            key={c.id} 
+                                            className="p-4 border border-gray-800 dark:bg-black/10 rounded-xl transition-all hover:border-gray-700 group flex flex-col justify-between"
+                                        >
+                                            <div>
+                                                {/* Nombre */}
+                                                <h4 className="text-xs font-black dark:text-gray-200 uppercase tracking-wide">
+                                                    {c.nombre_1} {c.apellido_1}
+                                                </h4>
+                                                
+                                                {/* Metadata del Contacto */}
+                                                <div className="mt-3 space-y-1.5">
+                                                    <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase font-medium">
+                                                        <Layers size={12} className="text-[#c1f75e]/70" />
+                                                        <span>División: {c.divisiones?.[0]?.nombre || '---'}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase font-medium italic">
+                                                        <Briefcase size={12} className="text-[#c1f75e]/70" />
+                                                        <span>Cargo: {c.divisiones?.[0]?.pivot?.cargo || '---'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Acción */}
+                                            <div className="mt-4 pt-3 border-t border-gray-900 flex justify-end">
+                                                <Link 
+                                                    href={route('personas.show', c.id)} 
+                                                    className="inline-flex items-center gap-1 text-[#c1f75e] opacity-80 group-hover:opacity-100 transition-all font-black text-[9px] uppercase tracking-wider"
+                                                >
+                                                    Ver Ficha <ExternalLink size={10} />
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </section>
                     </div>
                 </div>
@@ -260,7 +280,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 }
 
 // Componente auxiliar para ítems de información
-function InfoItem({ icon: Icon, label, value }: any) {
+function InfoItem({ icon: Icon, label, value }: InfoItemProps) {
     if (!value) return null;
     return (
         <div className="flex gap-3 items-start">
