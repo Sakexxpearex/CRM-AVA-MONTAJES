@@ -26,12 +26,14 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
 const handleVoiceTranscription = (text: string) => {
     console.log("Comando recibido:", text);
     
-    // Enviamos el texto al controlador para que el Servicio lo procese
+    
     router.post(route('licitaciones.comando-voz'), {
         texto_hablado: text
     }, {
         preserveScroll: true,
-        onError: (err) => alert("Error: " + err.error)
+        onError: (err) => {
+            console.log("Error recibido del backend", err);
+        }
     });
 };
 

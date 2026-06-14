@@ -188,7 +188,7 @@ public function updatePipeline(Request $request, Licitacion $licitacion)
         return $response->json();
 
     } catch (\Exception $e) {
-        // ESTO va a hacer que el error 500 se convierta en un mensaje de texto
+        
         return response()->json([
             'error_real' => $e->getMessage(),
             'donde' => $e->getFile() . ' linea ' . $e->getLine()
@@ -199,7 +199,7 @@ public function updatePipeline(Request $request, Licitacion $licitacion)
 
 public function comandoVoz(Request $request, CommandParserService $parser)
 {
-    // 1. Hablamos con el "Cerebro" (Llama 3)
+    // 1. Hablamos con Llama 3
     $comando = $parser->parseCommand($request->texto_hablado);
     
     // 2. Extraemos la intención y las variables de forma segura
@@ -217,7 +217,7 @@ public function comandoVoz(Request $request, CommandParserService $parser)
     $criterio   = $comando['criterio'] ?? null;
     $competidor = $comando['empresa_competidora'] ?? null;
 
-    // --- 🔎 BÚSQUEDA UNIVERSAL DE LA LICITACIÓN ---
+    // BÚSQUEDA DE LA LICITACIÓN 
     // (La sacamos del if para que sirva tanto para cambiar estado como para la bitácora)
     $licitacion = null;
     $busquedaRealizada = ''; 
@@ -241,7 +241,7 @@ public function comandoVoz(Request $request, CommandParserService $parser)
     // ----------------------------------------------
 
 
-    // 3. ESCENARIO: CAMBIAR ESTADO (Tu código intacto)
+    // 3. ESCENARIO: CAMBIAR ESTADO 
     if ($intent === 'CAMBIAR_ESTADO') {
         if ($licitacion) {
             $licitacion->estado_pipeline = $estado;
@@ -378,7 +378,7 @@ public function comandoVoz(Request $request, CommandParserService $parser)
 
             return back()->with('message', " Competencia registrada: {$empresa->nombre} asociada a {$licitacion->nombre_proyecto}");
         }
-        return back()->withErrors(['error' => "❌ No encontré el proyecto '{$busquedaRealizada}' para registrar la competencia."]);
+        return back()->withErrors(['error' => " No encontré el proyecto '{$busquedaRealizada}' para registrar la competencia."]);
     }
     
     // 6. ESCENARIO: BUSCAR / FILTRAR (Tu código intacto)
