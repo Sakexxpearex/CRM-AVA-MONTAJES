@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage , router} from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 import { 
     LayoutDashboard, Building2, FileSpreadsheet, 
     Users, Calendar, Moon, Sun, LogOut, Menu,
-    Briefcase // Importamos este para Proyectos
+    ClipboardCheck 
 } from 'lucide-react';
 import VoiceButton from '@/components/voice-button';
 import GlobalToast from '@/components/GlobalToast';
@@ -40,7 +40,6 @@ const handleVoiceTranscription = (text: string) => {
 
 
     return (
-        
         <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300 overflow-hidden">
             
             {/* Navegación mobile*/}
@@ -78,6 +77,7 @@ const handleVoiceTranscription = (text: string) => {
                     
                     <NavLink href={route('dashboard')} icon={<LayoutDashboard size={20}/>} label="Inicio" active={route().current('dashboard')} />
                     
+                    {/* Navegacion empresas */}
                     <NavLink 
                         href={route('empresas.index')} 
                         icon={<Building2 size={18}/>} 
@@ -85,6 +85,15 @@ const handleVoiceTranscription = (text: string) => {
                         active={route().current('empresas.*')} 
                     />
 
+                    {/* Navegacion precalificaciones */}
+                    <NavLink 
+                        href={route('precalificaciones.index')}  
+                        icon={<ClipboardCheck size={18}/>} 
+                        label="Precalificaciones" 
+                        active={route().current('precalificaciones.*')}
+                    />
+
+                    {/* Navegacion licitaciones */}
                     <NavLink 
                         href={route('licitaciones.index')}  
                         icon={<FileSpreadsheet size={18}/>} 
@@ -92,14 +101,7 @@ const handleVoiceTranscription = (text: string) => {
                         active={route().current('licitaciones.*')}
                     />
 
-                    {/* BOTÓN PROYECTOS (Desktop) */}
-                    <NavLink 
-                        href={route('proyectos.index')}  
-                        icon={<Briefcase size={18}/>} 
-                        label="Proyectos" 
-                        active={route().current('proyectos.*')}
-                    />
-
+                    {/* Navegacion contactos */}
                     <NavLink 
                         href={route('personas.index')} 
                         icon={<Users size={18}/>} 
@@ -141,18 +143,17 @@ const handleVoiceTranscription = (text: string) => {
                 />
 
                 <MobileNavLink 
+                    href={route('precalificaciones.index')} 
+                    icon={<ClipboardCheck size={22}/>} 
+                    label="Precalif." 
+                    active={route().current('precalificaciones.*')} 
+                />
+
+                <MobileNavLink 
                     href={route('licitaciones.index')} 
                     icon={<FileSpreadsheet size={22}/>} 
                     label="Licitaciones" 
                     active={route().current('licitaciones.*')} 
-                />
-
-                {/* BOTÓN PROYECTOS (Mobile) */}
-                <MobileNavLink 
-                    href={route('proyectos.index')} 
-                    icon={<Briefcase size={22}/>} 
-                    label="Proyectos" 
-                    active={route().current('proyectos.*')} 
                 />
 
                 <MobileNavLink 

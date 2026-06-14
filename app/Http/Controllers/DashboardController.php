@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Licitacion;
 use App\Models\Empresa;
 use App\Models\Persona;
+use App\Models\Precalificacion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -38,10 +39,27 @@ class DashboardController extends Controller
         $winRate = $totalParticipadas > 0 
             ? round(($totalGanadas / $totalParticipadas) * 100, 1) 
             : 0;
+        $alertasVencidasCount = Licitacion::whereNotIn('estado_pipeline', ['Ganada', 'Adjudicada', 'Operativa', 'Perdida', 'Cerrada', 'Desierta'])
+            ->enAlerta()
+            ->count();
+        $alertasPrecalifCount = Precalificacion::where('estado', 'Pendiente')
+            ->enAlerta()
+            ->count();
+        $tienePrecalificacionesEstancadas = $alertasVencidasCount > 0;
+        $tieneLicitacionesEstancadas = $alertasVencidasCount > 0;
+        $mensajeAlerta = null;
 
+        if ($tieneLicitacionesEstancadas && $tienePrecalificacionesEstancadas) {
+            $mensajeAlerta = "Tienes licitaciones y precalificaciones estancadas.";
+        } elseif ($tieneLicitacionesEstancadas) {
+            $mensajeAlerta = "Tienes licitaciones estancadas.";
+        } elseif ($tienePrecalificacionesEstancadas) {
+            $mensajeAlerta = "Tienes precalificaciones estancadas.";
+        }
 
         return Inertia::render('dashboard', [
-            'stats' => [
+        'alertaDirecta' => !session()->has('ocultar_alerta') ? $mensajeAlerta : null,    
+        'stats' => [
                 // Métricas Operativas
                 'totalLicitaciones' => $totalLicitacionesActivas,
                 'nuevasLicitaciones' => $nuevasEsteMes,
@@ -53,7 +71,14 @@ class DashboardController extends Controller
                 'win_rate' => $winRate,
                 'licitaciones_ganadas' => $totalGanadas,
                 'licitaciones_participadas' => $totalParticipadas,
+                'alertas_vencidas' => $alertasVencidasCount,
+                'precalificaciones_vencidas' => $alertasPrecalifCount,
             ]
         ]);
+    }
+    public function ocultarAlerta()
+    {
+        session(['ocultar_alerta' => true]);
+        return back();
     }
 }

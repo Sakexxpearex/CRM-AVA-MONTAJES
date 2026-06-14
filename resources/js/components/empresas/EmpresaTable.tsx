@@ -1,13 +1,12 @@
-import { Building2, Briefcase, FileText, Users, Trash2, Edit3,LayoutGrid, Eye } from 'lucide-react';
+import { Building2, Briefcase, FileText, Users, Trash2, Edit3, LayoutGrid, Eye } from 'lucide-react';
 import { Empresa } from '@/types/empresa';
 import { formatRut } from '@/utils/formatters';
 import { Link } from '@inertiajs/react';
 
-
 const tipoConfig = {
-    Cliente: { icon: FileText, color: 'text-green-600', bgColor: 'bg-green-50' },
-    Competencia: { icon: Briefcase, color: 'text-red-600', bgColor: 'bg-red-50' },
-    Subcontratista: { icon: Users, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+    Cliente: { icon: FileText, color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-50 dark:bg-green-950/20' },
+    Competencia: { icon: Briefcase, color: 'text-red-600 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-950/20' },
+    Subcontratista: { icon: Users, color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-50 dark:bg-blue-950/20' },
 };
 
 interface Props {
@@ -19,46 +18,64 @@ interface Props {
 export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
     return (
         <div className="w-full">
-            {/* Vista mobile */}
+            {/* Vista mobile (Optimizado) */}
             <div className="md:hidden divide-y divide-gray-100 dark:divide-gray-800">
                 {empresas.length > 0 ? (
                     empresas.map((empresa) => {
                         const config = tipoConfig[empresa.tipo] || tipoConfig.Cliente;
                         return (
-                            <div key={empresa.id} className="p-5 space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <Link href={route('empresas.show', empresa.id)} className="flex items-center gap-3"></Link>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-gray-900 text-[#C1F75E] rounded flex items-center justify-center border border-gray-700">
-                                            <Building2 size={20} />
+                            <div key={empresa.id} className="p-4 space-y-3.5 bg-white dark:bg-[#111]">
+                                {/* Bloque de información principal clicable */}
+                                <div className="flex items-start justify-between gap-2">
+                                    <Link 
+                                        href={route('empresas.show', empresa.id)} 
+                                        className="flex gap-3 items-center min-w-0 flex-1"
+                                    >
+                                        <div className="w-10 h-10 bg-gray-900 text-[#C1F75E] rounded-xl flex items-center justify-center border border-gray-800 shrink-0">
+                                            <Building2 size={18} />
                                         </div>
-                                        <div>
-                                            <h3 className="font-bold text-sm text-gray-900 dark:text-white uppercase leading-tight">
+                                        <div className="min-w-0">
+                                            <h3 className="font-bold text-sm text-gray-900 dark:text-white uppercase leading-tight truncate">
                                                 {empresa.nombre}
                                             </h3>
-                                            <span className="text-[9px] text-gray-500 font-bold uppercase flex items-center gap-1">
-                                                <LayoutGrid size={10} className="text-[#c1f75e]" /> 
-                                                {empresa.divisiones?.length || 0} Divisiones registradas
-                                            </span>
-                                            <p className="text-[10px] font-mono text-gray-500 mt-0.5 italic">{formatRut(empresa.rut)}</p>
+                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
+                                                <span className="text-[10px] text-gray-400 font-mono tracking-tight shrink-0">
+                                                    {formatRut(empresa.rut)}
+                                                </span>
+                                                <span className="text-gray-300 dark:text-gray-700 hidden sm:inline">•</span>
+                                                <span className="text-[9px] text-gray-500 font-bold uppercase flex items-center gap-1 shrink-0">
+                                                    <LayoutGrid size={10} className="text-[#c1f75e]" /> 
+                                                    {empresa.divisiones?.length || 0} Div.
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${config.bgColor} ${config.color} dark:bg-opacity-10`}>
+                                    </Link>
+                                    
+                                    {/* Categoría */}
+                                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shrink-0 ${config.bgColor} ${config.color}`}>
                                         {empresa.tipo}
                                     </span>
                                 </div>
-                                <div className="flex gap-2">
+
+                                {/* Botones de acción móviles estilizados */}
+                                <div className="flex gap-2 pt-1 border-t border-gray-50 dark:border-gray-800/40">
+                                    <Link
+                                        href={route('empresas.show', empresa.id)}
+                                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-gray-800/50 rounded-lg text-[10px] font-black uppercase text-gray-600 dark:text-gray-400"
+                                    >
+                                        <Eye size={13} /> Ver
+                                    </Link>
                                     <button 
                                         onClick={() => onEdit(empresa)}
-                                        className="flex-1 flex items-center justify-center gap-2 py-2 bg-gray-50 dark:bg-white/5 rounded text-[10px] font-black uppercase text-gray-600 dark:text-gray-400"
+                                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-gray-800/50 rounded-lg text-[10px] font-black uppercase text-gray-600 dark:text-gray-400"
                                     >
-                                        <Edit3 size={14} /> Editar
+                                        <Edit3 size={13} /> Editar
                                     </button>
                                     <button 
                                         onClick={() => onDelete(empresa.id)}
-                                        className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-50 dark:bg-red-500/10 rounded text-[10px] font-black uppercase text-red-600"
+                                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 dark:bg-red-500/10 rounded-lg text-[10px] font-black uppercase text-red-600"
                                     >
-                                        <Trash2 size={14} /> Eliminar
+                                        <Trash2 size={13} /> Borrar
                                     </button>
                                 </div>
                             </div>
@@ -71,7 +88,7 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                 )}
             </div>
 
-            {/* Vista pc */}
+            {/* Vista PC (Intacta, se visualiza excelente) */}
             <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
@@ -98,12 +115,11 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                                             >
                                                 {empresa.nombre}
                                             </Link>
-                                            {/* este no se si eliminarlo o ñau*/}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center font-mono text-xs text-gray-500 italic uppercase">{formatRut(empresa.rut)}</td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-black uppercase ${config.bgColor} ${config.color} dark:bg-opacity-10`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-black uppercase ${config.bgColor} ${config.color}`}>
                                             <config.icon size={12} strokeWidth={3} /> {empresa.tipo}
                                         </span>
                                     </td>
