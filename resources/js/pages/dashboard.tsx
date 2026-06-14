@@ -15,10 +15,48 @@ import {
 import PageContainer from '@/components/pages/PageContainer';
 import PageHeader from '@/components/pages/PageHeader';
 import StatCard from '@/components/dashboard/StatCard';
+import { useState, useEffect } from 'react';
 
-export default function Dashboard({ stats }: any) {
+// Declaramos las props que recibe el componente desde Laravel
+interface DashboardProps {
+    stats: {
+        volumen_total_formateado: string;
+        win_rate: number;
+        licitaciones_ganadas: number;
+        licitaciones_participadas: number;
+        totalLicitaciones: number;
+        nuevasLicitaciones: number;
+        totalEmpresas: number;
+        totalPersonas: number;
+        alertas_vencidas: number;
+        precalificaciones_vencidas: number;
+    };
+    alertaDirecta: string | null; // <-- Recibimos la nueva prop limpia del backend
+}
+
+export default function Dashboard({ stats, alertaDirecta }: DashboardProps) {
     const { auth } = usePage().props as any;
     const user = auth.user;
+    const [verAlerta, setVerAlerta] = useState(false);
+
+    useEffect(() => {
+        // Reaccionamos de forma limpia al backend: si viene texto, abrimos la alerta
+        if (alertaDirecta) {
+            setVerAlerta(true);
+        } else {
+            setVerAlerta(false);
+        }
+    }, [alertaDirecta]);
+
+    const manejarCerrarAlerta = () => {
+        // 1. La ocultamos visualmente de inmediato para que sea instantáneo
+        setVerAlerta(false);
+
+        // 2. Le avisamos silenciosamente al backend para que guarde en la sesión que ya se cerró
+        router.post(route('dashboard.ocultar-alerta'), {}, {
+            preserveScroll: true,
+        });
+    };
 
     if (!stats) {
         return <div className="p-10 text-white font-mono text-xs">Error: No se recibieron estadísticas del servidor.</div>;
@@ -50,6 +88,27 @@ export default function Dashboard({ stats }: any) {
                     subtitle="Resumen de actividad, métricas y gestión comercial"
                     icon={LayoutDashboard}
                 />
+
+                {/* Banner de Alerta de Atención */}
+                {verAlerta && (
+                    <div className="mb-6 flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 animate-pulse">
+                        <div className="flex items-center gap-3">
+                            <OctagonAlert className="w-5 h-5 flex-shrink-0" />
+                            <div>
+                                <p className="text-xs font-black uppercase tracking-wider">Atención Inmediata</p>
+                                {/* Imprimimos directamente la variable controlada que nos envió el backend */}
+                                <p className="text-sm font-medium text-gray-200 mt-0.5">{alertaDirecta}</p>
+                            </div>
+                        </div>
+                        {/* AQUÍ QUEDÓ CONECTADO TU BOTÓN CON LA NUEVA FUNCIÓN */}
+                        <button
+                            onClick={manejarCerrarAlerta}
+                            className="text-gray-400 hover:text-white text-xs font-bold px-2 py-1 rounded bg-black/20 hover:bg-black/40 transition-colors"
+                        >
+                            Cerrar
+                        </button>
+                    </div>
+                )}
 
                 {/* SECCIÓN 1: RENDIMIENTO COMERCIAL */}
                 <div className="mb-8">
@@ -121,24 +180,48 @@ export default function Dashboard({ stats }: any) {
 
                 {/* SECCIÓN 3: ALERTAS DE ATENCIÓN */}
                 <div className="mb-8">
-                    <h2 className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4 ml-1">
-                        Atención Requerida
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                        {/* Optimizamos el contenedor interactivo para comportamiento táctil (active:scale-98 en móvil) */}
-                        <div
-                            onClick={() => router.get('/alertas-estancadas')}
-                            className="block transition-all duration-200 lg:hover:scale-[1.02] lg:hover:shadow-md active:scale-95 rounded-2xl cursor-pointer"
-                        >
-                            <StatCard
-                                label="Licitaciones Estancadas"
-                                value={stats.alertas_vencidas}
-                                trend="Sin gestión comercial por más de 30 días"
-                                icon={OctagonAlert}
-                            />
+                    {(stats.alertas_vencidas > 0 || stats.precalificaciones_vencidas > 0) && (
+                        <div className="mb-8">
+                            <h2 className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4 ml-1">
+                                Atención Requerida
+                            </h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                                {/* Tarjeta de Licitaciones */}
+                                {stats.alertas_vencidas > 0 && (
+                                    <div
+                                        onClick={() => router.get('/alertas-estancadas')}
+                                        className="block transition-transform duration-300 hover:scale-105 hover:shadow-lg rounded-xl cursor-pointer border border-orange-500/30"
+                                    >
+                                        <StatCard
+                                            label="Licitaciones Estancadas"
+                                            value={stats.alertas_vencidas}
+                                            icon={OctagonAlert}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Tarjeta de Precalificaciones */}
+                                {stats.precalificaciones_vencidas > 0 && (
+                                    <div
+                                        onClick={() => router.get('/alertas-precalificaciones')}
+                                        className="block transition-transform duration-300 hover:scale-105 hover:shadow-lg rounded-xl cursor-pointer border border-orange-500/30"
+                                    >
+                                        <StatCard
+                                            label="Precalif. Estancadas"
+                                            value={stats.precalificaciones_vencidas}
+                                            icon={OctagonAlert}
+                                        />
+                                    </div>
+                                )}
+
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
+
+
             </PageContainer>
         </AuthenticatedLayout>
     );

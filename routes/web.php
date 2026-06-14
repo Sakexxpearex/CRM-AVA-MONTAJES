@@ -26,6 +26,7 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     // Dashboard principal
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/ocultar-alerta', [App\Http\Controllers\DashboardController::class, 'ocultarAlerta'])->name('dashboard.ocultar-alerta');
 
     // Modulo de empresas
     Route::resource('empresas', EmpresaController::class);
@@ -75,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('licitaciones.comando-voz');
     
     Route::get('/alertas-estancadas', [App\Http\Controllers\LicitacionController::class, 'alertasIndex'])->name('alertas.index');
+    Route::get('/alertas-precalificaciones', [PrecalificacionController::class, 'alertasIndex'])->name('alertas-precalificaciones');
 
 // Rutas para Precalificaciones
     Route::get('/precalificaciones', [PrecalificacionController::class, 'index'])->name('precalificaciones.index');
