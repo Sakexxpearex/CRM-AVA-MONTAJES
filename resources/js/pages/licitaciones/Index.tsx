@@ -28,6 +28,8 @@ export default function Index({
 
     const [searchTerm, setSearchTerm] = useState(filters.search ?? '');
     const [estadoFiltro, setEstadoFiltro] = useState(filters.estado ?? '');
+    // NUEVO: Estado para el filtro de empresa, inicializado con el valor de URL si existe.
+    const [empresaFiltro, setEmpresaFiltro] = useState(filters.empresa ?? '');
     const [montoOrder, setMontoOrder] = useState(filters.monto_order ?? '');
     const firstRender = useRef(true);
 
@@ -43,6 +45,8 @@ export default function Index({
                 {
                     search: searchTerm.trim() || undefined,
                     estado: estadoFiltro || undefined,
+                    // NUEVO: Se envía el estado de empresaFiltro como parámetro de la ruta
+                    empresa: empresaFiltro || undefined,
                     monto_order: montoOrder || undefined,
                 },
                 {
@@ -55,7 +59,8 @@ export default function Index({
         }, 350);
 
         return () => window.clearTimeout(timeout);
-    }, [searchTerm, estadoFiltro, montoOrder]);
+    // MODIFICACIÓN: Se añade empresaFiltro al array de dependencias para que dispare el fetch al cambiar
+    }, [searchTerm, estadoFiltro, empresaFiltro, montoOrder]);
 
     return (
         <AuthenticatedLayout>
@@ -98,17 +103,24 @@ export default function Index({
 
                 <LicitacionStats stats={stats} />
 
-                <div className="flex justify-start">
-                    <SearchLicitacion
-                        value={searchTerm}
-                        onChange={setSearchTerm}
-                        estado={estadoFiltro}
-                        onEstadoChange={setEstadoFiltro}
-                        montoOrder={montoOrder}
-                        onMontoOrderChange={setMontoOrder}
-                        estados={estados}
-                    />
-                </div>
+                {/* MODIFICACIÓN: Solo se renderiza el buscador si la vista actual es 'tabla' */}
+                {vista === 'tabla' && (
+                    <div className="flex justify-start">
+                        <SearchLicitacion
+                            value={searchTerm}
+                            onChange={setSearchTerm}
+                            estado={estadoFiltro}
+                            onEstadoChange={setEstadoFiltro}
+                            // NUEVO: Se pasan las empresas y el estado del filtro al componente hijo
+                            empresas={empresas}
+                            empresa={empresaFiltro}
+                            onEmpresaChange={setEmpresaFiltro}
+                            montoOrder={montoOrder}
+                            onMontoOrderChange={setMontoOrder}
+                            estados={estados}
+                        />
+                    </div>
+                )}
 
                 {/* renderizado segun lo que se selecciona*/}
                 {vista === 'kanban' ? (

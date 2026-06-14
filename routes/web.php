@@ -82,6 +82,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/precalificaciones', [PrecalificacionController::class, 'index'])->name('precalificaciones.index');
     Route::post('/precalificaciones', [PrecalificacionController::class, 'store'])->name('precalificaciones.store');
     Route::patch('/precalificaciones/{precalificacion}/estado', [PrecalificacionController::class, 'cambiarEstado'])->name('precalificaciones.estado');
+    Route::post('/precalificaciones/{id}/interacciones', [PrecalificacionController::class, 'storeInteraccion'])
+    ->name('precalificaciones.interacciones.store');
 });
 
 require __DIR__.'/settings.php';
