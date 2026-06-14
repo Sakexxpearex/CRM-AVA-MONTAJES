@@ -33,6 +33,19 @@ export default function Index({
     const [montoOrder, setMontoOrder] = useState(filters.monto_order ?? '');
     const firstRender = useRef(true);
 
+
+    useEffect(() => {
+        setSearchTerm(filters.search ?? '');
+        setEstadoFiltro(filters.estado ?? '');
+        setMontoOrder(filters.monto_order ?? '');
+    }, [filters])
+
+    const handleClearFilters = () => {
+        setSearchTerm('');
+        setEstadoFiltro('');
+        setMontoOrder('');
+    };
+
     useEffect(() => {
         if (firstRender.current) {
             firstRender.current = false;

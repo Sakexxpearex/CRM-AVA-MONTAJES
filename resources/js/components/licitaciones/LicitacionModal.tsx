@@ -140,9 +140,7 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                             {/* Solo los valores de la migración*/}
                                 <option value="Evaluación">Evaluación</option>
                                 <option value="Preparación">Preparación</option>
-                                <option value="Filtro">Filtro</option>
-                                <option value="Adjudicada">Adjudicada (Ganada)</option>
-                                <option value="Operativa">Operativa</option>
+                                <option value="Adjudicada">Adjudicada</option>
                                 <option value="Perdida">Perdida</option>
                                 <option value="Desierta">Desierta</option>
                                 <option value="Presentada">Presentada</option>

@@ -25,9 +25,7 @@ return new class extends Migration
                 'Evaluación',
                 'Preparación', 
                 'Presentada',
-                'Filtro', 
                 'Adjudicada',    
-                'Operativa',
                 'Perdida', 
                 'Desierta',
             ])->default('Evaluación');

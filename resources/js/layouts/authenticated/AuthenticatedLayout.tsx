@@ -6,6 +6,7 @@ import {
     ClipboardCheck 
 } from 'lucide-react';
 import VoiceButton from '@/components/voice-button';
+import GlobalToast from '@/components/GlobalToast';
 
 export default function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
     const [darkMode, setDarkMode] = useState(localStorage.getItem('theme') === 'dark');
@@ -20,17 +21,23 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
         }
     }, [darkMode]);
 
-    const handleVoiceTranscription = (text: string) => {
-        console.log("Comando recibido:", text);
-        
-        // Enviamos el texto al controlador para que el Servicio lo procese
-        router.post(route('licitaciones.comando-voz'), {
-            texto_hablado: text
-        }, {
-            preserveScroll: true,
-            onError: (err) => alert("Error: " + err.error)
-        });
-    };
+
+
+const handleVoiceTranscription = (text: string) => {
+    console.log("Comando recibido:", text);
+    
+    
+    router.post(route('licitaciones.comando-voz'), {
+        texto_hablado: text
+    }, {
+        preserveScroll: true,
+        onError: (err) => {
+            console.log("Error recibido del backend", err);
+        }
+    });
+};
+
+
 
     return (
         <div className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-300 overflow-hidden">
@@ -157,6 +164,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
                 />
             </div>
             <VoiceButton onTranscriptionComplete={handleVoiceTranscription} />
+            <GlobalToast />
         </div>
     );
 }
