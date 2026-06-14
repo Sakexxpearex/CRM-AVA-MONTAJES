@@ -213,18 +213,35 @@ public function comandoVoz(Request $request, CommandParserService $parser)
         $nombre    = $comando['nombre'] ?? 'vacio';
         $estadoBruto = $comando['nuevo_estado'] ?? ($comando['estado'] ?? 'vacio');
 
-        // NORMALIZADOR DE ESTADOS
+        $quitarTildesEstados = function($cadena) {
+            return str_replace(
+                ['á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú'],
+                ['a', 'e', 'i', 'o', 'u', 'a', 'e', 'i', 'o', 'u'],
+                strtolower(trim($cadena))
+            );
+        };
+
+        $estadoLimpio = $quitarTildesEstados($estadoBruto);
+
         $estadosValidos = [
-            'evaluación'  => 'Evaluación',
-            'preparación' => 'Preparación',
-            'presentada'  => 'Presentada',
-            'filtro'      => 'Filtro',
-            'adjudicada'  => 'Adjudicada',
-            'operativa'   => 'Operativa',
-            'perdida'     => 'Perdida',
-            'desierta'    => 'Desierta'
+            'evaluacion'     => 'Evaluación',
+            'en evaluacion'  => 'Evaluación',
+            'preparacion'    => 'Preparación',
+            'en preparacion' => 'Preparación',
+            'presentada'     => 'Presentada',
+            'filtro'         => 'Filtro',
+            'en filtro'      => 'Filtro',
+            'adjudicada'     => 'Adjudicada',
+            'ganada'         => 'Adjudicada', 
+            'operativa'      => 'Operativa',
+            'en operacion'   => 'Operativa',
+            'perdida'        => 'Perdida',
+            'desierta'       => 'Desierta'
         ];
-        $estado = $estadosValidos[mb_strtolower(trim($estadoBruto))] ?? $estadoBruto;
+
+        // Traduce la locura de la IA a la palabra perfecta para la BD
+        $estado = $estadosValidos[$estadoLimpio] ?? ucfirst(strtolower($estadoBruto));
+        // 👈 FIN DEL NORMALIZADOR
 
         // Variables nuevas para la Interacción/Bitácora
         $contacto        = $comando['contacto'] ?? 'No especificado';
@@ -284,7 +301,7 @@ public function comandoVoz(Request $request, CommandParserService $parser)
             }
         }
 
-        // 4. ESCENARIO: REGISTRAR BITACORA / INTERACCION
+     // 4. ESCENARIO: REGISTRAR BITACORA / INTERACCION
         if ($intent === 'REGISTRAR_BITACORA') {
             if ($licitacion && $descripcion) {
                 
@@ -299,37 +316,18 @@ public function comandoVoz(Request $request, CommandParserService $parser)
                 $textoHablado = $quitarTildes($request->texto_hablado ?? $descripcion);
                 $contactosAsociados = \App\Models\Persona::where('division_id', $licitacion->division_id)->get();
 
-                $personaId = 1; 
+               $personaId = null; 
                 $encontrado = false;
 
                 if ($contactosAsociados && $contactosAsociados->count() > 0) {
+                    // PLAN A: Buscar al contacto mencionado dentro de la división (Filtro Estricto)
                     foreach ($contactosAsociados as $persona) {
                         $nombreLimpio = $quitarTildes($persona->nombre_completo);
                         $palabrasDelNombre = explode(' ', $nombreLimpio);
 
                         foreach ($palabrasDelNombre as $palabra) {
-                            if (strlen($palabra) > 2 && str_contains($textoHablado, $palabra)) {
-                                $personaId = $persona->id;
-                                $encontrado = true;
-                                break 2; 
-                            }
-                        }
-                    }
-
-                    if (!$encontrado && $contactosAsociados->count() === 1) {
-                        $personaId = $contactosAsociados->first()->id;
-                        $encontrado = true;
-                    }
-                }
-
-                if (!$encontrado) {
-                    $personasGlobales = \App\Models\Persona::all(); 
-                    foreach ($personasGlobales as $persona) {
-                        $nombreLimpio = $quitarTildes($persona->nombre_completo);
-                        $palabrasDelNombre = explode(' ', $nombreLimpio);
-
-                        foreach ($palabrasDelNombre as $palabra) {
-                            if (strlen($palabra) > 2 && str_contains($textoHablado, $palabra)) {
+                            // Usamos preg_match con \b para exigir que sea la palabra EXACTA y no un pedazo de otra
+                            if (strlen($palabra) > 2 && preg_match("/\b" . preg_quote($palabra, '/') . "\b/i", $textoHablado)) {
                                 $personaId = $persona->id;
                                 $encontrado = true;
                                 break 2;
@@ -338,6 +336,26 @@ public function comandoVoz(Request $request, CommandParserService $parser)
                     }
                 }
 
+     
+
+                // PLAN C: Búsqueda global (Filtro Estricto)
+                if (!$encontrado) {
+                    $personasGlobales = \App\Models\Persona::all(); 
+                    foreach ($personasGlobales as $persona) {
+                        $nombreLimpio = $quitarTildes($persona->nombre_completo);
+                        $palabrasDelNombre = explode(' ', $nombreLimpio);
+
+                        foreach ($palabrasDelNombre as $palabra) {
+                            if (strlen($palabra) > 2 && preg_match("/\b" . preg_quote($palabra, '/') . "\b/i", $textoHablado)) {
+                                $personaId = $persona->id;
+                                $encontrado = true;
+                                break 2;
+                            }
+                        }
+                    }
+                }
+
+                // NORMALIZAMOS EL TIPO DE CONTACTO
                 $tipoExtraido = strtolower(trim($tipoInteraccion));
                 $tipoStr = 'Otro'; 
 
@@ -351,8 +369,23 @@ public function comandoVoz(Request $request, CommandParserService $parser)
                     $tipoStr = 'WhatsApp';
                 }
 
+                //  ESTRATEGIA 2: LA BANDEJA DE ENTRADA (CONTACTO FANTASMA)
+                $mensajeFinal = "";
+                
+                if (!$encontrado) {
+                    $nombreFaltante = $contacto !== 'No especificado' ? $contacto : 'Alguien no identificado';
+                    // Modificamos la nota para dejar constancia de con quién hablaron
+                    $descripcion = "[Mencionó a: {$nombreFaltante}] - " . $descripcion;
+                    $mensajeFinal = "Nota guardada, pero no encontré a '{$nombreFaltante}'. ¡Recuerda asignarlo luego!";
+                } else {
+                    $personaAsignada = \App\Models\Persona::find($personaId);
+                    $nombrePersona = $personaAsignada ? $personaAsignada->nombre_completo : 'Contacto';
+                    $mensajeFinal = " Nota guardada con éxito. Cliente asignado: {$nombrePersona}";
+                }
+
+                // GUARDAR INTERACCIÓN
                 $licitacion->interacciones()->create([
-                    'persona_id'    => $personaId, 
+                    'persona_id'    => $personaId, // Si no se encontró, guardará null
                     'user_id'       => auth()->id() ?? 1, 
                     'fecha'         => now(), 
                     'comentario'    => $descripcion,
@@ -360,11 +393,8 @@ public function comandoVoz(Request $request, CommandParserService $parser)
                 ]);
 
                 $licitacion->touch(); 
-
-                $personaAsignada = \App\Models\Persona::find($personaId);
-                $nombreFinal = $personaAsignada ? $personaAsignada->nombre_completo : 'Contacto por defecto';
                 
-                return back()->with('message', "Nota guardada. Cliente asignado: {$nombreFinal}");
+                return back()->with('message', $mensajeFinal);
             }
             return back()->withErrors(['error' => "Faltan datos para registrar la nota."]);
         }
