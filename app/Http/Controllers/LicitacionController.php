@@ -166,82 +166,125 @@ class LicitacionController extends Controller
         return redirect()->route('licitaciones.index')->with('message', '¡Éxito! Proyecto creado y métricas de AVA actualizadas.');
     }
 
-    public function transcribe(Request $request)
-    {
-        if (!$request->hasFile('audio')) {
-            return response()->json(['res' => 'No llega el archivo audio'], 500);
-        }
-
-        try {
-            $file = $request->file('audio');
-            $apiKey = env('GROQ_API_KEY');
-
-            $response = Http::withToken($apiKey)
-                ->attach('file', file_get_contents($file->getRealPath()), 'audio.wav')
-                ->post('https://api.groq.com/openai/v1/audio/transcriptions', [
-                    'model'    => 'whisper-large-v3',
-                    'language' => 'es',
-                ]);
-
-            return $response->json();
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'error_real' => $e->getMessage(),
-                'donde'      => $e->getFile() . ' linea ' . $e->getLine()
-            ], 500);
-        }
+   public function transcribe(Request $request)
+{
+    // 1. Verificar si el archivo llega
+    if (!$request->hasFile('audio')) {
+        return response()->json(['res' => 'No llega el archivo audio'], 500);
     }
 
-    public function comandoVoz(Request $request, CommandParserService $parser)
-    {
+    try {
+        $file = $request->file('audio');
+        $apiKey = env('GROQ_API_KEY');
+
+        // 2. Intentar la conexión
+        $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+            ->attach('file', file_get_contents($file->getRealPath()), 'audio.wav')
+            ->post('https://api.groq.com/openai/v1/audio/transcriptions', [
+                'model' => 'whisper-large-v3',
+                'language' => 'es',
+            ]);
+
+        return $response->json();
+
+    } catch (\Exception $e) {
+        
+        return response()->json([
+            'error_real' => $e->getMessage(),
+            'donde' => $e->getFile() . ' linea ' . $e->getLine()
+        ], 500);
+    }
+}
+
+public function comandoVoz(Request $request, CommandParserService $parser)
+{
+    try {
+        // 1. Hablamos con Llama 3
         $comando = $parser->parseCommand($request->texto_hablado);
         
-        $intent          = strtoupper($comando['intent'] ?? 'DESCONOCIDO');
-        $codigoDpc       = $comando['codigo_dpc'] ?? null; 
-        $nombre          = $comando['nombre'] ?? 'vacio';
-        $estado          = $comando['nuevo_estado'] ?? ($comando['estado'] ?? 'vacio');
+        // Protección extra: asegurarnos de que el parser devolvió un array
+        if (!is_array($comando)) {
+             return back()->withErrors(['error' => " La IA no respondió correctamente. Intenta decir el comando de otra forma."]);
+        }
 
+        // 2. Extraemos la intención y las variables de forma segura
+        $intent    = strtoupper($comando['intent'] ?? 'DESCONOCIDO');
+        $codigoDpc = $comando['codigo_dpc'] ?? null; 
+        $nombre    = $comando['nombre'] ?? 'vacio';
+        $estadoBruto = $comando['nuevo_estado'] ?? ($comando['estado'] ?? 'vacio');
+
+        // NORMALIZADOR DE ESTADOS
+        $estadosValidos = [
+            'evaluación'  => 'Evaluación',
+            'preparación' => 'Preparación',
+            'presentada'  => 'Presentada',
+            'filtro'      => 'Filtro',
+            'adjudicada'  => 'Adjudicada',
+            'operativa'   => 'Operativa',
+            'perdida'     => 'Perdida',
+            'desierta'    => 'Desierta'
+        ];
+        $estado = $estadosValidos[mb_strtolower(trim($estadoBruto))] ?? $estadoBruto;
+
+        // Variables nuevas para la Interacción/Bitácora
         $contacto        = $comando['contacto'] ?? 'No especificado';
         $tipoInteraccion = $comando['tipo'] ?? 'No especificado'; 
         $descripcion     = $comando['nota'] ?? ($comando['descripcion'] ?? null);
 
+        // Variables para Radar y Competencia
         $criterio   = $comando['criterio'] ?? null;
         $competidor = $comando['empresa_competidora'] ?? null;
 
+        // BÚSQUEDA DE LA LICITACIÓN (Filtro de Francotirador MEJORADO)
         $licitacion = null;
         $busquedaRealizada = ''; 
+        $buscoPorDpc = false; // Candado de seguridad
 
-        if ($codigoDpc) {
-            $busquedaRealizada = "DPC {$codigoDpc}";
-            $codigoLimpio = preg_replace('/[^a-zA-Z0-9]/', '', $codigoDpc);
+        // PLAN A: Búsqueda estricta por código DPC
+        if (!empty($codigoDpc)) {
+            $buscoPorDpc = true; // Activamos el candado
+            $numeroLimpio = preg_replace('/[^0-9]/', '', $codigoDpc);
+            $busquedaRealizada = "DPC {$numeroLimpio}";
 
-            $licitacion = \App\Models\Licitacion::whereRaw("regexp_replace(nombre_proyecto, '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ["%DPC%{$codigoLimpio}%"])
-                                                ->orWhereRaw("regexp_replace(nombre_proyecto, '[^a-zA-Z0-9]', '', 'g') ILIKE ?", ["%{$codigoLimpio}%"])
-                                                ->first();
+            if (!empty($numeroLimpio)) {
+                // Buscamos solo entre los proyectos que dicen "DPC"
+                $posibles = \App\Models\Licitacion::where('nombre_proyecto', 'ILIKE', '%DPC%')->get();
+
+                // Francotirador: Busca exactamente "DPC 1", "DPC-1", "DPC 01", pero rechaza "DPC 10"
+                $licitacion = $posibles->first(function($lic) use ($numeroLimpio) {
+                    return preg_match("/DPC[-\s_]*0*{$numeroLimpio}(?!\d)/i", $lic->nombre_proyecto);
+                });
+            }
         }
         
-        if (!$licitacion && $nombre !== 'vacio') {
+        // PLAN B: Solo busca por nombre si NO mencionaste un DPC en el audio
+        // Si el candado ($buscoPorDpc) está activo, jamás entrará aquí a buscar basura
+        if (!$licitacion && !$buscoPorDpc && $nombre !== 'vacio') {
             $busquedaRealizada = $nombre;
             $licitacion = \App\Models\Licitacion::where('nombre_proyecto', 'ILIKE', '%' . $nombre . '%')->first();
         }
+        // ----------------------------------------------
+        // ----------------------------------------------
 
+        // 3. ESCENARIO: CAMBIAR ESTADO 
         if ($intent === 'CAMBIAR_ESTADO') {
             if ($licitacion) {
                 $licitacion->estado_pipeline = $estado;
                 
+                // Automatización financiera
                 if (in_array($estado, ['Adjudicada', 'Operativa'])) {
                     $licitacion->monto_adjudicado = $licitacion->monto_estimado;
                     $licitacion->fecha_adjudicacion = now();
                 }
                 
                 $licitacion->save();
-                return back()->with('message', "✅ Éxito: {$nombre} ahora es {$estado}");
+                return back()->with('message', " La licitación '{$licitacion->nombre_proyecto}' ahora está en estado {$estado}");
             } else {
-                return back()->withErrors(['error' => "❌ La IA buscó el proyecto '{$nombre}', pero no existe en tu base de datos con ese nombre."]);
+                return back()->withErrors(['error' => " La IA buscó el proyecto '{$busquedaRealizada}', pero no lo encontró en tu base de datos."]);
             }
         }
 
+        // 4. ESCENARIO: REGISTRAR BITACORA / INTERACCION
         if ($intent === 'REGISTRAR_BITACORA') {
             if ($licitacion && $descripcion) {
                 
@@ -268,7 +311,7 @@ class LicitacionController extends Controller
                             if (strlen($palabra) > 2 && str_contains($textoHablado, $palabra)) {
                                 $personaId = $persona->id;
                                 $encontrado = true;
-                                break 2;
+                                break 2; 
                             }
                         }
                     }
@@ -326,6 +369,7 @@ class LicitacionController extends Controller
             return back()->withErrors(['error' => "Faltan datos para registrar la nota."]);
         }
 
+        // 5. ESCENARIO: REGISTRAR COMPETENCIA
         if ($intent === 'REGISTRAR_COMPETENCIA') {
             if ($licitacion && $competidor) {
                 
@@ -341,19 +385,26 @@ class LicitacionController extends Controller
 
                 $licitacion->touch();
 
-                return back()->with('message', " Competencia registrada: {$empresa->nombre} asociada a {$licitacion->nombre_proyecto}");
+                return back()->with('message', "Competencia registrada: {$empresa->nombre} asociada a {$licitacion->nombre_proyecto}");
             }
-            return back()->withErrors(['error' => " No encontré el proyecto '{$busquedaRealizada}' para registrar la competencia."]);
+            return back()->withErrors(['error' => "No encontré el proyecto '{$busquedaRealizada}' para registrar la competencia."]);
         }
         
+        // 6. ESCENARIO: BUSCAR / FILTRAR 
         if ($intent === 'BUSCAR') {
             $terminoBusqueda = $codigoDpc ? "DPC {$codigoDpc}" : ($nombre !== 'vacio' ? $nombre : ($comando['empresa'] ?? ''));
             return redirect()->route('licitaciones.index', ['search' => $terminoBusqueda]);
         }
 
+        // 9. ERROR TIPO 2: La IA devolvió un JSON raro o no entendió
         $respuestaIA = json_encode($comando);
-        return back()->withErrors(['error' => "🤖 La IA se confundió. Esto fue lo que intentó devolver: {$respuestaIA}"]);
+        return back()->withErrors(['error' => "La IA no entendió el Mensaje."]);
+
+    } catch (\Exception $e) {
+        // Bloque de seguridad: Atrapa el error y lo muestra en pantalla en lugar del error 500 de Laravel.
+        return back()->withErrors(['error' => "Fallo interno del sistema: " . $e->getMessage() . " (Línea: " . $e->getLine() . ")"]);
     }
+}
 
     public function alertas()
     {
