@@ -27,6 +27,11 @@ class LicitacionController extends Controller
             ->when($request->filled('estado'), function ($query) use ($request) {
                 $query->where('estado_pipeline', $request->string('estado'));
             })
+            // NUEVO FILTRO: Filtrar por la empresa seleccionada. 
+            // Comprueba si el request tiene el parámetro 'empresa' y aplica el 'where'.
+            ->when($request->filled('empresa'), function ($query) use ($request) {
+                $query->where('empresa_id', $request->string('empresa'));
+            })
             ->when(in_array($montoOrder, ['asc', 'desc'], true), function ($query) use ($montoOrder) {
                 $query->orderBy('monto_estimado', $montoOrder);
             }, function ($query) {
@@ -56,7 +61,8 @@ class LicitacionController extends Controller
             'empresas'        => Empresa::all(),
             'divisiones'      => Division::with('empresa')->get(),
             'stats'           => $stats,
-            'filters'         => $request->only(['search', 'estado', 'monto_order']),
+            // MODIFICACIÓN: Agregado 'empresa' a los filtros retornados a la vista para que el estado persista
+            'filters'         => $request->only(['search', 'estado', 'monto_order', 'empresa']),
             'estados'         => [
                 'Evaluación',
                 'Preparación',
