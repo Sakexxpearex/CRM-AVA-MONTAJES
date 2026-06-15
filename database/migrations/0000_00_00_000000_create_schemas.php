@@ -26,16 +26,16 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-        $esquemas = [
-            "laravel",
-            "usuarios",
-            "crm"
-        ];
+   public function down(): void
+{
+    // Cambia el orden: suele ser mejor borrar en orden inverso al de creación
+    // Pero lo más importante es el CASCADE
+    $esquemas = ["crm", "usuarios", "laravel"]; 
 
-        foreach($esquemas as $esquema) {
+    foreach($esquemas as $esquema) {
+        // Añade una verificación para no borrar esquemas críticos del sistema
+        if ($esquema !== 'public') {
             DB::statement("DROP SCHEMA IF EXISTS {$esquema} CASCADE");
         }
     }
-};
+}};

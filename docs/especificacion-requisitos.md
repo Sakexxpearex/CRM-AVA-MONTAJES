@@ -194,7 +194,7 @@ Permite ingresar nuevos proyectos o licitaciones al pipeline comercial de AVA, a
 - **Reglas de Validación:**
   - **R12.1:** El campo `id` hereda estrictamente el comportamiento definido en **R1.1**.
   - **R12.2:** Para `nombre_proyecto` se requiere una cadena de texto (máx. 255 caracteres) de carácter obligatorio.
-  - **R12.3:** El atributo `estado_pipeline` se restringirá única y exclusivamente al conjunto predefinido {“Evaluación”, “Preparación”, “Filtro”, “Ganada”, “Perdida”, “Llenar Cupo”}.
+  - **R12.3:** El atributo `estado_pipeline` se restringirá única y exclusivamente al conjunto predefinido {"Presentada","Adjudicada","Desierta"}.
   - **R12.4:** Las llaves externas `empresa_id` y `division_id` se validarán contra los registros existentes en los módulos **R2** y **R4** respectivamente.
   - **R12.5:** Al guardar el proyecto, la interfaz despliega el mensaje “Licitación registrada con éxito”.
   - **R12.6:** [Alerta de Inactividad Comercial - 30 días] El sistema evaluará diariamente la diferencia en días corridos entre la fecha actual del servidor y el timestamp de la última interacción vinculada (**R13**) a este ID de licitación. Si el indicador es superior a 30 días (o no existen interacciones y han pasado 30 días desde su creación), se activará automáticamente un estado de Alerta Visual en el pipeline del Dashboard.
@@ -210,7 +210,7 @@ Registra las gestiones e hitos comerciales con contactos vinculados directamente
 - **Reglas de Validación:**
   - **R13.1:** El campo `fecha` (tipo Date) no puede ser cronológicamente posterior a la fecha actual del servidor.
   - **R13.2:** El campo `comentario` requiere una entrada de texto libre obligatorio que argumente la gestión comercial.
-  - **R13.3:** El atributo `tipo_contacto` se limitará exclusivamente al conjunto de opciones {“Reunión”, “Presencial”, “Llamada”, “Correo”, “WhatsApp”, “Otro”}.
+  - **R13.3:** El atributo `tipo_contacto` se limitará exclusivamente al conjunto de opciones {“Reunión Presencial”, “Llamada”, “Correo”, “WhatsApp”, “Otro”}.
   - **R13.4:** Los campos `licitacion_id`, `persona_id` y `user_id` deben verificar su existencia e integridad referencial contra los módulos **R12**, **R6** y **R1** respectivamente.
   - **R13.5:** Al persistir la interacción, se muestra el mensaje “Interacción registrada con éxito” y se refresca automáticamente el cálculo de inactividad de la licitación (**R12.6**).
 - **Salidas:**

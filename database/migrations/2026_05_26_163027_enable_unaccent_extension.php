@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('CREATE EXTENSION IF NOT EXISTS unaccent;');
+        DB::statement('CREATE EXTENSION IF NOT EXISTS unaccent SCHEMA public;');
     }
 
     /**

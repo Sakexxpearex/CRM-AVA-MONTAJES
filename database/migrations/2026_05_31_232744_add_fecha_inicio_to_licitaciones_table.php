@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('licitaciones', function (Blueprint $table) {
+        Schema::connection('crm')->table('licitaciones', function (Blueprint $table) {
             $table->dropColumn('fecha_inicio');
         });
     }

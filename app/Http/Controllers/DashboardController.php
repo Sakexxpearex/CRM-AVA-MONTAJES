@@ -30,7 +30,7 @@ class DashboardController extends Controller
         $totalPersonas = Persona::count();
 
         // 5. Rendimiento Comercial (Lo que arreglamos con el Tinker)
-        $volumenTotal = Licitacion::where('estado_pipeline', $estadosGanadores)->sum('monto_adjudicado');
+        $volumenTotal = Licitacion::whereIn('estado_pipeline', $estadosGanadores)->sum('monto_adjudicado');
         $volumen_total_formateado = '$' . number_format($volumenTotal, 0, ',', '.');
         // 6. Win Rate (Ganadas vs Participadas)
         $totalParticipadas = Licitacion::whereIn('estado_pipeline', ['Adjudicada', 'Operativa', 'Ganada', 'Perdida'])->count();
@@ -45,7 +45,7 @@ class DashboardController extends Controller
         $alertasPrecalifCount = Precalificacion::where('estado', 'Pendiente')
             ->enAlerta()
             ->count();
-        $tienePrecalificacionesEstancadas = $alertasVencidasCount > 0;
+        $tienePrecalificacionesEstancadas = $alertasPrecalifCount > 0;
         $tieneLicitacionesEstancadas = $alertasVencidasCount > 0;
         $mensajeAlerta = null;
 

@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('valoracion_division');
+        Schema::connection('crm')->dropIfExists('valoracion_division');
     }
 };
