@@ -44,6 +44,8 @@ export default function Index({
         setSearchTerm('');
         setEstadoFiltro('');
         setMontoOrder('');
+        // FIX: Se agregó la limpieza del estado del filtro de empresa
+        setEmpresaFiltro('');
     };
 
     useEffect(() => {
@@ -131,6 +133,8 @@ export default function Index({
                             montoOrder={montoOrder}
                             onMontoOrderChange={setMontoOrder}
                             estados={estados}
+                            // FIX: Se pasa la función handleClearFilters a la prop onClear
+                            onClear={handleClearFilters}
                         />
                     </div>
                 )}

@@ -24,7 +24,9 @@ class LicitacionController extends Controller
 
         $licitacionesActivas = Licitacion::with(['empresa', 'division'])
             ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('nombre_proyecto', 'ILIKE', '%' . $request->string('search')->trim() . '%');
+                // Para que ignore los acentos
+                $searchTerm = '%' . $request->string('search')->trim() . '%';
+                $query->whereRaw('unaccent(nombre_proyecto) ILIKE unaccent(?)', [$searchTerm]);
             })
             ->when($request->filled('estado'), function ($query) use ($request) {
                 $query->where('estado_pipeline', $request->string('estado'));

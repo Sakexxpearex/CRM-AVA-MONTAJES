@@ -15,7 +15,7 @@ export default function SearchEmpresa({ value, onChange, tipo, onTipoChange }: P
         <input 
           type="text" 
           className="w-full bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-lg py-2.5 pl-11 pr-4 text-[11px] font-bold tracking-wider uppercase outline-none focus:ring-2 focus:ring-[#c1f75e] transition-all text-gray-800 dark:text-white"
-          placeholder="BUSCAR POR NOMBRE..."
+          placeholder="BUSCAR POR NOMBRE"
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
