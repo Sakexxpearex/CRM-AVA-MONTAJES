@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'; // 🌟 Cambiamos a Link de Inertia
+import { Link } from '@inertiajs/react';
 import { Eye, Building2, Wallet } from 'lucide-react';
 
 interface TableProps {
@@ -31,36 +31,44 @@ export default function PrecalificacionesTable({ precalificaciones }: TableProps
             <div className="block md:hidden space-y-3 px-1">
                 {precalificaciones.map((item) => (
                     <div key={item.id} className="bg-white dark:bg-[#111] border border-gray-100 dark:border-gray-800 rounded-2xl p-4 shadow-sm space-y-4 flex flex-col justify-between">
+                        
+                        {/* Cabecera de la Card */}
                         <div className="space-y-1">
-                            <span className="font-black text-sm text-gray-800 dark:text-gray-200 uppercase tracking-tight leading-tight block">
+                            <span className="font-black text-sm text-gray-800 dark:text-gray-200 uppercase tracking-tight leading-tight block break-words">
                                 {item.nombre_precalificacion}
                             </span>
-                            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase flex items-center gap-1.5 tracking-wider">
-                                <Building2 size={11} className="text-gray-400 dark:text-gray-600" />
-                                {item.empresa?.nombre || 'S/N'}
-                                {item.division?.nombre && ` — ${item.division.nombre}`}
+                            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase flex items-start gap-1.5 tracking-wider break-words">
+                                <Building2 size={11} className="text-gray-400 dark:text-gray-600 mt-0.5 shrink-0" />
+                                <span>
+                                    {item.empresa?.nombre || 'S/N'}
+                                    {item.division?.nombre && ` — ${item.division.nombre}`}
+                                </span>
                             </span>
                         </div>
 
-                        <div className="flex items-center justify-between pt-3 border-t border-gray-50 dark:border-gray-800/60">
+                        {/* Contenedor inferior */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-gray-50 dark:border-gray-800/60 gap-3">
+                            
+                            {/* Bloque del Monto */}
                             <div className="flex flex-col">
                                 <span className="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-1 mb-0.5">
                                     <Wallet size={9} /> Est.
                                 </span>
-                                <span className="font-mono text-xs font-black text-gray-900 dark:text-gray-300">
+                                <span className="font-mono text-xs sm:text-sm font-black text-[#c1f75e] dark:text-[#c1f75e]">
                                     {formatCurrency(item.monto_estimated ?? item.monto_estimado)}
                                 </span>
                             </div>
 
-                            {/* 🌟 Navegación por Link */}
+                            {/* Botón de Acción*/}
                             <Link
                                 href={route('precalificaciones.show', item.id)}
-                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:text-[#c1f75e] font-black text-[10px] uppercase tracking-wider rounded-xl transition-colors border border-gray-200/50 dark:border-gray-800"
+                                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:text-[#c1f75e] font-black text-[10px] uppercase tracking-wider rounded-xl transition-colors border border-gray-200/50 dark:border-gray-800 w-full sm:w-auto"
                             >
                                 <Eye size={14} />
                                 Evaluar
                             </Link>
                         </div>
+
                     </div>
                 ))}
             </div>
@@ -99,7 +107,6 @@ export default function PrecalificacionesTable({ precalificaciones }: TableProps
                                 </td>
 
                                 <td className="px-6 py-4 text-right">
-                                    {/* 🌟 Navegación por Link */}
                                     <Link
                                         href={route('precalificaciones.show', item.id)}
                                         className="inline-flex items-center gap-2 px-3 py-1.5 text-gray-400 hover:text-black hover:bg-[#c1f75e] border border-transparent hover:border-gray-800 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all"

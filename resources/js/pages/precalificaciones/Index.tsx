@@ -33,7 +33,10 @@ export default function Index({ precalificaciones, empresas, divisiones, persona
                     onActionClick={() => setIsCreateOpen(true)}
                 />
 
-                <ContentPanel padding={false}>
+                <ContentPanel 
+                    padding={false} 
+                    className="bg-transparent dark:bg-transparent border-transparent dark:border-transparent shadow-none md:bg-white md:dark:bg-[#0d1117] md:border-gray-200 md:dark:border-gray-800 md:shadow-sm"
+                >
                     <PrecalificacionesTable precalificaciones={precalificaciones} />
                 </ContentPanel>
             </PageContainer>
