@@ -57,9 +57,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/divisiones/{division}', [DivisionController::class, 'update'])->name('divisiones.update');
     Route::delete('/divisiones/{division}', [DivisionController::class, 'destroy'])->name('divisiones.destroy');
 
-    // Rutas de Proyectos
-    Route::get('/proyectos', [ProyectoController::class, 'index'])->name('proyectos.index');
-    Route::get('/proyectos/{id}', [ProyectoController::class, 'show'])->name('proyectos.show');
 
     // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -84,6 +81,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/precalificaciones/{precalificacion}/estado', [PrecalificacionController::class, 'cambiarEstado'])->name('precalificaciones.estado');
     Route::post('/precalificaciones/{id}/interacciones', [PrecalificacionController::class, 'storeInteraccion'])
     ->name('precalificaciones.interacciones.store');
+    Route::get('/precalificaciones/{id}', [PrecalificacionController::class, 'show'])->name('precalificaciones.show');
+    Route::put('/precalificaciones/{id}', [PrecalificacionController::class, 'update'])->name('precalificaciones.update');
 });
 
 require __DIR__.'/settings.php';

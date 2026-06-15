@@ -52,18 +52,23 @@ class PrecalificacionController extends Controller
         return redirect()->back()->with('message', 'Precalificación registrada con éxito');
     }
 
+
     public function show($id)
     {
+        // Traemos la precalificación con sus relaciones y sus interacciones/bitácora ordenadas
         $precalificacion = Precalificacion::with([
-            'empresa',
-            'division',
-            'persona',
-            'interacciones.persona', // Historial de notas de terreno vinculadas
-            'interacciones.user'
+            'empresa', 
+            'division', 
+            'persona', 
+            'interacciones.persona',
+            'interacciones.user' // Ajusta el nombre de la relación si es distinto
         ])->findOrFail($id);
 
         return Inertia::render('precalificaciones/Show', [
-            'precalificacion' => $precalificacion
+            'precalificacion' => $precalificacion,
+            'empresas' => Empresa::orderBy('nombre')->get(),
+            'divisiones' => Division::orderBy('nombre')->get(),
+            'personas' => Persona::with('trabajoActual.division')->get(),
         ]);
     }
 
@@ -109,6 +114,26 @@ class PrecalificacionController extends Controller
 
         return redirect()->back()->with('message', 'Nota registrada en la bitácora.');
     }
+
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'nombre_precalificacion' => 'required|string|max:255',
+            'empresa_id'             => 'required|exists:crm.empresas,id',
+            'division_id'            => 'required|exists:crm.divisiones,id',
+            'persona_id'             => 'nullable|exists:crm.personas,id',
+            'monto_estimado'         => 'nullable|numeric|min:0',
+            'resumen_visita'         => 'required|string',
+        ]);
+
+        $precalificacion = Precalificacion::findOrFail($id);
+        $precalificacion->update($validated);
+
+        return redirect()->route('precalificaciones.show', $id)
+            ->with('message', 'Propuesta actualizada correctamente.');
+    }
+
 
     public function alertasIndex()
     {

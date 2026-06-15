@@ -8,7 +8,6 @@ import PageHeader from '@/components/pages/PageHeader';
 import ContentPanel from '@/components/pages/ContentPanel';
 
 import PrecalificacionesTable from '@/components/precalificaciones/PrecalificacionesTable';
-import PrecalificacionShowModal from '@/components/precalificaciones/PrecalificacionShowModal';
 import PrecalificacionModal from '@/components/precalificaciones/PrecalificacionModal';
 
 interface Props {
@@ -20,10 +19,6 @@ interface Props {
 
 export default function Index({ precalificaciones, empresas, divisiones, personas }: Props) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [selectedPrecalificacion, setSelectedPrecalificacion] = useState<any | null>(null);
-
-    // Encontrar la versión fresca de la precalificación seleccionada desde las props reactivas de Inertia
-    const activePrecalificacion = precalificaciones.find(p => p.id === selectedPrecalificacion?.id) || selectedPrecalificacion;
 
     return (
         <AuthenticatedLayout>
@@ -39,10 +34,8 @@ export default function Index({ precalificaciones, empresas, divisiones, persona
                 />
 
                 <ContentPanel padding={false}>
-                    <PrecalificacionesTable 
-                        precalificaciones={precalificaciones} 
-                        onSelectRow={(item) => setSelectedPrecalificacion(item)}
-                    />
+                    {/* 🌟 La tabla ahora maneja internamente los links de redirección nativos */}
+                    <PrecalificacionesTable precalificaciones={precalificaciones} />
                 </ContentPanel>
             </PageContainer>
 
@@ -55,19 +48,13 @@ export default function Index({ precalificaciones, empresas, divisiones, persona
                 <Plus size={18} strokeWidth={3} />
             </button>
 
-            {/* Modal para Crear */}
+            {/* El único modal que conservamos aquí es el de Creación Rápida */}
             <PrecalificacionModal
                 isOpen={isCreateOpen}
                 onClose={() => setIsCreateOpen(false)}
                 empresas={empresas}
                 divisiones={divisiones}
                 personas={personas} 
-            />
-
-            {/* Modal de detalle, bitácora y aprobación */}
-            <PrecalificacionShowModal
-                precalificacion={activePrecalificacion}
-                onClose={() => setSelectedPrecalificacion(null)}
             />
         </AuthenticatedLayout>
     );

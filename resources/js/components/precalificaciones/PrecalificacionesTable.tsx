@@ -1,11 +1,11 @@
+import { Link } from '@inertiajs/react'; // 🌟 Cambiamos a Link de Inertia
 import { Eye, Building2, Wallet } from 'lucide-react';
 
 interface TableProps {
     precalificaciones: any[];
-    onSelectRow: (item: any) => void;
 }
 
-export default function PrecalificacionesTable({ precalificaciones, onSelectRow }: TableProps) {
+export default function PrecalificacionesTable({ precalificaciones }: TableProps) {
     
     const formatCurrency = (monto: number | null) => {
         if (!monto) return 'No definido';
@@ -27,14 +27,10 @@ export default function PrecalificacionesTable({ precalificaciones, onSelectRow 
     return (
         <div className="w-full">
             
-            {/* VISTA MOBILE: Tarjetas (Se mantiene intacta y adaptada) */}
+            {/* VISTA MOBILE */}
             <div className="block md:hidden space-y-3 px-1">
                 {precalificaciones.map((item) => (
-                    <div 
-                        key={item.id}
-                        className="bg-white dark:bg-[#111] border border-gray-100 dark:border-gray-800 rounded-2xl p-4 shadow-sm space-y-4 flex flex-col justify-between"
-                    >
-                        {/* Header */}
+                    <div key={item.id} className="bg-white dark:bg-[#111] border border-gray-100 dark:border-gray-800 rounded-2xl p-4 shadow-sm space-y-4 flex flex-col justify-between">
                         <div className="space-y-1">
                             <span className="font-black text-sm text-gray-800 dark:text-gray-200 uppercase tracking-tight leading-tight block">
                                 {item.nombre_precalificacion}
@@ -46,7 +42,6 @@ export default function PrecalificacionesTable({ precalificaciones, onSelectRow 
                             </span>
                         </div>
 
-                        {/* Footer */}
                         <div className="flex items-center justify-between pt-3 border-t border-gray-50 dark:border-gray-800/60">
                             <div className="flex flex-col">
                                 <span className="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-1 mb-0.5">
@@ -57,19 +52,20 @@ export default function PrecalificacionesTable({ precalificaciones, onSelectRow 
                                 </span>
                             </div>
 
-                            <button
-                                onClick={() => onSelectRow(item)}
+                            {/* 🌟 Navegación por Link */}
+                            <Link
+                                href={route('precalificaciones.show', item.id)}
                                 className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:text-[#c1f75e] font-black text-[10px] uppercase tracking-wider rounded-xl transition-colors border border-gray-200/50 dark:border-gray-800"
                             >
                                 <Eye size={14} />
                                 Evaluar
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* VISTA PC: Tabla tradicional con los ajustes estéticos de la app */}
+            {/* VISTA PC */}
             <div className="hidden md:block overflow-x-auto w-full">
                 <table className="w-full text-left border-collapse">
                     <thead>
@@ -84,10 +80,12 @@ export default function PrecalificacionesTable({ precalificaciones, onSelectRow 
                             <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                                 <td className="px-6 py-4">
                                     <div className="flex flex-col">
-                                        {/* Título en mayúscula y con hover a color de la marca */}
-                                        <span className="font-black text-sm text-gray-800 dark:text-gray-200 uppercase tracking-tight leading-tight group-hover:text-[#c1f75e] transition-colors">
+                                        <Link 
+                                            href={route('precalificaciones.show', item.id)}
+                                            className="font-black text-sm text-gray-800 dark:text-gray-200 uppercase tracking-tight leading-tight group-hover:text-[#c1f75e] transition-colors"
+                                        >
                                             {item.nombre_precalificacion}
-                                        </span>
+                                        </Link>
                                         <span className="text-[10px] text-gray-500 font-black uppercase mt-1 flex items-center gap-1.5 tracking-wider">
                                             <Building2 size={11} className="text-gray-400 dark:text-gray-600" /> 
                                             {item.empresa?.nombre || 'S/N'} 
@@ -101,14 +99,14 @@ export default function PrecalificacionesTable({ precalificaciones, onSelectRow 
                                 </td>
 
                                 <td className="px-6 py-4 text-right">
-                                    <button
-                                        onClick={() => onSelectRow(item)}
+                                    {/* 🌟 Navegación por Link */}
+                                    <Link
+                                        href={route('precalificaciones.show', item.id)}
                                         className="inline-flex items-center gap-2 px-3 py-1.5 text-gray-400 hover:text-black hover:bg-[#c1f75e] border border-transparent hover:border-gray-800 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all"
-                                        title="Evaluar Propuesta"
                                     >
                                         <Eye size={14} />
                                         <span>Evaluar</span>
-                                    </button>
+                                    </Link>
                                 </td>
                             </tr>
                         ))}
