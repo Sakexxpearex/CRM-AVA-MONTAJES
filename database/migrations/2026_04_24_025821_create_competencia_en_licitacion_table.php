@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('competencia_en_licitacion');
+        Schema::connection('crm')->dropIfExists('competencia_en_licitacion');
     }
 };

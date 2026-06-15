@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('historial_laboral');
+        Schema::connection('crm')->dropIfExists('historial_laboral');
     }
 };
