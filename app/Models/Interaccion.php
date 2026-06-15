@@ -18,6 +18,7 @@ class Interaccion extends Model
         'fecha',
         'comentario',
         'tipo_contacto',
+        'precalificacion_id', 
     ];
 
     // 3. Casteos (Para que Laravel sepa automáticamente que 'fecha' es un objeto Date y no un simple texto)
@@ -52,6 +53,11 @@ class Interaccion extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function precalificacion()
+{
+    return $this->belongsTo(Precalificacion::class, 'precalificacion_id');
+}
 
     public function getOrigenAttribute(): string
 {

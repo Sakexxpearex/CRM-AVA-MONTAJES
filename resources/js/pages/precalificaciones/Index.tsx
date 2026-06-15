@@ -34,7 +34,6 @@ export default function Index({ precalificaciones, empresas, divisiones, persona
                 />
 
                 <ContentPanel padding={false}>
-                    {/* 🌟 La tabla ahora maneja internamente los links de redirección nativos */}
                     <PrecalificacionesTable precalificaciones={precalificaciones} />
                 </ContentPanel>
             </PageContainer>
@@ -48,7 +47,7 @@ export default function Index({ precalificaciones, empresas, divisiones, persona
                 <Plus size={18} strokeWidth={3} />
             </button>
 
-            {/* El único modal que conservamos aquí es el de Creación Rápida */}
+            {/* Creación Rápida */}
             <PrecalificacionModal
                 isOpen={isCreateOpen}
                 onClose={() => setIsCreateOpen(false)}

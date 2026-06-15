@@ -4,7 +4,7 @@ import { X, Check, CornerDownRight, MessageSquare, Send, Calendar, User, Buildin
 interface ShowProps {
     precalificacion: any | null;
     onClose: () => void;
-    onEditClick: (precalificacion: any) => void; // 🌟 Nueva función gatillo
+    onEditClick: (precalificacion: any) => void;
 }
 
 export default function PrecalificacionShowModal({ precalificacion, onClose, onEditClick }: ShowProps) {
@@ -50,7 +50,7 @@ export default function PrecalificacionShowModal({ precalificacion, onClose, onE
                     </h2>
                 </div>
 
-                {/* Contenido (Se mantiene idéntico a tu diseño) */}
+                {/* Contenido */}
                 <div className="p-6 space-y-5 overflow-y-auto flex-1 text-sm style-scrollbar">
                     <div className="space-y-1">
                         <span className="text-[9px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest block">Proyecto</span>
@@ -104,7 +104,7 @@ export default function PrecalificacionShowModal({ precalificacion, onClose, onE
                         </div>
                     </div>
 
-                    {/* Bitácora de Comentarios */}
+                    {/* Comentarios */}
                     <div className="border-t border-gray-100 dark:border-gray-800/60 pt-4 space-y-3">
                         <span className="text-[9px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest block">Bitácora de Notas y Seguimiento</span>
                         <form onSubmit={handleGuardarInteraccion} className="flex gap-2">
@@ -120,11 +120,11 @@ export default function PrecalificacionShowModal({ precalificacion, onClose, onE
                     </div>
                 </div>
 
-                {/* Footer - 🌟 AQUÍ INTEGRAMOS EL BOTÓN EDITAR */}
+                {/* Footer */}
                 <div className="p-6 pt-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-black/20 shrink-0">
                     {precalificacion.estado === 'Pendiente' ? (
                         <div className="flex flex-col gap-3">
-                            {/* Fila superior: El nuevo botón de edición */}
+                            {/* Botón de edición */}
                             <button
                                 type="button"
                                 onClick={() => onEditClick(precalificacion)}
@@ -134,7 +134,7 @@ export default function PrecalificacionShowModal({ precalificacion, onClose, onE
                                 Editar Datos Básicos
                             </button>
 
-                            {/* Fila inferior: Decisiones finales */}
+                            {/* Decisiones finales */}
                             <div className="grid grid-cols-2 gap-4">
                                 <button
                                     type="button"

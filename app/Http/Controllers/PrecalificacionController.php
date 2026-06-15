@@ -10,6 +10,7 @@ use App\Models\Licitacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class PrecalificacionController extends Controller
@@ -97,23 +98,26 @@ class PrecalificacionController extends Controller
     }
 
     public function storeInteraccion(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'comentario'    => 'required|string',
-            'tipo_contacto' => 'required|string|in:Reunión Presencial,Llamada,Correo,WhatsApp,Otro'
-        ]);
+{
+    $validated = $request->validate([
+        'comentario' => 'required|string',
+        'tipo_contacto' => 'required|in:Reunión Presencial,Llamada,Correo,WhatsApp,Otro',
+    ]);
 
-        $precalificacion = Precalificacion::findOrFail($id);
-        $precalificacion->interacciones()->create([
-            'comentario'    => $validated['comentario'],
-            'tipo_contacto' => $validated['tipo_contacto'],
-            'persona_id'    => $precalificacion->persona_id, 
-            'user_id'       => auth()->id(),              
-            'fecha'         => now()->format('Y-m-d'),      
-        ]);
+    $precalificacion = Precalificacion::findOrFail($id);
 
-        return redirect()->back()->with('message', 'Nota registrada en la bitácora.');
-    }
+    $precalificacion->interacciones()->create([
+        'comentario'       => $validated['comentario'],
+        'tipo_contacto' => $validated['tipo_contacto'],
+        'user_id'          => Auth::id(), 
+        'fecha'            => now(),
+        'persona_id'       => $precalificacion->persona_id,
+    ]);
+
+    return redirect()->route('precalificaciones.show', $id)
+        ->with('message', 'Nota registrada en la bitácora.');
+}
+
 
 
     public function update(Request $request, $id)

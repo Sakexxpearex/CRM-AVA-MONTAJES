@@ -17,8 +17,10 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
     const [isEditing, setIsEditing] = useState(false);
 
     // Formulario para Notas/Bitácora
+    // El valor por defecto inicial: 'Reunión Presencial'
     const noteForm = useForm({
         comentario: '',
+        tipo_contacto: 'Reunión Presencial', 
     });
 
     // Formulario de Edición de datos básicos
@@ -38,13 +40,11 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
 
     const personasFiltradas = editForm.data.empresa_id
     ? personas.filter((p) => {
-        // Opción 1: Validar si la división directa de la persona pertenece a la empresa
         const divisionDirecta = divisiones.find(d => String(d.id) === String(p.division_id));
         if (divisionDirecta && String(divisionDirecta.empresa_id) === String(editForm.data.empresa_id)) {
             return true;
         }
         
-        // Opción 2: Validar a través de su relación de trabajoActual (mapeado como trabajo_actual por Laravel)
         const idEmpresaDePersona = p.trabajo_actual?.division?.empresa_id;
         return String(idEmpresaDePersona) === String(editForm.data.empresa_id);
     })
@@ -64,7 +64,9 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
 
         noteForm.post(route('precalificaciones.interacciones.store', precalificacion.id), {
             preserveScroll: true,
-            onSuccess: () => noteForm.reset('comentario')
+            onSuccess: () => {
+                noteForm.reset('comentario');
+            }
         });
     };
 
@@ -75,12 +77,23 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
         });
     };
 
+
+    const getBadgeStyle = (tipo: string) => {
+        switch (tipo) {
+            case 'Reunión Presencial': return 'bg-[#c1f75e]/10 text-[#c1f75e] border border-[#c1f75e]/20';
+            case 'Llamada': return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+            case 'Correo': return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+            case 'WhatsApp': return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+            case 'Otro': default: return 'bg-gray-500/10 text-gray-400 border border-gray-500/20';
+        }
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title={`Evaluación - ${precalificacion.nombre_precalificacion}`} />
 
             <PageContainer>
-                {/* Header de navegación con botón para regresar */}
+                {/* Header */}
                 <div className="mb-4">
                     <Link 
                         href={route('precalificaciones.index')} 
@@ -98,7 +111,7 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                     
-                    {/* COLUMNA IZQUIERDA: Detalles de la Oportunidad / Formulario de Edición (Ocupa 2 columnas) */}
+                    {/* Detalles/ Formulario de edición */}
                     <div className="lg:col-span-2 space-y-6">
                         <div className="bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm transition-all">
                             
@@ -118,7 +131,7 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
                             </div>
 
                             {!isEditing ? (
-                                /* MODO LECTURA */
+
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-1">
@@ -150,7 +163,7 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
 
                                     <div className="space-y-1">
                                         <span className="text-[9px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest block">Monto Preliminar Estimado</span>
-                                        <div className="w-full bg-gray-50 dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl text-base px-3 py-2.5 text-[#c1f75e] font-mono font-black tracking-tight flex items-center gap-2">
+                                        <div className="w-full bg-gray-50 dark:bg-black border border-gray-100 dark:border-gray-800 text-base px-3 py-2.5 text-[#c1f75e] font-mono font-black tracking-tight flex items-center gap-2">
                                             <Wallet size={14} className="text-gray-400" />
                                             {precalificacion.monto_estimado ? new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(precalificacion.monto_estimado) : 'No estipulado'}
                                         </div>
@@ -158,13 +171,12 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
 
                                     <div className="space-y-1">
                                         <span className="text-[9px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest block">Minuta / Resumen de Visita</span>
-                                        <div className="w-full bg-gray-50 dark:bg-black border border-gray-100 dark:border-gray-800 rounded-xl text-xs p-4 text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
+                                        <div className="w-full bg-gray-50 dark:bg-black border border-gray-100 dark:border-gray-800 text-xs p-4 text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
                                             {precalificacion.resumen_visita || precalificacion.descripcion || 'Sin descripción técnica.'}
                                         </div>
                                     </div>
                                 </div>
                             ) : (
-                                /* MODO EDICIÓN FORMULARIO ACTIVO */
                                 <form onSubmit={handleUpdatePropuesta} className="space-y-4">
                                     <div>
                                         <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider italic mb-1">Nombre Oportunidad / Proyecto</label>
@@ -261,7 +273,7 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
                             )}
                         </div>
 
-                        {/* Bloque de Decisiones de Aprobación */}
+                        {/* Aprobación/Rechazo */}
                         <div className="bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
                             <span className="text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-wider block mb-4">
                                 Resolución de Viabilidad del Proyecto
@@ -295,24 +307,29 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
                         </div>
                     </div>
 
-                    {/* COLUMNA DERECHA: Panel Lateral de Bitácora y Seguimiento */}
+                    {/* Bitácora */}
                     <div className="space-y-4">
-                        <div className="bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col max-h-[600px]">
+                        <div className="bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col max-h-[620px]">
                             <h3 className="text-sm font-black uppercase text-gray-400 dark:text-gray-500 tracking-wider flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-gray-800/80 mb-4 shrink-0">
                                 <MessageSquare size={16} className="text-[#c1f75e]" />
                                 Bitácora de Notas
                             </h3>
 
-                            {/* Listado de Interacciones históricas */}
+                            {/* Listado de interacciones  */}
                             <div className="flex-1 overflow-y-auto space-y-3 pr-1 style-scrollbar text-xs">
                                 {precalificacion.interacciones && precalificacion.interacciones.length > 0 ? (
                                     precalificacion.interacciones.map((note: any) => (
-                                        <div key={note.id} className="bg-gray-50 dark:bg-black/40 border border-gray-100 dark:border-gray-800/60 p-3 rounded-xl space-y-1">
+                                        <div key={note.id} className="bg-gray-50 dark:bg-black/40 border border-gray-100 dark:border-gray-800/60 p-3 rounded-xl space-y-2">
                                             <div className="flex items-center justify-between text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase">
-                                                <span>{note.user?.name || 'Sistema'}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`px-1.5 py-0.5 rounded text-[8px] tracking-wide font-black uppercase ${getBadgeStyle(note.tipo_contacto)}`}>
+                                                        {note.tipo_contacto || 'Nota'}
+                                                    </span>
+                                                    <span>{note.user?.name || 'Sistema'}</span>
+                                                </div>
                                                 <span>{new Date(note.created_at).toLocaleDateString('es-CL')}</span>
                                             </div>
-                                            <p className="text-gray-700 dark:text-gray-300 leading-normal">{note.comentario}</p>
+                                            <p className="text-gray-700 dark:text-gray-300 leading-normal font-medium">{note.comentario}</p>
                                         </div>
                                     ))
                                 ) : (
@@ -322,26 +339,46 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
                                 )}
                             </div>
 
-                            {/* Campo de envío de notas */}
-                            <form onSubmit={handleSaveBitacora} className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 shrink-0">
-                                <input
-                                    type="text"
-                                    value={noteForm.data.comentario}
-                                    onChange={e => noteForm.setData('comentario', e.target.value)}
-                                    placeholder="Registrar evento o nota..."
-                                    className="flex-1 bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-xl px-3 py-2.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#c1f75e]"
-                                />
-                                <button 
-                                    type="submit" 
-                                    disabled={noteForm.processing}
-                                    className="bg-gray-100 dark:bg-white/5 hover:bg-[#c1f75e] hover:text-black text-gray-400 p-2.5 rounded-xl transition-all border border-transparent dark:border-gray-800"
-                                >
-                                    <Send size={13} />
-                                </button>
+                            {/* Formulario de Registro  */}
+                            <form onSubmit={handleSaveBitacora} className="space-y-3 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 shrink-0">
+                                <div>
+                                    <label className="block text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">
+                                        Tipo de Registro
+                                    </label>
+                                    {/* Mapeo del select directo a noteForm.data.tipo_contacto utilizando valores del enum */}
+                                    <select
+                                        value={noteForm.data.tipo_contacto}
+                                        onChange={e => noteForm.setData('tipo_contacto', e.target.value)}
+                                        className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-700 dark:text-white focus:outline-none focus:border-[#c1f75e]"
+                                    >
+                                        <option value="Reunión Presencial">Reunión Presencial</option>
+                                        <option value="Llamada">Llamada</option>
+                                        <option value="Correo">Correo</option>
+                                        <option value="WhatsApp">WhatsApp</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={noteForm.data.comentario}
+                                        onChange={e => noteForm.setData('comentario', e.target.value)}
+                                        placeholder="Escribe un comentario en la bitácora..."
+                                        required
+                                        className="flex-1 bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-xl px-3 py-2.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#c1f75e]"
+                                    />
+                                    <button 
+                                        type="submit" 
+                                        disabled={noteForm.processing}
+                                        className="bg-gray-100 dark:bg-white/5 hover:bg-[#c1f75e] hover:text-black text-gray-400 p-2.5 rounded-xl transition-all border border-transparent dark:border-gray-800 flex items-center justify-center shrink-0"
+                                    >
+                                        <Send size={13} />
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
-
                 </div>
             </PageContainer>
         </AuthenticatedLayout>
