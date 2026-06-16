@@ -12,15 +12,16 @@ class Evaluacion extends Model
     protected $connection = 'crm';
     protected $table = 'evaluaciones';
 
-    protected $fillable = [
-        'licitacion_id',
-        'empresa_id',
-        'persona_id',
-        'estrellas_empresa',
-        'comentario_empresa',
-        'estrellas_persona',
-        'comentario_persona',
-    ];
+protected $fillable = [
+    'licitacion_id',
+    'empresa_id',
+    'division_id',
+    'persona_id',  
+    'estrellas_empresa',
+    'comentario_empresa',
+    'estrellas_persona',
+    'comentario_persona',
+];
 
     public function licitacion()
     {
