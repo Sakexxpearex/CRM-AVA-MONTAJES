@@ -253,13 +253,14 @@ export default function Show({ licitacion, empresasCompetencia, empresas, divisi
                     </div>
                 </div>
             )}
-
             <PipelineModal 
                 isOpen={isPipelineModalOpen}
                 onClose={() => setIsPipelineModalOpen(false)}
                 licitacion={licitacion}
                 empresasCompetencia={empresasCompetencia || []}
+                contactos={licitacion?.division?.personas || []}
             />
+
 
             <LicitacionEditModal 
                 isOpen={isEditModalOpen}

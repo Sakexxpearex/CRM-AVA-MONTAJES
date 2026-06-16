@@ -47,7 +47,7 @@ export default function Index({
         // FIX: Se agregó la limpieza del estado del filtro de empresa
         setEmpresaFiltro('');
     };
-
+    console.log("Datos de la primera licitación:", licitaciones[0]);
     useEffect(() => {
         if (firstRender.current) {
             firstRender.current = false;

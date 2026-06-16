@@ -138,7 +138,6 @@ public function store(Request $request)
         $persona->load([
             'historialLaboral.division.empresa',
             'trabajoActual.division.empresa',
-            'notas.user',
             'interacciones' => function($query) {
                 $query->with(['user', 'licitacion'])->latest();
             },

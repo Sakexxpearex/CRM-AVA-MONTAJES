@@ -7,6 +7,7 @@ use App\Models\Licitacion;
 use App\Models\Empresa;
 use App\Models\Division;
 use App\Models\Proyecto;
+use App\Models\Evaluacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -16,13 +17,14 @@ use Inertia\Inertia;
 
 class LicitacionController extends Controller
 {
-    public function index(Request $request)
+public function index(Request $request)
     {
         $todas = Licitacion::all();
         
         $montoOrder = $request->input('monto_order');
 
-        $licitacionesActivas = Licitacion::with(['empresa', 'division'])
+        // Se agrega division.personas para disponer de los contactos en el frontend
+        $licitacionesActivas = Licitacion::with(['empresa', 'division.personas'])
             ->when($request->filled('search'), function ($query) use ($request) {
                 // Para que ignore los acentos
                 $searchTerm = '%' . $request->string('search')->trim() . '%';
@@ -41,7 +43,8 @@ class LicitacionController extends Controller
             })
             ->get();
         
-        $alertasVencidas = Licitacion::with(['empresa', 'division'])
+        // Tambien se agrega aqui por si se gestiona una licitacion desde las alertas
+        $alertasVencidas = Licitacion::with(['empresa', 'division.personas'])
             ->whereNotIn('estado_pipeline', ['Ganada', 'Adjudicada', 'Operativa', 'Perdida', 'Cerrada', 'Desierta'])
             ->enAlerta()
             ->get();
@@ -148,24 +151,54 @@ class LicitacionController extends Controller
 
         return back();
     }
-
-    public function adjudicar(Request $request, $id)
+public function cerrarLicitacion(Request $request, $id)
     {
         $licitacion = Licitacion::findOrFail($id);
 
-        $request->validate([
-            'centro_costo' => 'required|string|unique:usuarios.proyectos,centro_costo'
+        // Se agrega persona_id a las reglas de validacion
+        $validated = $request->validate([
+            'estado_pipeline'    => 'required|in:Adjudicada,Operativa,Perdida,Desierta',
+            'estrellas_empresa'  => 'nullable|integer|min:1|max:5',
+            'comentario_empresa' => 'nullable|string',
+            'persona_id'         => 'nullable|integer', 
+            'estrellas_persona'  => 'nullable|integer|min:1|max:5',
+            'comentario_persona' => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($licitacion, $request) {
-            Proyecto::create([
-                'centro_costo' => $request->centro_costo,
-                'nombre'       => $licitacion->nombre_proyecto,
-                'alias'        => strtoupper(Str::limit($licitacion->nombre_proyecto, 10, '')),
-            ]);
+        DB::transaction(function () use ($licitacion, $validated) {
+            
+            // 1. Actualizar Licitacion
+            $licitacion->estado_pipeline = $validated['estado_pipeline'];
+
+            if (in_array($validated['estado_pipeline'], ['Adjudicada', 'Operativa'])) {
+                $licitacion->monto_adjudicado = $licitacion->monto_estimado;
+                $licitacion->fecha_adjudicacion = now();
+            }
+
+            $licitacion->save();
+
+            // 2. Registrar Evaluacion
+           if (!empty($validated['estrellas_empresa']) || !empty($validated['estrellas_persona'])) {
+                
+                Evaluacion::updateOrCreate(
+                    // A. El filtro de búsqueda: ¿Ya existe una evaluación para esta licitación?
+                    ['licitacion_id' => $licitacion->id],
+                    
+                    // B. Los datos a insertar (si es nueva) o sobrescribir (si ya existía)
+                    [
+                        'empresa_id'         => $licitacion->empresa_id,
+                        'division_id'        => $licitacion->division_id,
+                        'persona_id'         => $validated['persona_id'] ?? null,
+                        'estrellas_empresa'  => $validated['estrellas_empresa'] ?? null,
+                        'comentario_empresa' => $validated['comentario_empresa'] ?? null,
+                        'estrellas_persona'  => $validated['estrellas_persona'] ?? null,
+                        'comentario_persona' => $validated['comentario_persona'] ?? null,
+                    ]
+                );
+            }
         });
 
-        return redirect()->route('licitaciones.index')->with('message', '¡Éxito! Proyecto creado y métricas de AVA actualizadas.');
+        return redirect()->back()->with('message', "Licitacion cerrada como '{$validated['estado_pipeline']}' y evaluacion registrada.");
     }
 
    public function transcribe(Request $request)
