@@ -144,10 +144,19 @@ public function store(Request $request)
            
         ]);
 
+        // Muestra las licitaciones que coinciden con la empresa y division del contacto, o todas si no tiene un trabajo actual
+        $licitacionesQuery = Licitacion::select('id', 'nombre_proyecto as nombre');
+
+        if ($persona->trabajoActual && $persona->trabajoActual->division) {
+            $division = $persona->trabajoActual->division;
+            $licitacionesQuery->where('empresa_id', $division->empresa_id)
+                              ->where('division_id', $division->id);
+        }
+
         return Inertia::render('personas/Show', [
             'persona' => $persona,
             'divisiones' => Division::with('empresa')->get(),
-            'licitaciones' => Licitacion::select('id', 'nombre_proyecto as nombre')->get()
+            'licitaciones' => $licitacionesQuery->get()
         ]);
     }
 

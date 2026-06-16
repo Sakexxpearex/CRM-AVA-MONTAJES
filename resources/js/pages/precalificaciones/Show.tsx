@@ -37,11 +37,16 @@ export default function Show({ precalificacion, empresas, divisiones, personas }
     const personasFiltradas = editForm.data.empresa_id
     ? personas.filter((p) => {
         const divisionDirecta = divisiones.find(d => String(d.id) === String(p.division_id));
-        if (divisionDirecta && String(divisionDirecta.empresa_id) === String(editForm.data.empresa_id)) {
-            return true;
+        const idEmpresaDePersona = divisionDirecta ? String(divisionDirecta.empresa_id) : String(p.trabajo_actual?.division?.empresa_id);
+        
+        let match = idEmpresaDePersona === String(editForm.data.empresa_id);
+        // Solo muestra los contactos que pertenecen a la empresa y division seleccionada
+        if (editForm.data.division_id) {
+            const idDivisionDePersona = p.trabajo_actual?.division_id ? String(p.trabajo_actual.division_id) : String(p.division_id);
+            match = match && (idDivisionDePersona === String(editForm.data.division_id));
         }
-        const idEmpresaDePersona = p.trabajo_actual?.division?.empresa_id;
-        return String(idEmpresaDePersona) === String(editForm.data.empresa_id);
+        
+        return match;
     })
     : [];
 

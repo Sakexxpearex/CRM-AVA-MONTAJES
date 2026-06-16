@@ -69,8 +69,17 @@ export default function PrecalificacionModal({ isOpen, onClose, empresas, divisi
 
     const personasFiltradas = data.empresa_id
         ? personas.filter((p) => {
-            const idEmpresaDePersona = p.trabajo_actual?.division?.empresa_id;
-            return String(idEmpresaDePersona) === String(data.empresa_id);
+            const divisionDirecta = divisiones.find(d => String(d.id) === String(p.division_id));
+            const idEmpresaDePersona = divisionDirecta ? String(divisionDirecta.empresa_id) : String(p.trabajo_actual?.division?.empresa_id);
+            
+            let match = idEmpresaDePersona === String(data.empresa_id);
+            // Para que solo aparezcan los contactos que pertenecen a la empresa y division seleccionada
+            if (data.division_id) {
+                const idDivisionDePersona = p.trabajo_actual?.division_id ? String(p.trabajo_actual.division_id) : String(p.division_id);
+                match = match && (idDivisionDePersona === String(data.division_id));
+            }
+            
+            return match;
         })
         : [];
 

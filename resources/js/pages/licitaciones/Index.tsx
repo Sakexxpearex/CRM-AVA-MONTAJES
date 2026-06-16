@@ -23,12 +23,25 @@ export default function Index({
     estados = [],
 }: any) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    // Definimos 'kanban' como la vista por defecto
-    const [vista, setVista] = useState<'kanban' | 'tabla'>('kanban');
+    // Recuperamos la vista guardada o usamos kanba por defecto
+    const [vista, setVista] = useState<'kanban' | 'tabla'>(() => {
+        if (typeof window !== 'undefined') {
+            return (localStorage.getItem('licitaciones_vista') as 'kanban' | 'tabla') || 'kanban';
+        }
+        return 'kanban';
+    });
+
+    // Funcion para cambiar y guardar la vista
+    const cambiarVista = (nuevaVista: 'kanban' | 'tabla') => {
+        setVista(nuevaVista);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('licitaciones_vista', nuevaVista);
+        }
+    };
 
     const [searchTerm, setSearchTerm] = useState(filters.search ?? '');
     const [estadoFiltro, setEstadoFiltro] = useState(filters.estado ?? '');
-    // NUEVO: Estado para el filtro de empresa, inicializado con el valor de URL si existe.
+    // Estado para el filtro de empresa, inicializado con el valor de URL si existe.
     const [empresaFiltro, setEmpresaFiltro] = useState(filters.empresa ?? '');
     const [montoOrder, setMontoOrder] = useState(filters.monto_order ?? '');
     const firstRender = useRef(true);
@@ -74,7 +87,7 @@ export default function Index({
         }, 350);
 
         return () => window.clearTimeout(timeout);
-    // MODIFICACIÓN: Se añade empresaFiltro al array de dependencias para que dispare el fetch al cambiar
+    // Se añade empresaFiltro al array de dependencias para que dispare el fetch al cambiar
     }, [searchTerm, estadoFiltro, empresaFiltro, montoOrder]);
 
     return (
@@ -92,7 +105,7 @@ export default function Index({
                     {/* Selector para elegir entre el tablero o la lista */}
                     <div className="flex bg-white/5 p-1 rounded-lg border border-gray-800 gap-1 w-full sm:w-auto justify-center sm:mr-4">
                         <button 
-                            onClick={() => setVista('kanban')}
+                            onClick={() => cambiarVista('kanban')}
                             className={`flex items-center gap-1.5 px-3 py-2 h-[32px] rounded text-[10px] font-black uppercase tracking-wider transition-all duration-150 ${
                                 vista === 'kanban' 
                                     ? 'bg-[#c1f75e] text-black shadow-lg shadow-[#c1f75e]/10' 
@@ -103,7 +116,7 @@ export default function Index({
                             <span>Tablero</span>
                         </button>
                         <button 
-                            onClick={() => setVista('tabla')}
+                            onClick={() => cambiarVista('tabla')}
                             className={`flex items-center gap-1.5 px-3 py-2 h-[32px] rounded text-[10px] font-black uppercase tracking-wider transition-all duration-150 ${
                                 vista === 'tabla' 
                                     ? 'bg-[#c1f75e] text-black shadow-lg shadow-[#c1f75e]/10' 
@@ -118,7 +131,7 @@ export default function Index({
 
                 <LicitacionStats stats={stats} />
 
-                {/* MODIFICACIÓN: Solo se renderiza el buscador si la vista actual es 'tabla' */}
+                {/* Solo se renderiza el buscador si la vista actual es tabla' */}
                 {vista === 'tabla' && (
                     <div className="flex justify-start">
                         <SearchLicitacion
@@ -126,14 +139,14 @@ export default function Index({
                             onChange={setSearchTerm}
                             estado={estadoFiltro}
                             onEstadoChange={setEstadoFiltro}
-                            // NUEVO: Se pasan las empresas y el estado del filtro al componente hijo
+                            // Se pasan las empresas y el estado del filtro al componente hijo
                             empresas={empresas}
                             empresa={empresaFiltro}
                             onEmpresaChange={setEmpresaFiltro}
                             montoOrder={montoOrder}
                             onMontoOrderChange={setMontoOrder}
                             estados={estados}
-                            // FIX: Se pasa la función handleClearFilters a la prop onClear
+                            // Se pasa la función handleClearFilters a la prop onClear
                             onClear={handleClearFilters}
                         />
                     </div>
