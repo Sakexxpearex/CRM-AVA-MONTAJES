@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/layouts/authenticated/AuthenticatedLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
-import { Building2, Hash, Tag, ChevronLeft, Layers, Plus, Edit3, Trash2, Users, Briefcase, ExternalLink } from 'lucide-react';
+import { Building2, Hash, Tag, ChevronLeft, Layers, Plus, Edit3, Trash2, Users, Briefcase, ExternalLink, Star } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
 // Componentes de pagina
@@ -79,7 +79,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
     const deleteDivision = (e: React.MouseEvent, id: number) => {
         e.stopPropagation();
-        if (confirm('¿Estás seguro de eliminar esta división?')) {
+        if (confirm('¿Estas seguro de eliminar esta division?')) {
             router.delete(route('divisiones.destroy', id));
         }
     };
@@ -102,7 +102,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
             <Head title={`${empresa.nombre} - AVA`} />
 
             <PageContainer>
-                {/* Navegación */}
+                {/* Navegacion */}
                 <Link
                     href={route('empresas.index')}
                     className="flex items-center gap-2 text-gray-500 hover:text-[#c1f75e] transition-colors text-[10px] font-black uppercase tracking-widest w-fit mb-2"
@@ -119,9 +119,51 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Información básica */}
+                    {/* Informacion basica y Reputacion */}
                     <div className="lg:col-span-4 space-y-6">
-                        <ContentPanel title="Identificación Comercial">
+                        
+                        {/* Tipo de empresa */}
+                        <div className="p-6 rounded-2xl bg-[#c1f75e] text-black shadow-lg shadow-[#c1f75e]/10 flex justify-between items-center">
+                            <div>
+                                <p className="text-[8px] font-black uppercase tracking-[0.2em] opacity-60">Categoria de Entidad</p>
+                                <h2 className="text-xl font-black uppercase italic">{empresa.tipo}</h2>
+                            </div>
+                            <Briefcase size={24} className="opacity-40" />
+                        </div>
+
+                        {/* Tarjeta de Evaluacion Global */}
+                        <div className="p-6 rounded-2xl bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                            <div className="space-y-1.5">
+                                <span className="text-[9px] font-black uppercase text-gray-400 dark:text-gray-500 block tracking-wider">
+                                    Valoracion Total
+                                </span>
+                                <div className="flex items-center gap-1">
+                                    {[1, 2, 3, 4, 5].map((star) => {
+                                        const notaRedondeada = Math.round(empresa.promedio_estrellas || 0);
+                                        return (
+                                            <Star
+                                                key={`global-star-${star}`}
+                                                size={16}
+                                                className={star <= notaRedondeada
+                                                    ? "text-yellow-400 fill-yellow-400"
+                                                    : "text-gray-300 dark:text-gray-800"
+                                                }
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div className="border-l border-gray-200 dark:border-gray-800 pl-5 text-center">
+                                <span className="text-3xl font-black dark:text-white font-mono block leading-none">
+                                    {empresa.promedio_estrellas && empresa.promedio_estrellas > 0 
+                                        ? Number(empresa.promedio_estrellas).toFixed(1) 
+                                        : '0.0'
+                                    }
+                                </span>
+                            </div>
+                        </div>
+
+                        <ContentPanel title="Identificacion Comercial">
                             <div className="space-y-4">
                                 <InfoItem
                                     icon={Hash}
@@ -135,15 +177,9 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                 />
                             </div>
                         </ContentPanel>
-
-                        {/* Tipo de empresa */}
-                        <div className="p-6 rounded-2xl bg-[#c1f75e] text-black shadow-lg shadow-[#c1f75e]/10">
-                            <p className="text-[8px] font-black uppercase tracking-[0.2em] opacity-60">Categoría de Entidad</p>
-                            <h2 className="text-xl font-black uppercase italic">{empresa.tipo}</h2>
-                        </div>
                     </div>
 
-                    {/* Divisiones y gestión */}
+                    {/* Divisiones y gestion */}
                     <div className="lg:col-span-8 space-y-8">
                         {/* Divisiones (clientes) */}
                         {empresa.tipo === 'Cliente' && (
@@ -161,7 +197,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                         }}
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-gray-800 rounded-lg text-[10px] font-black uppercase text-[#c1f75e] hover:bg-[#c1f75e]/10 transition-all"
                                     >
-                                        <Plus size={14} /> Nueva División
+                                        <Plus size={14} /> Nueva Division
                                     </button>
                                 </div>
 
@@ -170,7 +206,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                         <div
                                             key={div.id}
                                             onClick={() => setSelectedDivisionId(selectedDivisionId === div.id ? null : div.id)}
-                                            className={`p-4 border rounded-xl cursor-pointer transition-all group ${
+                                            className={`p-4 border rounded-xl cursor-pointer transition-all group flex flex-col justify-between ${
                                                 selectedDivisionId === div.id ? 'border-[#c1f75e] bg-[#c1f75e]/5' : 'border-gray-800 hover:border-gray-700'
                                             }`}
                                         >
@@ -182,6 +218,27 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button onClick={(e) => handleEditDivision(e, div)} className="p-1 hover:text-[#c1f75e]"><Edit3 size={14} /></button>
                                                     <button onClick={(e) => deleteDivision(e, div.id)} className="p-1 hover:text-red-500"><Trash2 size={14} /></button>
+                                                </div>
+                                            </div>
+
+                                            {/* Inserto: Evaluacion de la division */}
+                                            <div className="mt-4 flex items-center justify-between border-t border-gray-800 pt-3">
+                                                <span className="text-[9px] font-black uppercase text-gray-500 tracking-wider">
+                                                    valoracion Local
+                                                </span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <Star 
+                                                        size={12} 
+                                                        className={div.promedio_estrellas && div.promedio_estrellas > 0 
+                                                            ? "text-yellow-400 fill-yellow-400" 
+                                                            : "text-gray-300 dark:text-gray-700"} 
+                                                    />
+                                                    <span className={`text-[10px] font-bold font-mono ${!div.promedio_estrellas ? 'text-gray-500' : 'text-gray-800 dark:text-gray-200'}`}>
+                                                        {div.promedio_estrellas && div.promedio_estrellas > 0 
+                                                            ? Number(div.promedio_estrellas).toFixed(1)
+                                                            : 'S/N'
+                                                        }
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -201,7 +258,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
 
                             {filteredContactos.length === 0 ? (
                                 <div className="p-8 text-center border border-dashed border-gray-800 rounded-2xl text-gray-500 text-xs uppercase font-medium">
-                                    No hay personal clave asociado a esta selección
+                                    No hay personal clave asociado a esta seleccion
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -220,16 +277,36 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
                                                 <div className="mt-3 space-y-1.5">
                                                     <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase font-medium">
                                                         <Layers size={12} className="text-[#c1f75e]/70" />
-                                                        <span>División: {c.divisiones?.[0]?.nombre || '---'}</span>
+                                                        <span>Division: {c.divisiones?.[0]?.nombre || '---'}</span>
                                                     </div>
                                                     <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase font-medium italic">
                                                         <Briefcase size={12} className="text-[#c1f75e]/70" />
                                                         <span>Cargo: {c.divisiones?.[0]?.pivot?.cargo || '---'}</span>
                                                     </div>
+                                                    {/* Inserto: Valoración de la Persona */}
+                                                        <div className="mt-4 flex items-center justify-between border-t border-gray-800/50 pt-3">
+                                                            <span className="text-[9px] font-black uppercase text-gray-500 tracking-wider">
+                                                                Valoración Personal
+                                                            </span>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <Star 
+                                                                    size={12} 
+                                                                    className={c.promedio_estrellas && c.promedio_estrellas > 0 
+                                                                        ? "text-yellow-400 fill-yellow-400" 
+                                                                        : "text-gray-300 dark:text-gray-800"} 
+                                                                />
+                                                                <span className={`text-[10px] font-bold font-mono ${!c.promedio_estrellas ? 'text-gray-500' : 'text-gray-800 dark:text-gray-200'}`}>
+                                                                    {c.promedio_estrellas && c.promedio_estrellas > 0 
+                                                                        ? Number(c.promedio_estrellas).toFixed(1)
+                                                                        : 'S/N'
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div>
                                                 </div>
                                             </div>
 
-                                            {/* Acción */}
+                                            {/* Accion */}
                                             <div className="mt-4 pt-3 border-t border-gray-900 flex justify-end">
                                                 <Link 
                                                     href={route('personas.show', c.id)} 
@@ -279,7 +356,7 @@ export default function EmpresaShow({ empresa, divisiones, contactos }: any) {
     );
 }
 
-// Componente auxiliar para ítems de información
+// Componente auxiliar para items de informacion
 function InfoItem({ icon: Icon, label, value }: InfoItemProps) {
     if (!value) return null;
     return (

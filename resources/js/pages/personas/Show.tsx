@@ -3,7 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
 import {
     ChevronLeft, Mail, Phone, Building2, Briefcase,
-    MessageSquare, Plus, X, User, Hash, Linkedin, Edit3
+    MessageSquare, Plus, X, User, Hash, Linkedin, Edit3, Star
 } from 'lucide-react';
 
 import React from 'react';
@@ -23,7 +23,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
     const formExp = useForm({ persona_id: persona.id, division_id: '', cargo: '', fecha_inicio: '', fecha_fin: '', estado_actual: false as boolean });
     const formInt = useForm({ persona_id: persona.id, tipo_contacto: '', fecha: new Date().toISOString().split('T')[0], comentario: '', licitacion_id: '' });
 
-    // Formulario de edición (Perfil Limitado)
+    // Formulario de edicion (Perfil Limitado)
     const formEdit = useForm({
         rut: persona.rut || '',
         nombre_1: persona.nombre_1 || '',
@@ -66,7 +66,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
             <Head title={`${persona.nombre_1} ${persona.apellido_1} - Perfil AVA`} />
 
             <PageContainer>
-                {/* Navegación */}
+                {/* Navegacion */}
                 <Link
                     href={route('personas.index')}
                     className="flex items-center gap-2 text-gray-500 hover:text-[#c1f75e] transition-colors text-[10px] font-black uppercase tracking-widest w-fit mb-2"
@@ -79,7 +79,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                     title={`Perfil de Contacto`}
                     subtitle={`RUT: ${formatRut(persona.rut)}`}
                     icon={User}
-                    actionLabel="Registrar Gestión"
+                    actionLabel="Registrar Gestion"
                     onActionClick={() => setIsInteraccionModalOpen(true)}
                 >
                     {/* Boton secundario para edicion de perfil */}
@@ -94,7 +94,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                    {/*  Perfil y trayectoria */}
+                    {/* Perfil y trayectoria */}
                     <div className="lg:col-span-8 space-y-8">
                         <ContentPanel>
                             <div className="flex flex-col md:flex-row items-center gap-8">
@@ -106,9 +106,31 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                                         <h2 className="text-2xl font-black uppercase tracking-tighter dark:text-white leading-tight">
                                             {persona.nombre_1} {persona.nombre_2} {persona.apellido_1} {persona.apellido_2}
                                         </h2>
-                                        <p className="text-[#c1f75e] text-[10px] font-black uppercase tracking-[0.2em] mt-1 italic">
-                                            {persona.trabajo_actual?.cargo || 'Sin cargo definido'}
-                                        </p>
+                                        
+                                        <div className="flex flex-col md:flex-row md:items-center gap-3 mt-2">
+                                            <p className="text-[#c1f75e] text-[10px] font-black uppercase tracking-[0.2em] italic">
+                                                {persona.trabajo_actual?.cargo || 'Sin cargo definido'}
+                                            </p>
+                                            
+                                            {/* Inserto: Valoracion Personal */}
+                                            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-white/5 px-2.5 py-1 rounded border border-gray-200 dark:border-gray-800 w-fit mx-auto md:mx-0">
+                                                <span className="text-[9px] font-black uppercase text-gray-500 tracking-wider">
+                                                    Reputacion:
+                                                </span>
+                                                <Star 
+                                                    size={12} 
+                                                    className={persona.promedio_estrellas && persona.promedio_estrellas > 0 
+                                                        ? "text-yellow-400 fill-yellow-400" 
+                                                        : "text-gray-300 dark:text-gray-700"} 
+                                                />
+                                                <span className={`text-[10px] font-bold font-mono ${!persona.promedio_estrellas ? 'text-gray-500' : 'text-gray-800 dark:text-gray-200'}`}>
+                                                    {persona.promedio_estrellas && persona.promedio_estrellas > 0 
+                                                        ? Number(persona.promedio_estrellas).toFixed(1)
+                                                        : 'S/N'
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="flex flex-wrap justify-center md:justify-start gap-3">
                                         <a href={`mailto:${persona.email}`} className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 px-4 py-2 rounded-lg text-[11px] font-bold border border-transparent hover:border-[#c1f75e]/30 transition-all">
@@ -159,7 +181,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                         </ContentPanel>
                     </div>
 
-                    {/* Bitácora y stats */}
+                    {/* Bitacora y stats */}
                     <div className="lg:col-span-4 space-y-8">
                         <div className="bg-[#c1f75e] rounded-2xl p-6 text-black shadow-lg shadow-[#c1f75e]/10">
                             <h4 className="text-[9px] font-black uppercase tracking-widest mb-4 opacity-70 italic">Actividad CRM</h4>
@@ -178,7 +200,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                         <ContentPanel>
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                                    <MessageSquare size={14} className="text-[#c1f75e]" /> Bitácora
+                                    <MessageSquare size={14} className="text-[#c1f75e]" /> Bitacora
                                 </h3>
                                 <Link href={route('personas.interacciones', persona.id)} className="text-[9px] font-black uppercase text-[#c1f75e] hover:underline">
                                     Ver Todo
@@ -228,13 +250,12 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                                 <X size={24} />
                             </button>
                             <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
-                                <MessageSquare className="text-[#c1f75e]" size={28} /> Nueva Gestión
+                                <MessageSquare className="text-[#c1f75e]" size={28} /> Nueva Gestion
                             </h2>
                             <form onSubmit={submitInteraccion} className="space-y-6">
                                 <div className="grid grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Canal de Contacto</label>
-                                        {/* CAMBIO AQUÍ: text-gray-900 dark:text-white */}
                                         <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e]" value={formInt.data.tipo_contacto} onChange={e => formInt.setData('tipo_contacto', e.target.value)} required>
                                             <option value="">Seleccionar...</option>
                                             <option value="Reunión Presencial">Reunión Presencial</option>
@@ -247,15 +268,13 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Fecha</label>
-                                        {/* CAMBIO AQUÍ: text-gray-900 dark:text-white */}
                                         <input type="date" className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e]" value={formInt.data.fecha} onChange={e => formInt.setData('fecha', e.target.value)} required />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Licitación Asociada</label>
-                                    {/* CAMBIO AQUÍ: text-gray-900 dark:text-white */}
+                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Licitacion Asociada</label>
                                     <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-4 text-gray-900 dark:text-white focus:ring-[#c1f75e]" value={formInt.data.licitacion_id} onChange={e => formInt.setData('licitacion_id', e.target.value)}>
-                                        <option value="">Sin licitación</option>
+                                        <option value="">Sin licitacion</option>
                                         {licitaciones?.map((lic: any) => <option key={lic.id} value={lic.id}>{lic.nombre_proyecto || lic.nombre}</option>)}
                                     </select>
                                 </div>
@@ -279,7 +298,7 @@ export default function PersonaShow({ persona, divisiones, licitaciones }: any) 
                             </h2>
                             <form onSubmit={submitExperiencia} className="space-y-5">
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Empresa / División</label>
+                                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Empresa / Division</label>
                                     <select className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 text-white focus:ring-[#c1f75e]" value={formExp.data.division_id} onChange={e => formExp.setData('division_id', e.target.value)} required>
                                         <option value="">Seleccionar...</option>
                                         {divisiones?.map((div: any) => <option key={div.id} value={div.id}>{div.empresa.nombre} — {div.nombre}</option>)}

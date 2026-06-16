@@ -48,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/licitaciones/{licitacion}/pipeline', [LicitacionController::class, 'updatePipeline'])
     ->name('licitaciones.update_pipeline');
 
+    Route::post('/licitaciones/{id}/cerrar', [LicitacionController::class, 'cerrarLicitacion'])->name('licitaciones.cerrar');
     // Ruta para cambiar  tablero kanban
     Route::put('/licitaciones/{licitacion}/pipeline', [LicitacionController::class, 'updatePipeline'])
     ->name('licitaciones.updatePipeline'); // <--- Revisa que se llame EXACTAMENTE así

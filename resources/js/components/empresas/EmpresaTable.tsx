@@ -1,4 +1,4 @@
-import { Building2, Briefcase, FileText, Users, Trash2, Edit3, LayoutGrid, Eye } from 'lucide-react';
+import { Building2, Briefcase, FileText, Users, Trash2, Edit3, LayoutGrid, Eye, Star } from 'lucide-react';
 import { Empresa } from '@/types/empresa';
 import { formatRut } from '@/utils/formatters';
 import { Link } from '@inertiajs/react';
@@ -51,10 +51,27 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                                         </div>
                                     </Link>
                                     
-                                    {/* Categoría */}
-                                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shrink-0 ${config.bgColor} ${config.color}`}>
-                                        {empresa.tipo}
-                                    </span>
+                                    {/* Etiquetas Superiores (Categoría y Reputación) */}
+                                    <div className="flex flex-col gap-1 items-end shrink-0">
+                                        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${config.bgColor} ${config.color}`}>
+                                            {empresa.tipo}
+                                        </span>
+                                        {/* Inserto de Reputación Móvil */}
+                                        <div className="flex items-center gap-1 bg-gray-50 dark:bg-white/[0.02] px-2 py-0.5 rounded border border-gray-100 dark:border-gray-800/50">
+                                            <Star 
+                                                size={10} 
+                                                className={empresa.promedio_estrellas && empresa.promedio_estrellas > 0 
+                                                    ? "text-yellow-400 fill-yellow-400" 
+                                                    : "text-gray-300 dark:text-gray-700"} 
+                                            />
+                                            <span className={`text-[9px] font-black uppercase tracking-wider ${!empresa.promedio_estrellas ? 'text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}>
+                                                {empresa.promedio_estrellas && empresa.promedio_estrellas > 0 
+                                                    ? empresa.promedio_estrellas.toFixed(1)
+                                                    : 'S/N'
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Botones de acción móviles estilizados */}
@@ -96,6 +113,8 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                             <th className="px-6 py-4">Empresa</th>
                             <th className="px-6 py-4 text-center">RUT</th>
                             <th className="px-6 py-4 text-center">Categoría</th>
+                            {/* Nueva cabecera de Reputación */}
+                            <th className="px-6 py-4 text-center">Reputación</th>
                             <th className="px-6 py-4 text-right">Acciones</th>
                         </tr>
                     </thead>
@@ -123,6 +142,25 @@ export default function EmpresasTable({ empresas, onEdit, onDelete }: Props) {
                                             <config.icon size={12} strokeWidth={3} /> {empresa.tipo}
                                         </span>
                                     </td>
+                                    
+                                    {/* Inserto de Reputación PC */}
+                                    <td className="px-6 py-4 text-center">
+                                        <div className="flex items-center justify-center gap-1.5">
+                                            <Star 
+                                                size={14} 
+                                                className={empresa.promedio_estrellas && empresa.promedio_estrellas > 0 
+                                                    ? "text-yellow-400 fill-yellow-400" 
+                                                    : "text-gray-300 dark:text-gray-700"} 
+                                            />
+                                            <span className={`text-xs font-bold ${!empresa.promedio_estrellas ? 'text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}>
+                                                {empresa.promedio_estrellas && empresa.promedio_estrellas > 0 
+                                                    ? empresa.promedio_estrellas.toFixed(1)
+                                                    : 'S/N'
+                                                }
+                                            </span>
+                                        </div>
+                                    </td>
+
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <Link 

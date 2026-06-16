@@ -63,12 +63,18 @@ class Empresa extends Model
     {
         return $this->hasMany(CompetenciaEnLicitacion::class, 'empresa_id');
     }
+// En app/Models/Empresa.php
 
-    /**
-     * Relación Polimórfica: Una empresa puede tener muchas notas internas.
-     */
-    public function notas()
+    public function evaluaciones()
     {
-        return $this->morphMany(Nota::class, 'notable');
+        return $this->hasMany(Evaluacion::class, 'empresa_id');
     }
+
+    public function getPromedioEstrellasAttribute()
+    {
+        $promedio = $this->evaluaciones()->avg('estrellas_empresa');
+        return $promedio ? round($promedio, 1) : 0;
+    }
+
+    protected $appends = ['promedio_estrellas'];
 }

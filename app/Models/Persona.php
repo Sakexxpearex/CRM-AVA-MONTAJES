@@ -59,10 +59,22 @@ class Persona extends Model
         return $this->hasMany(Interaccion::class, 'persona_id');
     }
 
-    public function notas()
+
+    public function evaluaciones()
     {
-        return $this->morphMany(Nota::class, 'notable');
+        return $this->hasMany(Evaluacion::class, 'persona_id');
     }
+
+    // 2. El cálculo al vuelo
+    public function getPromedioEstrellasAttribute()
+    {
+        // Calcula el promedio de la columna 'estrellas_persona' y lo redondea a 1 decimal
+        $promedio = $this->evaluaciones()->avg('estrellas_persona');
+        return $promedio ? round($promedio, 1) : 0; // Si no tiene notas, devuelve 0
+    }
+
+    // 3. Forzar a que Laravel envíe este dato a React siempre
+    protected $appends = ['promedio_estrellas'];
 
     // --- ACCESORIOS ---
 

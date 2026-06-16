@@ -40,6 +40,21 @@ class Division extends Model
             ])
             ->withTimestamps();
     }
+    // Relación con las evaluaciones de esa sucursal
+    public function evaluaciones()
+    {
+        return $this->hasMany(Evaluacion::class, 'division_id');
+    }
+
+    // Calcula el promedio de estrellas de la EMPRESA en esta división
+    public function getPromedioEstrellasAttribute()
+    {
+        $promedio = $this->evaluaciones()->avg('estrellas_empresa');
+        return $promedio ? round($promedio, 1) : 0;
+    }
+
+    // Fuerza a Laravel a enviar este dato siempre
+    protected $appends = ['promedio_estrellas'];
 
     // 4. Atributo para mostrar "Empresa - División" (Ej: Codelco - El Teniente)
     public function getNombreCompletoAttribute()

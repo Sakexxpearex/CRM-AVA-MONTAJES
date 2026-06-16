@@ -43,6 +43,7 @@ class EmpresaController extends Controller
 
     public function show(Empresa $empresa)
 {
+
     return Inertia::render('empresas/Show', [
         'empresa' => $empresa,
         'divisiones' => $empresa->divisiones()->withCount('personas')->get(),
