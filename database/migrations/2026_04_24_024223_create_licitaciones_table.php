@@ -12,9 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->onDelete('cascade');
             $table->foreignId('division_id')->constrained('divisiones')->onDelete('cascade');
-            
             $table->string('nombre_proyecto');
-            
+            $table->enum('certidumbre', ['C1', 'C2', 'C3'])->default('C3')->comment('Calificación de certeza inicial');
             $table->text('descripcion')->nullable(); // Para detallar el alcance del servicio
             $table->decimal('monto_estimado', 15, 2)->nullable(); // Ej: 1500000.50 (Vital para el CRM)
             $table->date('fecha_cierre')->nullable(); // Cuándo se debe entregar la propuesta

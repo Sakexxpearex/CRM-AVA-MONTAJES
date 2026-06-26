@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { X, Briefcase, Building2, DollarSign, Calendar, FileText } from 'lucide-react';
+import { X, Briefcase, DollarSign, Calendar, FileText, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function LicitacionModal({ isOpen, onClose, empresas, divisiones }: any) {
@@ -13,6 +13,7 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
         monto_estimado: '',
         descripcion: '',
         fecha_cierre: '',
+        certidumbre: '', // <--- Aquí ya lo tenías
     });
 
     useEffect(() => {
@@ -129,6 +130,8 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                                 onChange={e => setData('monto_estimado', e.target.value)}
                             />
                         </div>
+                        
+                        {/* Estado */}
                         <div className="space-y-1">
                             <label className="text-[10px] font-black uppercase text-gray-500 ml-1 italic">Estado en Pipeline</label>
                             <select 
@@ -137,7 +140,6 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                                 value={data.estado_pipeline}
                                 onChange={e => setData('estado_pipeline', e.target.value)}
                             >
-                            {/* Solo los valores de la migración*/}
                                 <option value="Evaluación">Evaluación</option>
                                 <option value="Preparación">Preparación</option>
                                 <option value="Adjudicada">Adjudicada</option>
@@ -146,6 +148,7 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                                 <option value="Presentada">Presentada</option>
                             </select>
                         </div>
+                        
                         {/* Fecha de cierre */}
                         <div className="space-y-1">
                             <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block tracking-widest">
@@ -157,6 +160,25 @@ export default function LicitacionModal({ isOpen, onClose, empresas, divisiones 
                                 value={data.fecha_cierre}
                                 onChange={e => setData('fecha_cierre', e.target.value)}
                             />
+                        </div>
+
+                        {/* NUEVO: Certidumbre (Agregado a la grilla) */}
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block tracking-widest flex items-center gap-1">
+                                <Target size={10} className="inline" /> Nivel Certidumbre
+                            </label>
+                            <select 
+                                required
+                                className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-md p-3 text-sm dark:text-white focus:ring-2 focus:ring-[#c1f75e] outline-none"
+                                value={data.certidumbre}
+                                onChange={e => setData('certidumbre', e.target.value)}
+                            >
+                                <option value="" disabled className="dark:bg-[#111]">Seleccionar...</option>
+                                <option value="C1">C1 - Alta Probabilidad</option>
+                                <option value="C2">C2 - Probabilidad Media</option>
+                                <option value="C3">C3 - Baja Probabilidad</option>
+                            </select>
+                            {errors.certidumbre && <p className="text-red-500 text-[10px] font-bold uppercase mt-1">{errors.certidumbre}</p>}
                         </div>
                     </div>
 

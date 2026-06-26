@@ -21,6 +21,7 @@ protected $fillable = [
         'descripcion', 
         'monto_estimado', 
         'monto_adjudicado', 
+        'certidumbre',
         'fecha_cierre', 
         'fecha_inicio', 
         'fecha_adjudicacion', 

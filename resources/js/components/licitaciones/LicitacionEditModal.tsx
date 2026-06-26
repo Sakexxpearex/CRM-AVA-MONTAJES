@@ -17,6 +17,8 @@ export default function LicitacionEditModal({
         monto_estimado: licitacion?.monto_estimado || '',
         descripcion: licitacion?.descripcion || '',
         fecha_cierre: licitacion?.fecha_cierre || '',
+        /* NUEVO: Inicializar certidumbre */
+        certidumbre: licitacion?.certidumbre || '',
     });
 
     useEffect(() => {
@@ -28,6 +30,8 @@ export default function LicitacionEditModal({
                 monto_estimado: licitacion.monto_estimado || '',
                 descripcion: licitacion.descripcion || '',
                 fecha_cierre: licitacion.fecha_cierre || '',
+                /* NUEVO: Actualizar certidumbre al abrir */
+                certidumbre: licitacion.certidumbre || '',
             });
         }
     }, [isOpen, licitacion]);
@@ -158,6 +162,25 @@ export default function LicitacionEditModal({
                             />
                             <InputError message={errors.fecha_cierre} />
                         </div>
+                    </div>
+
+                    {/* NUEVO: Campo de Certidumbre */}
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 ml-1 block tracking-wider">
+                            Nivel Certidumbre
+                        </label>
+                        <select
+                            className="w-full bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-lg text-sm p-3 dark:text-white focus:ring-1 focus:ring-[#c1f75e] outline-none cursor-pointer"
+                            value={data.certidumbre}
+                            onChange={(e) => setData('certidumbre', e.target.value)}
+                            required
+                        >
+                            <option value="" disabled className="dark:bg-[#111]">Seleccionar...</option>
+                            <option value="C1" className="dark:bg-[#111]">C1 - Alta Probabilidad</option>
+                            <option value="C2" className="dark:bg-[#111]">C2 - Probabilidad Media</option>
+                            <option value="C3" className="dark:bg-[#111]">C3 - Baja Probabilidad</option>
+                        </select>
+                        <InputError message={errors.certidumbre} />
                     </div>
 
                     <div className="space-y-1">

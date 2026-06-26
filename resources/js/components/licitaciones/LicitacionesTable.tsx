@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Eye, Building2, Calendar, DollarSign } from 'lucide-react';
+import { Eye, Building2, Calendar, DollarSign, Target } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
 import { formatDate } from '@/utils/formatters';
 
@@ -41,6 +41,15 @@ export default function LicitacionesTable({ licitaciones }: { licitaciones: any[
                                         {formatMoney(lic.monto_estimado)}
                                     </span>
                                 </div>
+                                
+                                {/* NUEVO: Certidumbre en Mobile (al centro) */}
+                                <div className="flex flex-col text-center">
+                                    <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Cert.</span>
+                                    <span className="text-[10px] font-bold dark:text-gray-300 uppercase">
+                                        {lic.certidumbre || '-'}
+                                    </span>
+                                </div>
+
                                 <div className="flex flex-col text-right">
                                     <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Cierre</span>
                                     <span className="text-[10px] font-bold dark:text-gray-300 uppercase">
@@ -64,6 +73,10 @@ export default function LicitacionesTable({ licitaciones }: { licitaciones: any[
                         <tr className="bg-gray-50 dark:bg-[#0A0A0A] text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-200 dark:border-gray-800">
                             <th className="px-6 py-4">Proyecto / Cliente</th>
                             <th className="px-6 py-4 text-center">Estado</th>
+                            
+                            {/* NUEVO: Cabecera Certidumbre en PC */}
+                            <th className="px-6 py-4 text-center">Cert.</th>
+                            
                             <th className="px-6 py-4 text-center">Monto Estimado</th>
                             <th className="px-6 py-4 text-center">Fecha Cierre</th>
                             <th className="px-6 py-4 text-right">Acciones</th>
@@ -85,6 +98,12 @@ export default function LicitacionesTable({ licitaciones }: { licitaciones: any[
                                 <td className="px-6 py-4 text-center">
                                     <EstadoBadge estado={lic.estado_pipeline} />
                                 </td>
+                                
+                                {/* NUEVO: Dato de Certidumbre en PC */}
+                                <td className="px-6 py-4 text-center font-bold text-xs dark:text-gray-300">
+                                    {lic.certidumbre || '-'}
+                                </td>
+
                                 <td className="px-6 py-4 text-center font-mono text-xs font-bold dark:text-gray-300">
                                     {formatMoney(lic.monto_estimado)}
                                 </td>
