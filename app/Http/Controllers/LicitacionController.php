@@ -88,6 +88,7 @@ public function index(Request $request)
             'monto_estimado'  => 'nullable|numeric',
             'descripcion'     => 'nullable|string',
             'fecha_cierre'    => 'nullable|date',
+            'certidumbre'     => 'required|string|in:C1,C2,C3', // <-- NUEVO
         ]);
 
         Licitacion::create($validated);
@@ -122,6 +123,7 @@ public function index(Request $request)
             'descripcion'      => 'nullable|string',
             'fecha_cierre'     => 'nullable|date',
             'estado_pipeline'  => 'nullable|in:Evaluación,Preparación,Presentada,Filtro,Adjudicada,Operativa,Perdida,Desierta', 
+            'certidumbre'      => 'required|string|in:C1,C2,C3', // <-- NUEVO
         ]);
 
         // Ya están las llaves correctamente alineadas aquí:
