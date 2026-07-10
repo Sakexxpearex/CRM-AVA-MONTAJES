@@ -13,6 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Railway/Render terminate TLS at their edge proxy and forward plain HTTP
+        // to the container. Without this, Laravel thinks every request is
+        // insecure and generates http:// asset/route URLs, which browsers then
+        // block as mixed content on an https:// page.
+        $middleware->trustProxies(at: '*');
+
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
