@@ -12,6 +12,12 @@ if [ "$RUN_MIGRATIONS" != "false" ]; then
     php artisan migrate --force
 fi
 
+# DatabaseSeeder uses updateOrCreate/firstOrCreate, safe to run on every boot.
+if [ "$RUN_SEED" != "false" ]; then
+    echo "Seeding demo data..."
+    php artisan db:seed --force
+fi
+
 php artisan storage:link || true
 
 echo "Starting server on port ${PORT:-8080}..."
